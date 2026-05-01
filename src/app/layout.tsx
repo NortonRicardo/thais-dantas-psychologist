@@ -5,8 +5,12 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'LEMM',
-  description: 'LEMM',
+  title: {
+    default: 'LEMM | Laboratório de Pesquisa Avançada',
+    template: '%s | LEMM',
+  },
+  description:
+    'Laboratório de pesquisa avançada em clima, IA e alta computação.',
   icons: {
     icon: '/favicon.png',
     apple: '/favicon.png',
@@ -16,7 +20,7 @@ export const metadata: Metadata = {
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
 })
 
 const cinzel = Cinzel({
@@ -30,7 +34,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en"
+      lang="pt-BR"
       className={`${inter.variable} ${cinzel.variable}`}
       suppressHydrationWarning
     >
