@@ -93,7 +93,7 @@ export function LabLanding() {
           <h1
             className={cn(
               'mb-8 w-full min-w-0 whitespace-normal font-black uppercase leading-[1.05] tracking-tight text-white lg:whitespace-nowrap',
-              'text-[clamp(1.55rem,4.5vw,3.25rem)] max-[900px]:text-[1.65rem]',
+              'text-[clamp(1.65rem,5vw,3.75rem)] max-[900px]:text-[1.8rem]',
               fontOrbitron
             )}
           >
