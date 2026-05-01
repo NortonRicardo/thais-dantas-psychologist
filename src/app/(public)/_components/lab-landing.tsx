@@ -69,13 +69,42 @@ export function LabLanding() {
         </header>
 
         <div
-          className="pointer-events-none absolute right-[12%] top-1/2 z-1 h-[450px] w-[450px] -translate-y-1/2 max-[900px]:right-[-50px] max-[900px]:h-[300px] max-[900px]:w-[300px] max-[900px]:opacity-20"
+          className="pointer-events-none absolute right-[12%] top-1/2 z-1 h-[300px] w-[300px] -translate-y-1/2 max-[900px]:right-[-50px] max-[900px]:h-[200px] max-[900px]:w-[200px] max-[900px]:opacity-20"
           aria-hidden
         >
-          <div className="absolute h-full w-full rounded-full border border-cyan-400/10" />
-          <div className="animate-lemm-orbit absolute h-full w-full will-change-transform">
-            <div className="absolute -top-2.5 left-1/2 size-5 -translate-x-1/2 rounded-full bg-[#00d4ff] shadow-[0_0_25px_#00d4ff,0_0_50px_rgba(0,212,255,0.4)]" />
-          </div>
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 100 100"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <defs>
+              <filter id="ball-glow" x="-150%" y="-150%" width="400%" height="400%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+                <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur2" />
+                <feMerge>
+                  <feMergeNode in="blur1" />
+                  <feMergeNode in="blur2" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <path
+              id="hex-path"
+              d="M50,5 L88.97,27.5 L88.97,72.5 L50,95 L11.03,72.5 L11.03,27.5 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="0.65"
+              strokeLinejoin="round"
+            />
+
+            <circle r="2.2" fill="#00d4ff" filter="url(#ball-glow)">
+              <animateMotion dur="8s" repeatCount="indefinite">
+                <mpath href="#hex-path" />
+              </animateMotion>
+            </circle>
+          </svg>
         </div>
 
         <div className="relative z-3 max-w-[850px] pt-14 max-[900px]:pt-12">
