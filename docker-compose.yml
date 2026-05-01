@@ -1,0 +1,27 @@
+name: lemm
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: lemm
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./bun.lock:/app/bun.lock
+      - ./next.config.ts:/app/next.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./postcss.config.mjs:/app/postcss.config.mjs
+      - ./components.json:/app/components.json
+    environment:
+      NODE_ENV: development
+      WATCHPACK_POLLING: 'true'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
