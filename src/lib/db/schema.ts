@@ -53,3 +53,19 @@ export const aboutTimelineEntries = pgTable('about_timeline_entries', {
 
 export type AboutTimelineEntry = typeof aboutTimelineEntries.$inferSelect
 export type NewAboutTimelineEntry = typeof aboutTimelineEntries.$inferInsert
+
+/** Parceiros da rede de colaboração (página Infraestrutura) */
+export const collaborationPartners = pgTable('collaboration_partners', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type CollaborationPartner = typeof collaborationPartners.$inferSelect
+export type NewCollaborationPartner = typeof collaborationPartners.$inferInsert

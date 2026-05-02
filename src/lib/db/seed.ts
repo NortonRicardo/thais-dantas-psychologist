@@ -1,5 +1,5 @@
 import { db } from './index'
-import { aboutTimelineEntries, events } from './schema'
+import { aboutTimelineEntries, collaborationPartners, events } from './schema'
 
 const seedEvents = [
   {
@@ -115,6 +115,26 @@ const seedAboutTimeline = [
   },
 ]
 
+const seedCollaborationPartners = [
+  {
+    name: 'INPE',
+    description: 'Modelagem climática, HPC e big data espacial',
+  },
+  {
+    name: 'UnB',
+    description: 'LAMFO (Finanças e IA) e projeto SEM FOGO',
+  },
+  {
+    name: 'UFCAT',
+    description: 'Cadeias agroindustriais, otimização e engenharia civil',
+  },
+  {
+    name: 'Furnas',
+    description:
+      'Variáveis climáticas, conservação do solo e regulação ambiental (2022–2024)',
+  },
+]
+
 async function main() {
   console.warn('🌱 Seeding events…')
   await db.delete(events)
@@ -125,6 +145,11 @@ async function main() {
   await db.delete(aboutTimelineEntries)
   await db.insert(aboutTimelineEntries).values(seedAboutTimeline)
   console.warn(`✅ ${seedAboutTimeline.length} marcos inseridos.`)
+
+  console.warn('🌱 Seeding rede de colaboração…')
+  await db.delete(collaborationPartners)
+  await db.insert(collaborationPartners).values(seedCollaborationPartners)
+  console.warn(`✅ ${seedCollaborationPartners.length} parceiros inseridos.`)
 
   process.exit(0)
 }

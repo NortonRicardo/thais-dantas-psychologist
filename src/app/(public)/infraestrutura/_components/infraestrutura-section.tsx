@@ -66,7 +66,17 @@ function PartnerCard({ name, desc }: { name: string; desc: string }) {
   )
 }
 
-export function InfraestruturaSection() {
+export type CollaborationPartnerPublic = {
+  id: string
+  name: string
+  description: string
+}
+
+type Props = {
+  partners: CollaborationPartnerPublic[]
+}
+
+export function InfraestruturaSection({ partners }: Props) {
   return (
     <div className="mt-10 flex h-full w-full flex-1 flex-col gap-10 pb-16">
       {/* Hardware atual */}
@@ -114,26 +124,19 @@ export function InfraestruturaSection() {
       </div>
 
       {/* Rede de parceiros */}
-      <div className="mt-auto pt-8 border-t border-white/10">
+      <div className="mt-auto border-t border-white/10 pt-8">
         <SectionTitle>Rede de colaboração</SectionTitle>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <PartnerCard
-            name="INPE"
-            desc="Modelagem climática, HPC e big data espacial"
-          />
-          <PartnerCard
-            name="UnB"
-            desc="LAMFO (Finanças e IA) e projeto SEM FOGO"
-          />
-          <PartnerCard
-            name="UFCAT"
-            desc="Cadeias agroindustriais, otimização e engenharia civil"
-          />
-          <PartnerCard
-            name="Furnas"
-            desc="Variáveis climáticas, conservação do solo e regulação ambiental (2022–2024)"
-          />
-        </div>
+        {partners.length === 0 ? (
+          <p className="text-sm text-white/35">
+            Rede de colaboração em atualização.
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {partners.map(p => (
+              <PartnerCard key={p.id} name={p.name} desc={p.description} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
