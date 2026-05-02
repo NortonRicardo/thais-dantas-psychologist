@@ -57,6 +57,11 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       updatedAt: new Date(),
     }
 
+    if (fd.get('removeImage') === 'true') {
+      patch.image         = null
+      patch.imageMimeType = null
+    }
+
     const imageFile = fd.get('image') as File | null
     if (imageFile && imageFile.size > 0) {
       patch.image         = Buffer.from(await imageFile.arrayBuffer())

@@ -15,7 +15,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return new NextResponse(row.image as unknown as BodyInit, {
     headers: {
       'Content-Type': row.imageMimeType ?? 'image/jpeg',
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': 'no-cache',
     },
   })
 }

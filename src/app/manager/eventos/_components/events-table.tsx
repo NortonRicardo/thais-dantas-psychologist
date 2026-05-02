@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { ImageIcon, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -88,22 +88,31 @@ export function EventsTable() {
         <EventDialog onSuccess={fetchEvents} />
       </div>
 
-      <div className="w-full overflow-x-auto rounded-xl border border-white/10 bg-white/[0.03]">
-        <Table className="min-w-[900px]">
+      <div
+        className="w-full overflow-x-auto rounded-xl"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
+        }}
+      >
+        <Table className="min-w-[1000px]">
           <TableHeader>
-            <TableRow className="border-white/10 hover:bg-transparent">
-              <TableHead className="text-white/50 w-[35%]">Título</TableHead>
-              <TableHead className="text-white/50">Tipo</TableHead>
-              <TableHead className="text-white/50 text-center">Data</TableHead>
-              <TableHead className="text-white/50">Palestrante</TableHead>
-              <TableHead className="text-white/50 text-center">Destaque</TableHead>
-              <TableHead className="text-white/50 text-right">Ações</TableHead>
+            <TableRow className="border-white/[0.07] hover:bg-transparent" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[35%]">Título</TableHead>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">Tipo</TableHead>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-center">Data</TableHead>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">Palestrante</TableHead>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-center">Destaque</TableHead>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {loading && Array.from({ length: 4 }).map((_, i) => (
-              <TableRow key={i} className="border-white/10">
+              <TableRow key={i} className="border-white/[0.07]">
                 {Array.from({ length: 6 }).map((_, j) => (
                   <TableCell key={j}><Skeleton className="h-4 w-full bg-white/10" /></TableCell>
                 ))}
@@ -111,7 +120,7 @@ export function EventsTable() {
             ))}
 
             {!loading && rows.length === 0 && (
-              <TableRow className="border-white/10 hover:bg-transparent">
+              <TableRow className="border-white/[0.07] hover:bg-transparent">
                 <TableCell colSpan={6} className="py-12 text-center text-sm text-white/30">
                   Nenhum evento cadastrado ainda.
                 </TableCell>
@@ -119,12 +128,30 @@ export function EventsTable() {
             )}
 
             {!loading && paged.map(row => (
-              <TableRow key={row.id} className="border-white/10 hover:bg-white/[0.03]">
+              <TableRow key={row.id} className="border-white/[0.07] transition-colors hover:bg-white/[0.04]">
                 <TableCell className="font-medium text-white/90">
-                  <span className="line-clamp-1">{row.title}</span>
-                  {row.organizer && (
-                    <span className="block text-[0.7rem] text-white/35 mt-0.5 line-clamp-1">{row.organizer}</span>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+                      {row.imageMimeType ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={`/api/events/${row.id}/image?t=${new Date(row.updatedAt).getTime()}`}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <ImageIcon size={14} className="text-white/20" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 max-w-[220px]">
+                      <span className="line-clamp-1 block truncate">{row.title}</span>
+                      {row.organizer && (
+                        <span className="block truncate text-[0.7rem] text-white/35 mt-0.5">{row.organizer}</span>
+                      )}
+                    </div>
+                  </div>
                 </TableCell>
 
                 <TableCell>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Pencil, Plus } from 'lucide-react'
+import { ImageIcon, Pencil, Plus, Trash2, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -24,12 +24,15 @@ export type EventRow = {
   meetLink: string | null
   featured: boolean
   imageMimeType: string | null
+  updatedAt: string
 }
 
 const EVENT_TYPES = [
   'Conferência', 'Workshop', 'Seminário', 'Desafio',
   'Minicurso', 'Defesa', 'Palestra', 'Mesa-Redonda', 'Encontro',
 ]
+
+const INPUT_CLS = 'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
 
 function toDatetimeLocal(iso: string) {
   const d = new Date(iso)
@@ -43,13 +46,44 @@ type Props = {
 }
 
 export function EventDialog({ event, onSuccess }: Props) {
-  const [open, setOpen]       = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [featured, setFeatured] = useState(event?.featured ?? false)
-  const [type, setType]       = useState(event?.type ?? '')
-  const fileRef               = useRef<HTMLInputElement>(null)
+  const [open, setOpen]           = useState(false)
+  const [loading, setLoading]     = useState(false)
+  const [featured, setFeatured]   = useState(event?.featured ?? false)
+  const [type, setType]           = useState(event?.type ?? '')
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [removeImage, setRemoveImage]   = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const isEdit = !!event
+
+  const existingImageUrl =
+    isEdit && event.imageMimeType && !removeImage
+      ? `/api/events/${event.id}/image?t=${new Date(event.updatedAt).getTime()}`
+      : null
+  const previewSrc = imagePreview ?? existingImageUrl
+
+  function handleOpenChange(newOpen: boolean) {
+    if (newOpen) {
+      setFeatured(event?.featured ?? false)
+      setType(event?.type ?? '')
+      setImagePreview(null)
+      setRemoveImage(false)
+    }
+    setOpen(newOpen)
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImagePreview(URL.createObjectURL(file))
+    setRemoveImage(false)
+  }
+
+  function handleRemoveImage() {
+    setImagePreview(null)
+    setRemoveImage(true)
+    if (fileRef.current) fileRef.current.value = ''
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -59,6 +93,7 @@ export function EventDialog({ event, onSuccess }: Props) {
     const fd   = new FormData(form)
     fd.set('featured', String(featured))
     fd.set('type', type)
+    if (removeImage) fd.set('removeImage', 'true')
 
     const url    = isEdit ? `/api/events/${event.id}` : '/api/events'
     const method = isEdit ? 'PUT' : 'POST'
@@ -78,7 +113,7 @@ export function EventDialog({ event, onSuccess }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {isEdit ? (
           <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-sky-400 hover:bg-sky-400/10">
@@ -103,37 +138,25 @@ export function EventDialog({ event, onSuccess }: Props) {
           {/* Title */}
           <div className="grid gap-1.5">
             <Label htmlFor="title" className="text-white/70">Título *</Label>
-            <Input
-              id="title" name="title" required
-              defaultValue={event?.title}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30"
-            />
+            <Input id="title" name="title" required defaultValue={event?.title} className={INPUT_CLS} />
           </div>
 
           {/* Description */}
           <div className="grid gap-1.5">
             <Label htmlFor="description" className="text-white/70">Descrição *</Label>
-            <Textarea
-              id="description" name="description" required rows={3}
-              defaultValue={event?.description}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30 resize-none"
-            />
+            <Textarea id="description" name="description" required rows={3} defaultValue={event?.description} className={`${INPUT_CLS} resize-none`} />
           </div>
 
           {/* Date + Type */}
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
               <Label htmlFor="date" className="text-white/70">Data e hora *</Label>
-              <Input
-                id="date" name="date" type="datetime-local" required
-                defaultValue={event?.date ? toDatetimeLocal(event.date) : ''}
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-0 focus-visible:border-white/30 [color-scheme:dark]"
-              />
+              <Input id="date" name="date" type="datetime-local" required defaultValue={event?.date ? toDatetimeLocal(event.date) : ''} className={`${INPUT_CLS} [color-scheme:dark]`} />
             </div>
             <div className="grid gap-1.5">
               <Label className="text-white/70">Tipo *</Label>
               <Select value={type} onValueChange={setType} required>
-                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-[#00d4ff]/40">
+                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
                   <SelectValue placeholder="Selecionar…" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#071525] border-white/10 text-white">
@@ -149,19 +172,11 @@ export function EventDialog({ event, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
               <Label htmlFor="speaker" className="text-white/70">Palestrante</Label>
-              <Input
-                id="speaker" name="speaker"
-                defaultValue={event?.speaker ?? ''}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30"
-              />
+              <Input id="speaker" name="speaker" defaultValue={event?.speaker ?? ''} className={INPUT_CLS} />
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="organizer" className="text-white/70">Organização</Label>
-              <Input
-                id="organizer" name="organizer"
-                defaultValue={event?.organizer ?? ''}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30"
-              />
+              <Input id="organizer" name="organizer" defaultValue={event?.organizer ?? ''} className={INPUT_CLS} />
             </div>
           </div>
 
@@ -169,32 +184,59 @@ export function EventDialog({ event, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
               <Label htmlFor="link" className="text-white/70">Link (saiba mais)</Label>
-              <Input
-                id="link" name="link" type="url" placeholder="https://…"
-                defaultValue={event?.link ?? ''}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30"
-              />
+              <Input id="link" name="link" type="url" placeholder="https://…" defaultValue={event?.link ?? ''} className={INPUT_CLS} />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="meetLink" className="text-white/70">Link da sala (Meet / Teams)</Label>
-              <Input
-                id="meetLink" name="meetLink" type="url" placeholder="https://…"
-                defaultValue={event?.meetLink ?? ''}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30"
-              />
+              <Label htmlFor="meetLink" className="text-white/70">Link da sala</Label>
+              <Input id="meetLink" name="meetLink" type="url" placeholder="https://…" defaultValue={event?.meetLink ?? ''} className={INPUT_CLS} />
             </div>
           </div>
 
           {/* Image */}
           <div className="grid gap-1.5">
-            <Label htmlFor="image" className="text-white/70">
-              Imagem {event?.imageMimeType && <span className="text-[#00d4ff]">(atual: {event.imageMimeType})</span>}
-            </Label>
-            <Input
+            <Label className="text-white/70">Imagem</Label>
+
+            <input
               ref={fileRef}
               id="image" name="image" type="file" accept="image/*"
-              className="bg-white/5 border-white/10 text-white/70 file:text-white/60 file:bg-white/5 file:border-0 file:rounded file:px-2 file:py-1 file:text-xs focus-visible:ring-0 focus-visible:border-white/30"
+              className="hidden"
+              onChange={handleFileChange}
             />
+
+            {previewSrc ? (
+              <div className="group relative h-44 w-full overflow-hidden rounded-lg border border-white/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewSrc} alt="Preview" className="h-full w-full object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
+                    title="Trocar imagem"
+                  >
+                    <Upload size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-500/20 text-rose-300 transition hover:bg-rose-500/40 hover:text-rose-200"
+                    title="Remover imagem"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-white/15 bg-white/[0.02] transition hover:border-white/30 hover:bg-white/[0.05]"
+              >
+                <ImageIcon size={22} className="text-white/25" />
+                <span className="text-sm text-white/40">Clique para selecionar</span>
+                <span className="text-xs text-white/20">PNG · JPG · WEBP</span>
+              </button>
+            )}
           </div>
 
           {/* Featured */}
@@ -210,17 +252,10 @@ export function EventDialog({ event, onSuccess }: Props) {
 
           {/* Actions */}
           <div className="flex justify-end gap-3 border-t border-white/10 pt-4">
-            <Button
-              type="button" variant="ghost"
-              className="text-white/50 hover:text-white hover:bg-white/5"
-              onClick={() => setOpen(false)}
-            >
+            <Button type="button" variant="ghost" className="text-white/50 hover:text-white hover:bg-white/5" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button
-              type="submit" disabled={loading || !type}
-              className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
-            >
+            <Button type="submit" disabled={loading || !type} className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50">
               {loading ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar evento'}
             </Button>
           </div>
