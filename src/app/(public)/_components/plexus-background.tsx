@@ -2,19 +2,20 @@
 
 import { useEffect, useRef } from 'react'
 
-const settings = {
+const baseSettings = {
   countMin: 100,
   countMax: 300,
   speed: 0.18,
   /** >1 concentra mais pontos (e linhas) à direita: x = w * (1 - (1-u)^skew). */
   rightDensitySkew: 1.75,
-  color: '255, 120, 0',
   reachRatio: 0.15,
   minSeparationRatio: 0.05,
   lineOpacityMax: 0.22,
   dotOpacity: 0.6,
   lineWidth: 0.6,
 } as const
+
+const defaultNetworkColor = '255, 120, 0' as const
 
 type Particle = { x: number; y: number; vx: number; vy: number; size: number }
 
@@ -23,8 +24,8 @@ function particleCountForSize(w: number, h: number) {
   const ref = 420
   const t = Math.max(1, m / ref)
   return Math.min(
-    settings.countMax,
-    Math.max(settings.countMin, Math.round(settings.countMin * t))
+    baseSettings.countMax,
+    Math.max(baseSettings.countMin, Math.round(baseSettings.countMin * t))
   )
 }
 
@@ -34,13 +35,13 @@ function minSeparationForCount(
   countMin: number
 ) {
   const t =
-    (count - countMin) / Math.max(1, settings.countMax - settings.countMin)
+    (count - countMin) / Math.max(1, baseSettings.countMax - baseSettings.countMin)
   return Math.max(0.03, baseRatio * (1 - 0.2 * t))
 }
 
 function rectLayout(w: number, h: number) {
   const maxDim = Math.max(w, h)
-  const reach = Math.max(25, Math.round(maxDim * settings.reachRatio))
+  const reach = Math.max(25, Math.round(maxDim * baseSettings.reachRatio))
   return { width: w, height: h, reach }
 }
 
@@ -48,6 +49,11 @@ function rectLayout(w: number, h: number) {
 function randomXRightHeavy(w: number, skew: number) {
   const u = Math.random()
   return w * (1 - Math.pow(1 - u, skew))
+}
+
+type PlexusBackgroundProps = {
+  /** Cor RGB da rede, ex.: `"0, 212, 255"` (cyan) ou padrão laranja. */
+  networkColor?: string
 }
 
 function bounceOffEdges(p: Particle, w: number, h: number) {
@@ -63,7 +69,9 @@ function bounceOffEdges(p: Particle, w: number, h: number) {
   }
 }
 
-export function PlexusBackground() {
+export function PlexusBackground({
+  networkColor = defaultNetworkColor,
+}: PlexusBackgroundProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -75,6 +83,7 @@ export function PlexusBackground() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    const colorRgb = networkColor
     const wrapEl = wrapper
     const canvasEl = canvas
     const drawCtx = ctx
@@ -100,9 +109,9 @@ export function PlexusBackground() {
       const { width: w, height: h } = rectLayout(width, height)
       const count = particleCountForSize(width, height)
       const minRatio = minSeparationForCount(
-        settings.minSeparationRatio,
+        baseSettings.minSeparationRatio,
         count,
-        settings.countMin
+        baseSettings.countMin
       )
       const minD = Math.max(width, height) * minRatio
       particles = []
@@ -111,7 +120,7 @@ export function PlexusBackground() {
         let y = 0
         let guard = 0
         while (guard < 100) {
-          x = randomXRightHeavy(w, settings.rightDensitySkew)
+          x = randomXRightHeavy(w, baseSettings.rightDensitySkew)
           y = Math.random() * h
           const ok = particles.every(p => Math.hypot(p.x - x, p.y - y) >= minD)
           if (ok) break
@@ -120,8 +129,8 @@ export function PlexusBackground() {
         particles.push({
           x,
           y,
-          vx: (Math.random() - 0.5) * settings.speed,
-          vy: (Math.random() - 0.5) * settings.speed,
+          vx: (Math.random() - 0.5) * baseSettings.speed,
+          vy: (Math.random() - 0.5) * baseSettings.speed,
           size: Math.random() * 1.2 + 1,
         })
       }
@@ -155,8 +164,8 @@ export function PlexusBackground() {
           const dist = Math.hypot(p.x - p2.x, p.y - p2.y)
           if (dist < reach) {
             const opacity = 1 - dist / reach
-            drawCtx.strokeStyle = `rgba(${settings.color}, ${opacity * settings.lineOpacityMax})`
-            drawCtx.lineWidth = settings.lineWidth
+            drawCtx.strokeStyle = `rgba(${colorRgb}, ${opacity * baseSettings.lineOpacityMax})`
+            drawCtx.lineWidth = baseSettings.lineWidth
             drawCtx.beginPath()
             drawCtx.moveTo(p.x, p.y)
             drawCtx.lineTo(p2.x, p2.y)
@@ -166,7 +175,7 @@ export function PlexusBackground() {
       }
 
       for (const p of particles) {
-        drawCtx.fillStyle = `rgba(${settings.color}, ${settings.dotOpacity})`
+        drawCtx.fillStyle = `rgba(${colorRgb}, ${baseSettings.dotOpacity})`
         drawCtx.beginPath()
         drawCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         drawCtx.fill()
@@ -189,7 +198,7 @@ export function PlexusBackground() {
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [])
+  }, [networkColor])
 
   return (
     <div
@@ -199,7 +208,10 @@ export function PlexusBackground() {
     >
       <canvas
         ref={canvasRef}
-        className="block h-full w-full filter-[drop-shadow(0_0_14px_rgba(255,120,0,0.45))]"
+        className="block h-full w-full"
+        style={{
+          filter: `drop-shadow(0 0 14px rgba(${networkColor}, 0.45))`,
+        }}
       />
     </div>
   )

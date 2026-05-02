@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { Orbitron } from 'next/font/google'
 
 import { cn } from '@/lib/utils'
 
+import { LabPublicHeader } from './lab-public-header'
 import { PlexusBackground } from './plexus-background'
 
 const orbitron = Orbitron({
@@ -10,15 +10,6 @@ const orbitron = Orbitron({
   weight: ['400', '700', '900'],
   variable: '--font-orbitron',
 })
-
-const navItems = [
-  { href: '#', label: 'Projetos' },
-  { href: '#', label: 'Eventos' },
-  { href: '#', label: 'Data SheLeads' },
-  { href: '#', label: 'Sobre Nós' },
-  { href: '#', label: 'Infraestrutura' },
-  { href: '#', label: 'Contato' },
-] as const
 
 const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'
 
@@ -48,30 +39,7 @@ export function LabLanding() {
           aria-hidden
         />
 
-        <header className="absolute left-0 top-0 z-10 flex w-full items-center justify-between px-[8%] py-10 max-[900px]:px-[6%] max-[900px]:py-6">
-          <div
-            className={cn(
-              'text-2xl font-black tracking-[6px] text-white [text-shadow:0_0_10px_rgba(255,255,255,0.3)]',
-              fontOrbitron
-            )}
-          >
-            LEMM
-          </div>
-          <nav className="max-[900px]:hidden" aria-label="Navegação principal">
-            <ul className="m-0 flex list-none gap-6 p-0 lg:gap-10">
-              {navItems.map(({ href, label }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="text-[0.85rem] font-normal uppercase tracking-[2px] text-[#8892b0] transition-[color,text-shadow] duration-300 hover:text-[#00d4ff] hover:[text-shadow:0_0_8px_rgba(0,212,255,0.6)]"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
+        <LabPublicHeader variant="absolute" />
 
         <div className="relative z-6 max-w-[850px] pt-14 max-[900px]:pt-12">
           <p
