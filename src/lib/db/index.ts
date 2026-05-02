@@ -1,13 +1,13 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
 import * as schema from './schema'
 
-// Reuse connection pool across hot-reloads in development
-const globalForDb = globalThis as unknown as { pool?: Pool }
+const globalForDb = globalThis as unknown as { client?: postgres.Sql }
 
-const pool =
-  globalForDb.pool ?? new Pool({ connectionString: process.env.DATABASE_URL })
+const client =
+  globalForDb.client ??
+  postgres(process.env.DATABASE_URL!, { max: 10 })
 
-if (process.env.NODE_ENV !== 'production') globalForDb.pool = pool
+if (process.env.NODE_ENV !== 'production') globalForDb.client = client
 
-export const db = drizzle(pool, { schema })
+export const db = drizzle(client, { schema })

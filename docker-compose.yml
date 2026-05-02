@@ -18,6 +18,8 @@ services:
       - ./components.json:/app/components.json
       - ./drizzle.config.ts:/app/drizzle.config.ts
       - ./drizzle:/app/drizzle
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
       WATCHPACK_POLLING: 'true'

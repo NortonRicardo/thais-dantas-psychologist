@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { ManagerView } from './_components/manager-view'
+import { ManagerView } from '../_components/manager-view'
 
 export const metadata: Metadata = {
   title: 'Gestor | LEMM',

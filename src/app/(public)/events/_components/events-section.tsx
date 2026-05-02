@@ -1,6 +1,3 @@
-'use client'
-
-import Image from 'next/image'
 import {
   CalendarDays,
   ExternalLink,
@@ -9,7 +6,6 @@ import {
   Users,
   Video,
 } from 'lucide-react'
-import { events, type Event } from './events-data'
 
 const glass = {
   background:
@@ -20,57 +16,119 @@ const glass = {
   boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
 } as const
 
-const typeColor: Record<Event['type'], string> = {
-  Conferência: 'rgba(0,180,255,0.18)',
-  Workshop: 'rgba(160,0,255,0.18)',
-  Seminário: 'rgba(0,200,120,0.18)',
-  Desafio: 'rgba(255,140,0,0.18)',
-  Minicurso: 'rgba(0,160,255,0.18)',
-  Defesa: 'rgba(255,60,100,0.18)',
+const TYPE_COLOR: Record<string, { bg: string; border: string; text: string }> =
+  {
+    Conferência: {
+      bg: 'rgba(0,180,255,0.18)',
+      border: 'rgba(0,180,255,0.35)',
+      text: 'rgb(100,210,255)',
+    },
+    Workshop: {
+      bg: 'rgba(160,0,255,0.18)',
+      border: 'rgba(160,0,255,0.35)',
+      text: 'rgb(210,130,255)',
+    },
+    Seminário: {
+      bg: 'rgba(0,200,120,0.18)',
+      border: 'rgba(0,200,120,0.35)',
+      text: 'rgb(80,220,150)',
+    },
+    Desafio: {
+      bg: 'rgba(255,140,0,0.18)',
+      border: 'rgba(255,140,0,0.35)',
+      text: 'rgb(255,180,60)',
+    },
+    Minicurso: {
+      bg: 'rgba(0,160,255,0.18)',
+      border: 'rgba(0,160,255,0.35)',
+      text: 'rgb(80,190,255)',
+    },
+    Defesa: {
+      bg: 'rgba(255,60,100,0.18)',
+      border: 'rgba(255,60,100,0.35)',
+      text: 'rgb(255,100,130)',
+    },
+    Palestra: {
+      bg: 'rgba(0,210,200,0.18)',
+      border: 'rgba(0,210,200,0.35)',
+      text: 'rgb(80,230,220)',
+    },
+    'Mesa-Redonda': {
+      bg: 'rgba(255,200,0,0.18)',
+      border: 'rgba(255,200,0,0.35)',
+      text: 'rgb(255,220,80)',
+    },
+    Encontro: {
+      bg: 'rgba(0,200,100,0.18)',
+      border: 'rgba(0,200,100,0.35)',
+      text: 'rgb(60,220,140)',
+    },
+  }
+const FALLBACK_COLOR = {
+  bg: 'rgba(255,255,255,0.08)',
+  border: 'rgba(255,255,255,0.2)',
+  text: 'rgba(255,255,255,0.6)',
 }
-const typeBorder: Record<Event['type'], string> = {
-  Conferência: 'rgba(0,180,255,0.35)',
-  Workshop: 'rgba(160,0,255,0.35)',
-  Seminário: 'rgba(0,200,120,0.35)',
-  Desafio: 'rgba(255,140,0,0.35)',
-  Minicurso: 'rgba(0,160,255,0.35)',
-  Defesa: 'rgba(255,60,100,0.35)',
+
+export type PublicEvent = {
+  id: string
+  title: string
+  description: string
+  date: string
+  type: string
+  speaker: string | null
+  organizer: string | null
+  link: string | null
+  meetLink: string | null
+  featured: boolean
+  imageMimeType: string | null
+  updatedAt: string
 }
-const typeText: Record<Event['type'], string> = {
-  Conferência: 'rgb(100,210,255)',
-  Workshop: 'rgb(210,130,255)',
-  Seminário: 'rgb(80,220,150)',
-  Desafio: 'rgb(255,180,60)',
-  Minicurso: 'rgb(80,190,255)',
-  Defesa: 'rgb(255,100,130)',
-}
+
+const MONTHS = [
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
+]
 
 function formatDate(iso: string) {
   const d = new Date(iso)
-  return d.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+  const dd = String(d.getUTCDate()).padStart(2, '0')
+  const mon = MONTHS[d.getUTCMonth()]
+  const yr = d.getUTCFullYear()
+  return `${dd} ${mon} ${yr}`
 }
-
 function formatTime(iso: string) {
   const d = new Date(iso)
-  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  const hh = String(d.getUTCHours()).padStart(2, '0')
+  const mm = String(d.getUTCMinutes()).padStart(2, '0')
+  return `${hh}:${mm}`
 }
-
 function isPast(iso: string) {
   return new Date(iso) < new Date()
 }
+function imageUrl(event: PublicEvent) {
+  return `/api/events/${event.id}/image?t=${new Date(event.updatedAt).getTime()}`
+}
 
-function TypeBadge({ type }: { type: Event['type'] }) {
+function TypeBadge({ type }: { type: string }) {
+  const c = TYPE_COLOR[type] ?? FALLBACK_COLOR
   return (
     <span
       className="rounded-full px-2.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[2px]"
       style={{
-        background: typeColor[type],
-        border: `1px solid ${typeBorder[type]}`,
-        color: typeText[type],
+        background: c.bg,
+        border: `1px solid ${c.border}`,
+        color: c.text,
       }}
     >
       {type}
@@ -78,17 +136,17 @@ function TypeBadge({ type }: { type: Event['type'] }) {
   )
 }
 
-function FeaturedCard({ event }: { event: Event }) {
+function FeaturedCard({ event }: { event: PublicEvent }) {
   const past = isPast(event.date)
   return (
     <div className="relative overflow-hidden rounded-3xl" style={glass}>
-      {event.image && (
+      {event.imageMimeType && (
         <div className="absolute inset-0">
-          <Image
-            src={event.image}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageUrl(event)}
             alt=""
-            fill
-            className="object-cover opacity-15"
+            className="h-full w-full object-cover opacity-15"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#050a0f]/95 via-[#050a0f]/70 to-transparent" />
         </div>
@@ -162,7 +220,7 @@ function FeaturedCard({ event }: { event: Event }) {
   )
 }
 
-function EventCard({ event }: { event: Event }) {
+function EventCard({ event }: { event: PublicEvent }) {
   const past = isPast(event.date)
   return (
     <div
@@ -188,7 +246,6 @@ function EventCard({ event }: { event: Event }) {
       </div>
 
       <div className="mt-auto flex items-center gap-4 border-t border-white/10 pt-4">
-        {/* Coluna 1 — metadados alinhados à esquerda */}
         <div className="flex flex-1 flex-col gap-1.5 text-[0.68rem] text-white/40">
           <span className="flex items-center gap-1.5">
             <CalendarDays size={11} strokeWidth={1.5} />
@@ -196,14 +253,12 @@ function EventCard({ event }: { event: Event }) {
           </span>
           {event.speaker && (
             <span className="flex items-center gap-1.5">
-              <Mic size={11} strokeWidth={1.5} />
-              {event.speaker}
+              <Mic size={11} strokeWidth={1.5} /> {event.speaker}
             </span>
           )}
           {event.organizer && (
             <span className="flex items-center gap-1.5">
-              <Users size={11} strokeWidth={1.5} />
-              {event.organizer}
+              <Users size={11} strokeWidth={1.5} /> {event.organizer}
             </span>
           )}
           {event.link && (
@@ -218,7 +273,6 @@ function EventCard({ event }: { event: Event }) {
           )}
         </div>
 
-        {/* Coluna 2 — botão centralizado */}
         {event.meetLink && (
           <div className="flex shrink-0 items-center justify-center">
             <a
@@ -236,20 +290,20 @@ function EventCard({ event }: { event: Event }) {
   )
 }
 
-export function EventsSection() {
+type Props = { events: PublicEvent[] }
+
+export function EventsSection({ events }: Props) {
   const featured = events.find(e => e.featured)
   const rest = events
-    .filter(e => !e.featured)
+    .filter(e => e.id !== featured?.id)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   const upcoming = rest.filter(e => !isPast(e.date))
   const past = rest.filter(e => isPast(e.date))
 
   return (
     <div className="mt-8 flex w-full flex-col gap-10 pb-16">
-      {/* Destaque */}
       {featured && <FeaturedCard event={featured} />}
 
-      {/* Próximos */}
       {upcoming.length > 0 && (
         <div>
           <p className="mb-5 text-sm font-semibold uppercase tracking-[3px] text-white/50">
@@ -263,7 +317,6 @@ export function EventsSection() {
         </div>
       )}
 
-      {/* Passados */}
       {past.length > 0 && (
         <div>
           <p className="mb-5 text-sm font-semibold uppercase tracking-[3px] text-white/30">
@@ -275,6 +328,12 @@ export function EventsSection() {
             ))}
           </div>
         </div>
+      )}
+
+      {events.length === 0 && (
+        <p className="mt-12 text-center text-sm text-white/30">
+          Nenhum evento cadastrado ainda.
+        </p>
       )}
     </div>
   )
