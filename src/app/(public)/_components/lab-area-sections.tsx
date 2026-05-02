@@ -12,14 +12,26 @@ const orbitron = Orbitron({
 
 const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'
 
-/** Escurecimento uniforme + gradiente horizontal (escuro no lado do texto). */
+/** Escurecimento uniforme original + gradiente horizontal dramático (escuro no lado do texto). */
 const overlayScrim = 'rgba(5,10,15,0.58)'
 const overlayGradientLeft =
-  'linear-gradient(90deg,rgba(5,10,15,0.97)_0%,rgba(5,10,15,0.78)_42%,rgba(5,10,15,0.58)_100%)'
+  'linear-gradient(90deg,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.75) 35%,rgba(0,0,0,0.25) 65%,transparent 100%)'
 const overlayGradientRight =
-  'linear-gradient(90deg,rgba(5,10,15,0.58)_0%,rgba(5,10,15,0.78)_58%,rgba(5,10,15,0.97)_100%)'
+  'linear-gradient(90deg,transparent 0%,rgba(0,0,0,0.25) 35%,rgba(0,0,0,0.75) 65%,rgba(0,0,0,0.92) 100%)'
 
 const areas = [
+  {
+    id: 'area8',
+    imageSrc:
+      'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070',
+    imageAlt: 'Laboratório e equipamentos — formação de recursos humanos',
+    tag: 'Educação & Pesquisa',
+    title: 'Formação de Recursos Humanos',
+    description:
+      'Integração estruturada entre graduação e pós-graduação, formando novos talentos em ciência de dados e modelagem avançada.',
+    cta: 'NOSSA EQUIPE',
+    href: '#',
+  },
   {
     id: 'area1',
     imageSrc:
@@ -42,18 +54,6 @@ const areas = [
     description:
       'Desenvolvimento de arquiteturas Transformers, modelos híbridos (IA + Física) e fluxos de RAG para recuperação de informação científica qualificada.',
     cta: 'VER MODELOS',
-    href: '#',
-  },
-  {
-    id: 'area3',
-    imageSrc: '/data-center.png',
-    imageAlt:
-      'Data center e infraestrutura — computação de alto desempenho no LEMM',
-    tag: 'Alta Performance',
-    title: 'Computação de Alto Desempenho (HPC)',
-    description:
-      'Infraestrutura multiusuária escalável para processamento de Big Data espacial e treinamento intensivo em GPU para modelos complexos.',
-    cta: 'INFRAESTRUTURA',
     href: '#',
   },
   {
@@ -94,8 +94,7 @@ const areas = [
   },
   {
     id: 'area7',
-    imageSrc:
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2000',
+    imageSrc: '/system.png',
     imageAlt: 'Interface digital — plataformas e produtos tecnológicos',
     tag: 'Produtos Digitais',
     title: 'Plataformas e Produtos Tecnológicos',
@@ -105,15 +104,15 @@ const areas = [
     href: '#',
   },
   {
-    id: 'area8',
-    imageSrc:
-      'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070',
-    imageAlt: 'Laboratório e equipamentos — formação de recursos humanos',
-    tag: 'Educação & Pesquisa',
-    title: 'Formação de Recursos Humanos',
+    id: 'area3',
+    imageSrc: '/data-center.png',
+    imageAlt:
+      'Data center e infraestrutura — computação de alto desempenho no LEMM',
+    tag: 'Alta Performance',
+    title: 'Computação de Alto Desempenho (HPC)',
     description:
-      'Integração estruturada entre graduação e pós-graduação, formando novos talentos em ciência de dados e modelagem avançada.',
-    cta: 'NOSSA EQUIPE',
+      'Infraestrutura multiusuária escalável para processamento de Big Data espacial e treinamento intensivo em GPU para modelos complexos.',
+    cta: 'INFRAESTRUTURA',
     href: '#',
   },
 ] as const
