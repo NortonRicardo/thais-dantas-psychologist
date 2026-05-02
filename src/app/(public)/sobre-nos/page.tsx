@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { PublicPageShell } from '../_components/public-page-shell'
+import { Timeline } from './_components/timeline'
 
 export const metadata: Metadata = {
   title: 'Sobre Nós | LEMM',
@@ -13,7 +14,8 @@ export default function SobreNosPage() {
     <PublicPageShell
       aria-label="Sobre o LEMM"
       title="Sobre Nós"
-      lead="Missão, equipe e histórico do laboratório — página em construção."
+      lead="Fundado em 2016 na PUC Goiás, o LEMM articula modelagem matemática, inteligência artificial, HPC e ciência de dados em pesquisa aplicada ao clima, otimização e inovação tecnológica."
+      fullWidthContent={<Timeline />}
     />
   )
 }
