@@ -68,13 +68,20 @@ export function LabLanding() {
           </nav>
         </header>
 
+        {/*
+          5 hexágonos pontudos R=40. Linha central: cx1=45 cx2=114.28 cx3=183.56 cy=50.
+          Diagonal superior-direita (adj. Hex3): centro (218.20, -10).
+          Diagonal inferior-esquerda (adj. Hex1): centro (10.36, 110).
+          Espaçamento horizontal = R×√3 ≈ 69.28; diagonal: Δx=34.64 Δy=60.
+          ViewBox expandido: -28 -54 285 208 para conter os dois novos hexágonos.
+        */}
         <div
-          className="pointer-events-none absolute right-[12%] top-1/2 z-1 h-[300px] w-[300px] -translate-y-1/2 max-[900px]:right-[-50px] max-[900px]:h-[200px] max-[900px]:w-[200px] max-[900px]:opacity-20"
+          className="pointer-events-none absolute right-[8%] top-1/2 z-1 h-[380px] w-[520px] -translate-y-1/2 max-[900px]:right-[-100px] max-[900px]:h-[240px] max-[900px]:w-[328px] max-[900px]:opacity-20"
           aria-hidden
         >
           <svg
             className="absolute inset-0 h-full w-full"
-            viewBox="0 0 100 100"
+            viewBox="-28 -54 285 208"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden
@@ -91,17 +98,79 @@ export function LabLanding() {
               </filter>
             </defs>
 
+            {/* Hexágono topo-direita — aresta compartilhada com Hex3: (183.56,10)→(218.20,30) */}
             <path
-              id="hex-path"
-              d="M50,5 L88.97,27.5 L88.97,72.5 L50,95 L11.03,72.5 L11.03,27.5 Z"
+              d="M218.20,-50 L252.84,-30 L252.84,10 L218.20,30 L183.56,10 L183.56,-30 Z"
               stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="0.65"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+
+            {/* Hexágono à esquerda do topo-direita — adj. a TR, Hex2 e Hex3 */}
+            <path
+              d="M148.92,-50 L183.56,-30 L183.56,10 L148.92,30 L114.28,10 L114.28,-30 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+
+            {/* Hexágono esquerdo */}
+            <path
+              d="M45,10 L79.64,30 L79.64,70 L45,90 L10.36,70 L10.36,30 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+
+            {/* Hexágono central */}
+            <path
+              d="M114.28,10 L148.92,30 L148.92,70 L114.28,90 L79.64,70 L79.64,30 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+
+            {/*
+              Trilha invisível para a bolinha.
+              O caminho percorre o contorno externo direito, mergulha pelo interior
+              superior (TR → Hex3 → Hex2 via arestas compartilhadas), continua o
+              contorno externo inferior e mergulha pelo interior inferior
+              (BL → Hex1 → BR2 via arestas compartilhadas), retornando ao início.
+            */}
+            <path
+              id="hex-outline"
+              d="M114.28,-30 L148.92,-50 L183.56,-30 L218.20,-50 L252.84,-30 L252.84,10 L218.20,30 L183.56,10 L148.92,30 L148.92,70 L114.28,90 L114.28,130 L79.64,150 L45,130 L10.36,150 L-24.28,130 L-24.28,90 L10.36,70 L45,90 L79.64,70 L79.64,30 L114.28,10 L114.28,-30 Z"
+              fill="none"
+              stroke="none"
+            />
+
+            {/* Hexágono direito */}
+            <path
+              d="M183.56,10 L218.20,30 L218.20,70 L183.56,90 L148.92,70 L148.92,30 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+
+            {/* Hexágono baixo-esquerda — aresta compartilhada com Hex1: (10.36,70)→(45,90) */}
+            <path
+              d="M10.36,70 L45,90 L45,130 L10.36,150 L-24.28,130 L-24.28,90 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+
+            {/* Hexágono à direita do baixo-esquerda — adj. a BL, Hex1 e Hex2 */}
+            <path
+              d="M79.64,70 L114.28,90 L114.28,130 L79.64,150 L45,130 L45,90 Z"
+              stroke="rgba(0, 212, 255, 0.15)"
+              strokeWidth="1.4"
               strokeLinejoin="round"
             />
 
             <circle r="2.2" fill="#00d4ff" filter="url(#ball-glow)">
-              <animateMotion dur="8s" repeatCount="indefinite">
-                <mpath href="#hex-path" />
+              <animateMotion dur="20s" repeatCount="indefinite">
+                <mpath href="#hex-outline" />
               </animateMotion>
             </circle>
           </svg>
