@@ -28,8 +28,13 @@ function particleCountForSize(w: number, h: number) {
   )
 }
 
-function minSeparationForCount(baseRatio: number, count: number, countMin: number) {
-  const t = (count - countMin) / Math.max(1, settings.countMax - settings.countMin)
+function minSeparationForCount(
+  baseRatio: number,
+  count: number,
+  countMin: number
+) {
+  const t =
+    (count - countMin) / Math.max(1, settings.countMax - settings.countMin)
   return Math.max(0.03, baseRatio * (1 - 0.2 * t))
 }
 
@@ -108,7 +113,7 @@ export function PlexusBackground() {
         while (guard < 100) {
           x = randomXRightHeavy(w, settings.rightDensitySkew)
           y = Math.random() * h
-          const ok = particles.every((p) => Math.hypot(p.x - x, p.y - y) >= minD)
+          const ok = particles.every(p => Math.hypot(p.x - x, p.y - y) >= minD)
           if (ok) break
           guard++
         }

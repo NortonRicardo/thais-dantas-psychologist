@@ -35,8 +35,7 @@ const areas = [
   },
   {
     id: 'area2',
-    imageSrc:
-      'https://www.plantareducacao.com.br/wp-content/uploads/2022/09/Dashboards-scaled-2.jpg',
+    imageSrc: '/dashboards-scaled-2.jpg',
     imageAlt: 'Dashboard de dados — IA e ciência de dados no LEMM',
     tag: 'Inteligência Artificial',
     title: 'IA e Ciência de Dados',
@@ -48,7 +47,8 @@ const areas = [
   {
     id: 'area3',
     imageSrc: '/data-center.png',
-    imageAlt: 'Data center e infraestrutura — computação de alto desempenho no LEMM',
+    imageAlt:
+      'Data center e infraestrutura — computação de alto desempenho no LEMM',
     tag: 'Alta Performance',
     title: 'Computação de Alto Desempenho (HPC)',
     description:
@@ -129,76 +129,78 @@ export function LabAreaSections() {
       {areas.map((area, index) => {
         const textRight = index % 2 === 1
         return (
-        <section
-          key={area.id}
-          id={area.id}
-          className="relative isolate flex min-h-screen items-center overflow-hidden px-[8%] max-md:px-[5%]"
-          aria-labelledby={`${area.id}-heading`}
-        >
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={area.imageSrc}
-              alt={area.imageAlt}
-              fill
-              className="object-cover"
-              sizes="100vw"
-              priority={index === 0}
-              quality={85}
-            />
-          </div>
-
-          {/* Sombra uniforme sobre toda a foto */}
-          <div
-            className="pointer-events-none absolute inset-0 z-1"
-            style={{ backgroundColor: overlayScrim }}
-            aria-hidden
-          />
-
-          <div
-            className="pointer-events-none absolute inset-0 z-2"
-            style={{
-              background: textRight ? overlayGradientRight : overlayGradientLeft,
-            }}
-            aria-hidden
-          />
-
-          <div
-            className={cn(
-              'relative z-10 w-full max-w-[600px] py-16',
-              textRight && 'ml-auto text-right'
-            )}
+          <section
+            key={area.id}
+            id={area.id}
+            className="relative isolate flex min-h-screen items-center overflow-hidden px-[8%] max-md:px-[5%]"
+            aria-labelledby={`${area.id}-heading`}
           >
-            <span
+            <div className="absolute inset-0 z-0">
+              <Image
+                src={area.imageSrc}
+                alt={area.imageAlt}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority={index === 0}
+                quality={85}
+              />
+            </div>
+
+            {/* Sombra uniforme sobre toda a foto */}
+            <div
+              className="pointer-events-none absolute inset-0 z-1"
+              style={{ backgroundColor: overlayScrim }}
+              aria-hidden
+            />
+
+            <div
+              className="pointer-events-none absolute inset-0 z-2"
+              style={{
+                background: textRight
+                  ? overlayGradientRight
+                  : overlayGradientLeft,
+              }}
+              aria-hidden
+            />
+
+            <div
               className={cn(
-                'mb-4 block text-[0.8rem] font-bold uppercase tracking-[4px] text-[#00d4ff]',
-                fontOrbitron
+                'relative z-10 w-full max-w-[600px] py-16',
+                textRight && 'ml-auto text-right'
               )}
             >
-              {area.tag}
-            </span>
-            <h2
-              id={`${area.id}-heading`}
-              className={cn(
-                'mb-6 text-[clamp(1.8rem,4vw,2.8rem)] font-black uppercase leading-snug',
-                fontOrbitron
-              )}
-            >
-              {area.title}
-            </h2>
-            <p className="mb-8 text-[1.05rem] font-light leading-relaxed text-[#cbd5e0] sm:text-[1.1rem]">
-              {area.description}
-            </p>
-            <Link
-              href={area.href}
-              className={cn(
-                'inline-block border border-white/30 px-8 py-3 text-[0.7rem] uppercase tracking-[2px] transition-colors duration-300 hover:bg-white hover:text-black',
-                fontOrbitron
-              )}
-            >
-              {area.cta}
-            </Link>
-          </div>
-        </section>
+              <span
+                className={cn(
+                  'mb-4 block text-[0.8rem] font-bold uppercase tracking-[4px] text-[#00d4ff]',
+                  fontOrbitron
+                )}
+              >
+                {area.tag}
+              </span>
+              <h2
+                id={`${area.id}-heading`}
+                className={cn(
+                  'mb-6 text-[clamp(1.8rem,4vw,2.8rem)] font-black uppercase leading-snug',
+                  fontOrbitron
+                )}
+              >
+                {area.title}
+              </h2>
+              <p className="mb-8 text-[1.05rem] font-light leading-relaxed text-[#cbd5e0] sm:text-[1.1rem]">
+                {area.description}
+              </p>
+              <Link
+                href={area.href}
+                className={cn(
+                  'inline-block border border-white/30 px-8 py-3 text-[0.7rem] uppercase tracking-[2px] transition-colors duration-300 hover:bg-white hover:text-black',
+                  fontOrbitron
+                )}
+              >
+                {area.cta}
+              </Link>
+            </div>
+          </section>
         )
       })}
     </div>
