@@ -2,7 +2,8 @@ import { Cpu, MemoryStick, MonitorCheck, CloudSun, Wrench } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const glass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
   borderRadius: '20px',
@@ -43,7 +44,9 @@ function Card({
       </div>
       <div>
         <p className="text-sm font-semibold text-white/90">{title}</p>
-        <p className="mt-1 text-xs leading-relaxed text-white/50">{description}</p>
+        <p className="mt-1 text-xs leading-relaxed text-white/50">
+          {description}
+        </p>
       </div>
     </div>
   )
@@ -51,8 +54,13 @@ function Card({
 
 function PartnerCard({ name, desc }: { name: string; desc: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 px-4 py-8 text-center" style={glass}>
-      <span className="text-sm font-bold tracking-wide text-white/80">{name}</span>
+    <div
+      className="flex flex-col items-center gap-3 px-4 py-8 text-center"
+      style={glass}
+    >
+      <span className="text-sm font-bold tracking-wide text-white/80">
+        {name}
+      </span>
       <span className="text-xs leading-relaxed text-white/45">{desc}</span>
     </div>
   )
@@ -61,7 +69,6 @@ function PartnerCard({ name, desc }: { name: string; desc: string }) {
 export function InfraestruturaSection() {
   return (
     <div className="mt-10 flex h-full w-full flex-1 flex-col gap-10 pb-16">
-
       {/* Hardware atual */}
       <div>
         <SectionTitle>Hardware atual</SectionTitle>
@@ -110,13 +117,24 @@ export function InfraestruturaSection() {
       <div className="mt-auto pt-8 border-t border-white/10">
         <SectionTitle>Rede de colaboração</SectionTitle>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <PartnerCard name="INPE" desc="Modelagem climática, HPC e big data espacial" />
-          <PartnerCard name="UnB" desc="LAMFO (Finanças e IA) e projeto SEM FOGO" />
-          <PartnerCard name="UFCAT" desc="Cadeias agroindustriais, otimização e engenharia civil" />
-          <PartnerCard name="Furnas" desc="Variáveis climáticas, conservação do solo e regulação ambiental (2022–2024)" />
+          <PartnerCard
+            name="INPE"
+            desc="Modelagem climática, HPC e big data espacial"
+          />
+          <PartnerCard
+            name="UnB"
+            desc="LAMFO (Finanças e IA) e projeto SEM FOGO"
+          />
+          <PartnerCard
+            name="UFCAT"
+            desc="Cadeias agroindustriais, otimização e engenharia civil"
+          />
+          <PartnerCard
+            name="Furnas"
+            desc="Variáveis climáticas, conservação do solo e regulação ambiental (2022–2024)"
+          />
         </div>
       </div>
-
     </div>
   )
 }

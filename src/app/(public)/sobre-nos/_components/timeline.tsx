@@ -1,5 +1,6 @@
 const glass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
   border: '1px solid rgba(255,255,255,0.18)',
@@ -7,7 +8,8 @@ const glass = {
 } as const
 
 const yearGlass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.03))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.03))',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
   border: '1px solid rgba(255,255,255,0.22)',
@@ -59,14 +61,19 @@ const events = [
   },
 ]
 
-function TimelineCard({ title, description }: { title: string; description: string }) {
+function TimelineCard({
+  title,
+  description,
+}: {
+  title: string
+  description: string
+}) {
   return (
-    <div
-      className="max-w-xs rounded-2xl px-5 py-5 sm:max-w-sm"
-      style={glass}
-    >
+    <div className="max-w-xs rounded-2xl px-5 py-5 sm:max-w-sm" style={glass}>
       <p className="text-sm font-semibold text-white/90">{title}</p>
-      <p className="mt-2 text-xs leading-relaxed text-white/55">{description}</p>
+      <p className="mt-2 text-xs leading-relaxed text-white/55">
+        {description}
+      </p>
     </div>
   )
 }
@@ -93,11 +100,17 @@ export function Timeline() {
           {events.map((event, i) => {
             const isLeft = i % 2 === 0
             return (
-              <div key={event.year} className="relative flex items-center justify-center gap-0">
+              <div
+                key={event.year}
+                className="relative flex items-center justify-center gap-0"
+              >
                 {/* Lado esquerdo */}
                 <div className="flex w-1/2 justify-end pr-8">
                   {isLeft ? (
-                    <TimelineCard title={event.title} description={event.description} />
+                    <TimelineCard
+                      title={event.title}
+                      description={event.description}
+                    />
                   ) : (
                     <div />
                   )}
@@ -109,7 +122,10 @@ export function Timeline() {
                 {/* Lado direito */}
                 <div className="flex w-1/2 justify-start pl-8">
                   {!isLeft ? (
-                    <TimelineCard title={event.title} description={event.description} />
+                    <TimelineCard
+                      title={event.title}
+                      description={event.description}
+                    />
                   ) : (
                     <div />
                   )}

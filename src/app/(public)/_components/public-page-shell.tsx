@@ -44,7 +44,9 @@ export function PublicPageShell({
           {children}
         </div>
         {fullWidthContent && (
-          <div className="relative z-10 flex w-full flex-1 flex-col">{fullWidthContent}</div>
+          <div className="relative z-10 flex w-full flex-1 flex-col">
+            {fullWidthContent}
+          </div>
         )}
       </LabSceneShell>
       <PublicFooter />

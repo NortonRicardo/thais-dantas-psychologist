@@ -3,7 +3,8 @@ import { BookOpen, Users, BarChart2, FlaskConical, Globe } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const glass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
   border: '1px solid rgba(255,255,255,0.18)',
@@ -57,7 +58,6 @@ const topics = [
 export function SheLeadsSection() {
   return (
     <div className="mt-8 flex w-full flex-col gap-12 pb-16">
-
       {/* Hero */}
       <div
         className="relative w-full overflow-hidden rounded-3xl"
@@ -106,10 +106,10 @@ export function SheLeadsSection() {
               </span>
             </div>
             <p className="max-w-xl text-sm leading-relaxed text-white/70">
-              A marca de formação, inclusão e liderança feminina do ecossistema LEMM.
-              Ampliar a participação de meninas e jovens mulheres em ciência de dados,
-              IA, modelagem matemática e tecnologias emergentes — com ciência real,
-              projetos reais e impacto real.
+              A marca de formação, inclusão e liderança feminina do ecossistema
+              LEMM. Ampliar a participação de meninas e jovens mulheres em
+              ciência de dados, IA, modelagem matemática e tecnologias
+              emergentes — com ciência real, projetos reais e impacto real.
             </p>
           </div>
         </div>
@@ -129,13 +129,18 @@ export function SheLeadsSection() {
             >
               <span
                 className="flex h-10 w-10 items-center justify-center rounded-full text-purple-300"
-                style={{ background: 'rgba(160,0,255,0.15)', border: '1px solid rgba(160,0,255,0.25)' }}
+                style={{
+                  background: 'rgba(160,0,255,0.15)',
+                  border: '1px solid rgba(160,0,255,0.25)',
+                }}
               >
                 <Icon size={17} strokeWidth={1.5} />
               </span>
               <div>
                 <p className="text-sm font-semibold text-white/90">{title}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/50">{description}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-white/50">
+                  {description}
+                </p>
               </div>
             </div>
           ))}
@@ -148,12 +153,13 @@ export function SheLeadsSection() {
           Áreas de atuação
         </p>
         <div className="flex flex-wrap gap-3">
-          {topics.map((t) => (
+          {topics.map(t => (
             <span
               key={t}
               className="rounded-full px-4 py-1.5 text-xs text-white/70"
               style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0))',
+                background:
+                  'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0))',
                 backdropFilter: 'blur(10px)',
                 WebkitBackdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.15)',
@@ -164,7 +170,6 @@ export function SheLeadsSection() {
           ))}
         </div>
       </div>
-
     </div>
   )
 }
