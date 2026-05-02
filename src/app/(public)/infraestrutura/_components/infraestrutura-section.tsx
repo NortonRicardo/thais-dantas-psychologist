@@ -1,4 +1,14 @@
-import { Cpu, MemoryStick, MonitorCheck, CloudSun, Wrench } from 'lucide-react'
+import {
+  CloudSun,
+  Cpu,
+  ExternalLink,
+  Globe,
+  LayoutGrid,
+  Layers,
+  MemoryStick,
+  MonitorCheck,
+  Wrench,
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const glass = {
@@ -10,6 +20,15 @@ const glass = {
   border: '1px solid rgba(255,255,255,0.18)',
   boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
 } as const
+
+const PLATFORM_ICONS: Record<string, LucideIcon> = {
+  'cloud-sun': CloudSun,
+  wrench: Wrench,
+  globe: Globe,
+  'layout-grid': LayoutGrid,
+  layers: Layers,
+  cpu: Cpu,
+}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -52,6 +71,74 @@ function Card({
   )
 }
 
+export type DevelopedPlatformPublic = {
+  id: string
+  title: string
+  description: string
+  projectLink: string | null
+  platformLink: string | null
+  badge: string | null
+  iconKey: string
+}
+
+function DevelopedPlatformCard({
+  title,
+  description,
+  badge,
+  iconKey,
+  projectLink,
+  platformLink,
+}: Omit<DevelopedPlatformPublic, 'id'>) {
+  const Icon = PLATFORM_ICONS[iconKey] ?? Layers
+  const linkBtn =
+    'inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/8 px-3 py-1.5 text-[0.65rem] font-medium text-white/75 transition-colors hover:bg-white/12 hover:text-white'
+
+  return (
+    <div className="flex flex-col gap-4 px-6 py-8" style={glass}>
+      <div className="flex items-start justify-between gap-2">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
+          <Icon size={16} strokeWidth={1.5} />
+        </span>
+        {badge && (
+          <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-white/40">
+            {badge}
+          </span>
+        )}
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-white/90">{title}</p>
+        <p className="mt-1 text-xs leading-relaxed text-white/50">
+          {description}
+        </p>
+      </div>
+      {(projectLink || platformLink) && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {projectLink && (
+            <a
+              href={projectLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkBtn}
+            >
+              Link do projeto <ExternalLink size={11} />
+            </a>
+          )}
+          {platformLink && (
+            <a
+              href={platformLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${linkBtn} border-cyan-400/35 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20`}
+            >
+              Acessar plataforma <ExternalLink size={11} />
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function PartnerCard({ name, desc }: { name: string; desc: string }) {
   return (
     <div
@@ -73,10 +160,11 @@ export type CollaborationPartnerPublic = {
 }
 
 type Props = {
+  platforms: DevelopedPlatformPublic[]
   partners: CollaborationPartnerPublic[]
 }
 
-export function InfraestruturaSection({ partners }: Props) {
+export function InfraestruturaSection({ platforms, partners }: Props) {
   return (
     <div className="mt-10 flex h-full w-full flex-1 flex-col gap-10 pb-16">
       {/* Hardware atual */}
@@ -107,20 +195,33 @@ export function InfraestruturaSection({ partners }: Props) {
       {/* Plataformas */}
       <div>
         <SectionTitle>Plataformas desenvolvidas</SectionTitle>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Card
-            icon={CloudSun}
-            title="Weather Brasil"
-            description="Plataforma de dados meteorológicos premiada no Troféu Seriema 2025 (Inovação). Será apresentada no WCERE 2026, em Portugal."
-            badge="2º lugar Seriema 2025"
-          />
-          <Card
-            icon={Wrench}
-            title="META TOOL BOX"
-            description="Plataforma de otimização e metaheurísticas com registro de software. Em desenvolvimento contínuo desde 2016, orientada a problemas reais de grande escala."
-            badge="Registro de Software"
-          />
-        </div>
+        {platforms.length === 0 ? (
+          <p className="text-sm text-white/35">Plataformas em atualização.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {platforms.map(
+              ({
+                id,
+                title,
+                description,
+                badge,
+                iconKey,
+                projectLink,
+                platformLink,
+              }) => (
+                <DevelopedPlatformCard
+                  key={id}
+                  title={title}
+                  description={description}
+                  badge={badge}
+                  iconKey={iconKey}
+                  projectLink={projectLink}
+                  platformLink={platformLink}
+                />
+              )
+            )}
+          </div>
+        )}
       </div>
 
       {/* Rede de parceiros */}

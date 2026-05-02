@@ -1,5 +1,10 @@
 import { db } from './index'
-import { aboutTimelineEntries, collaborationPartners, events } from './schema'
+import {
+  aboutTimelineEntries,
+  collaborationPartners,
+  developedPlatforms,
+  events,
+} from './schema'
 
 const seedEvents = [
   {
@@ -115,6 +120,27 @@ const seedAboutTimeline = [
   },
 ]
 
+const seedDevelopedPlatforms = [
+  {
+    title: 'Weather Brasil',
+    description:
+      'Plataforma de dados meteorológicos premiada no Troféu Seriema 2025 (Inovação). Será apresentada no WCERE 2026, em Portugal.',
+    projectLink: null,
+    platformLink: null,
+    badge: '2º lugar Seriema 2025',
+    iconKey: 'cloud-sun',
+  },
+  {
+    title: 'META TOOL BOX',
+    description:
+      'Plataforma de otimização e metaheurísticas com registro de software. Em desenvolvimento contínuo desde 2016, orientada a problemas reais de grande escala.',
+    projectLink: null,
+    platformLink: null,
+    badge: 'Registro de Software',
+    iconKey: 'wrench',
+  },
+]
+
 const seedCollaborationPartners = [
   {
     name: 'INPE',
@@ -145,6 +171,11 @@ async function main() {
   await db.delete(aboutTimelineEntries)
   await db.insert(aboutTimelineEntries).values(seedAboutTimeline)
   console.warn(`✅ ${seedAboutTimeline.length} marcos inseridos.`)
+
+  console.warn('🌱 Seeding plataformas desenvolvidas…')
+  await db.delete(developedPlatforms)
+  await db.insert(developedPlatforms).values(seedDevelopedPlatforms)
+  console.warn(`✅ ${seedDevelopedPlatforms.length} plataformas inseridas.`)
 
   console.warn('🌱 Seeding rede de colaboração…')
   await db.delete(collaborationPartners)

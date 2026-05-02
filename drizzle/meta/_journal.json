@@ -36,6 +36,13 @@
       "when": 1777756200000,
       "tag": "0004_collaboration_partners_drop_sort",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777756300000,
+      "tag": "0005_developed_platforms",
+      "breakpoints": true
     }
   ]
 }

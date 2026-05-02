@@ -38,6 +38,12 @@ export function proxy(req: NextRequest) {
     }
   }
 
+  if (pathname.startsWith('/api/developed-platforms') && req.method !== 'GET') {
+    if (session !== 'authenticated') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+  }
+
   return NextResponse.next()
 }
 
@@ -50,5 +56,7 @@ export const config = {
     '/api/about-timeline',
     '/api/collaboration-partners/:path*',
     '/api/collaboration-partners',
+    '/api/developed-platforms/:path*',
+    '/api/developed-platforms',
   ],
 }

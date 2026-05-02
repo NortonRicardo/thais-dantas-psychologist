@@ -69,3 +69,23 @@ export const collaborationPartners = pgTable('collaboration_partners', {
 
 export type CollaborationPartner = typeof collaborationPartners.$inferSelect
 export type NewCollaborationPartner = typeof collaborationPartners.$inferInsert
+
+/** Plataformas desenvolvidas (Infraestrutura) */
+export const developedPlatforms = pgTable('developed_platforms', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  projectLink: text('project_link'),
+  platformLink: text('platform_link'),
+  badge: text('badge'),
+  iconKey: text('icon_key').default('cloud-sun').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type DevelopedPlatform = typeof developedPlatforms.$inferSelect
+export type NewDevelopedPlatform = typeof developedPlatforms.$inferInsert
