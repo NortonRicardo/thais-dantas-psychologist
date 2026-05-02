@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { PublicPageShell } from '../_components/public-page-shell'
+import { ContatoSection } from './_components/contato-section'
 
 export const metadata: Metadata = {
   title: 'Contato | LEMM',
@@ -13,7 +14,8 @@ export default function ContatoPage() {
     <PublicPageShell
       aria-label="Contato LEMM"
       title="Contato"
-      lead="Formulário e canais oficiais serão disponibilizados em breve."
+      lead="Canais oficiais do Laboratório de Estudos e Modelagem Matemática na PUC Goiás."
+      fullWidthContent={<ContatoSection />}
     />
   )
 }
