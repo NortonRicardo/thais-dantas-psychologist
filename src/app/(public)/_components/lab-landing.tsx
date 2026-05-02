@@ -98,45 +98,7 @@ export function LabLanding() {
               </filter>
             </defs>
 
-            {/* Hexágono topo-direita — aresta compartilhada com Hex3: (183.56,10)→(218.20,30) */}
-            <path
-              d="M218.20,-50 L252.84,-30 L252.84,10 L218.20,30 L183.56,10 L183.56,-30 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
-
-            {/* Hexágono à esquerda do topo-direita — adj. a TR, Hex2 e Hex3 */}
-            <path
-              d="M148.92,-50 L183.56,-30 L183.56,10 L148.92,30 L114.28,10 L114.28,-30 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
-
-            {/* Hexágono esquerdo */}
-            <path
-              d="M45,10 L79.64,30 L79.64,70 L45,90 L10.36,70 L10.36,30 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
-
-            {/* Hexágono central */}
-            <path
-              d="M114.28,10 L148.92,30 L148.92,70 L114.28,90 L79.64,70 L79.64,30 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
-
-            {/*
-              Trilha invisível para a bolinha.
-              O caminho percorre o contorno externo direito, mergulha pelo interior
-              superior (TR → Hex3 → Hex2 via arestas compartilhadas), continua o
-              contorno externo inferior e mergulha pelo interior inferior
-              (BL → Hex1 → BR2 via arestas compartilhadas), retornando ao início.
-            */}
+            {/* Trilha invisível — 22 segmentos iguais (R=40 cada). Ambas as bolinhas a percorrem. */}
             <path
               id="hex-outline"
               d="M114.28,-30 L148.92,-50 L183.56,-30 L218.20,-50 L252.84,-30 L252.84,10 L218.20,30 L183.56,10 L148.92,30 L148.92,70 L114.28,90 L114.28,130 L79.64,150 L45,130 L10.36,150 L-24.28,130 L-24.28,90 L10.36,70 L45,90 L79.64,70 L79.64,30 L114.28,10 L114.28,-30 Z"
@@ -144,32 +106,108 @@ export function LabLanding() {
               stroke="none"
             />
 
-            {/* Hexágono direito */}
+            {/* Hexágono topo-direita — ativo: [0.091–0.318] e [0.682–0.909] */}
+            <path
+              d="M218.20,-50 L252.84,-30 L252.84,10 L218.20,30 L183.56,10 L183.56,-30 Z"
+              stroke="#00d4ff" strokeOpacity={0.15} strokeWidth={1.4} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.081;0.091;0.318;0.328;0.672;0.682;0.909;0.919;1"
+                values="0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.081;0.091;0.318;0.328;0.672;0.682;0.909;0.919;1"
+                values="1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4" />
+            </path>
+
+            {/* Hexágono esq. do topo — ativo: [0–0.091] [0.318–0.364] [0.636–0.682] [0.909–1] */}
+            <path
+              d="M148.92,-50 L183.56,-30 L183.56,10 L148.92,30 L114.28,10 L114.28,-30 Z"
+              stroke="#00d4ff" strokeOpacity={0.85} strokeWidth={2.5} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.091;0.101;0.308;0.318;0.364;0.374;0.626;0.636;0.682;0.692;0.899;0.909;1"
+                values="0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.091;0.101;0.308;0.318;0.364;0.374;0.626;0.636;0.682;0.692;0.899;0.909;1"
+                values="2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5" />
+            </path>
+
+            {/* Hexágono esquerdo — ativo: [0.091–0.227] e [0.773–0.909] */}
+            <path
+              d="M45,10 L79.64,30 L79.64,70 L45,90 L10.36,70 L10.36,30 Z"
+              stroke="#00d4ff" strokeOpacity={0.15} strokeWidth={1.4} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.081;0.091;0.227;0.237;0.763;0.773;0.909;0.919;1"
+                values="0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.081;0.091;0.227;0.237;0.763;0.773;0.909;0.919;1"
+                values="1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4" />
+            </path>
+
+            {/* Hexágono central — ativo: [0.045–0.136] [0.364–0.455] [0.545–0.636] [0.864–0.955] */}
+            <path
+              d="M114.28,10 L148.92,30 L148.92,70 L114.28,90 L79.64,70 L79.64,30 Z"
+              stroke="#00d4ff" strokeOpacity={0.15} strokeWidth={1.4} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.035;0.045;0.136;0.146;0.354;0.364;0.455;0.465;0.535;0.545;0.636;0.646;0.854;0.864;0.955;0.965;1"
+                values="0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.035;0.045;0.136;0.146;0.354;0.364;0.455;0.465;0.535;0.545;0.636;0.646;0.854;0.864;0.955;0.965;1"
+                values="1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4" />
+            </path>
+
+            {/* Hexágono direito — ativo: [0.273–0.409] e [0.591–0.727] */}
             <path
               d="M183.56,10 L218.20,30 L218.20,70 L183.56,90 L148.92,70 L148.92,30 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
+              stroke="#00d4ff" strokeOpacity={0.15} strokeWidth={1.4} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.263;0.273;0.409;0.419;0.581;0.591;0.727;0.737;1"
+                values="0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.263;0.273;0.409;0.419;0.581;0.591;0.727;0.737;1"
+                values="1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4" />
+            </path>
 
-            {/* Hexágono baixo-esquerda — aresta compartilhada com Hex1: (10.36,70)→(45,90) */}
+            {/* Hexágono baixo-esquerda — ativo: [0.182–0.409] e [0.591–0.818] */}
             <path
               d="M10.36,70 L45,90 L45,130 L10.36,150 L-24.28,130 L-24.28,90 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
+              stroke="#00d4ff" strokeOpacity={0.15} strokeWidth={1.4} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.172;0.182;0.409;0.419;0.581;0.591;0.818;0.828;1"
+                values="0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.172;0.182;0.409;0.419;0.581;0.591;0.818;0.828;1"
+                values="1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4" />
+            </path>
 
-            {/* Hexágono à direita do baixo-esquerda — adj. a BL, Hex1 e Hex2 */}
+            {/* Hexágono dir. do baixo — ativo: [0.136–0.182] [0.409–0.591] [0.818–0.864] */}
             <path
               d="M79.64,70 L114.28,90 L114.28,130 L79.64,150 L45,130 L45,90 Z"
-              stroke="rgba(0, 212, 255, 0.15)"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
+              stroke="#00d4ff" strokeOpacity={0.15} strokeWidth={1.4} strokeLinejoin="round"
+            >
+              <animate attributeName="stroke-opacity" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.126;0.136;0.182;0.192;0.399;0.409;0.591;0.601;0.808;0.818;0.864;0.874;1"
+                values="0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15;0.85;0.85;0.15;0.15" />
+              <animate attributeName="stroke-width" dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyTimes="0;0.126;0.136;0.182;0.192;0.399;0.409;0.591;0.601;0.808;0.818;0.864;0.874;1"
+                values="1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4;2.5;2.5;1.4;1.4" />
+            </path>
 
+            {/* Bolinha 1 — sentido horário */}
             <circle r="2.2" fill="#00d4ff" filter="url(#ball-glow)">
-              <animateMotion dur="20s" repeatCount="indefinite">
+              <animateMotion dur="20s" repeatCount="indefinite" calcMode="linear">
+                <mpath href="#hex-outline" />
+              </animateMotion>
+            </circle>
+
+            {/* Bolinha 2 — sentido anti-horário */}
+            <circle r="2.2" fill="#00d4ff" filter="url(#ball-glow)">
+              <animateMotion dur="20s" repeatCount="indefinite" calcMode="linear"
+                keyPoints="1;0" keyTimes="0;1">
                 <mpath href="#hex-outline" />
               </animateMotion>
             </circle>
