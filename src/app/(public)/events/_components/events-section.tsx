@@ -154,49 +154,51 @@ function EventCard({ event }: { event: Event }) {
         <p className="line-clamp-3 text-xs leading-relaxed text-white/50">{event.description}</p>
       </div>
 
-      <div className="mt-auto flex flex-col gap-1.5 border-t border-white/10 pt-4 text-[0.68rem] text-white/40">
-        <span className="flex items-center gap-1.5">
-          <CalendarDays size={11} strokeWidth={1.5} />
-          {formatDate(event.date)} · {formatTime(event.date)}
-        </span>
-        {event.speaker && (
+      <div className="mt-auto flex items-center gap-4 border-t border-white/10 pt-4">
+        {/* Coluna 1 — metadados alinhados à esquerda */}
+        <div className="flex flex-1 flex-col gap-1.5 text-[0.68rem] text-white/40">
           <span className="flex items-center gap-1.5">
-            <Mic size={11} strokeWidth={1.5} />
-            {event.speaker}
+            <CalendarDays size={11} strokeWidth={1.5} />
+            {formatDate(event.date)} · {formatTime(event.date)}
           </span>
-        )}
-        {event.organizer && (
-          <span className="flex items-center gap-1.5">
-            <Users size={11} strokeWidth={1.5} />
-            {event.organizer}
-          </span>
-        )}
-      </div>
-
-      {(event.link || event.meetLink) && (
-        <div className="flex flex-wrap gap-3">
+          {event.speaker && (
+            <span className="flex items-center gap-1.5">
+              <Mic size={11} strokeWidth={1.5} />
+              {event.speaker}
+            </span>
+          )}
+          {event.organizer && (
+            <span className="flex items-center gap-1.5">
+              <Users size={11} strokeWidth={1.5} />
+              {event.organizer}
+            </span>
+          )}
           {event.link && (
             <a
               href={event.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[0.7rem] text-white/40 transition-colors hover:text-white/70"
+              className="flex items-center gap-1.5 text-white/35 transition-colors hover:text-white/60"
             >
               <ExternalLink size={11} /> Saiba mais
             </a>
           )}
-          {event.meetLink && (
+        </div>
+
+        {/* Coluna 2 — botão centralizado */}
+        {event.meetLink && (
+          <div className="flex shrink-0 items-center justify-center">
             <a
               href={event.meetLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[0.7rem] text-cyan-400/70 transition-colors hover:text-cyan-300"
+              className="flex items-center gap-1.5 rounded-full border border-cyan-400/35 bg-cyan-400/10 px-3 py-1.5 text-[0.7rem] font-medium text-cyan-300 transition-colors hover:bg-cyan-400/20"
             >
               <Video size={11} /> Entrar na sala
             </a>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
