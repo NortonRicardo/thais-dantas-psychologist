@@ -24,7 +24,7 @@ export function PublicPageShell({
 }: PublicPageShellProps) {
   return (
     <>
-      <LabSceneShell aria-label={ariaLabel}>
+      <LabSceneShell aria-label={ariaLabel} subtlePlexus>
         <LabPublicHeader variant="static" />
         <div className="relative z-10 w-full max-w-3xl flex-1 self-start pt-2 text-left">
           <h1

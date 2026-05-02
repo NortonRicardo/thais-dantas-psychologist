@@ -18,6 +18,8 @@ type LabSceneShellProps = {
   sectionClassName?: string
   /** RGB da rede plexus, ex. `"0, 212, 255"`. */
   networkColor?: string
+  /** Menos pontos e mais transparentes — para páginas internas. */
+  subtlePlexus?: boolean
 }
 
 export function LabSceneShell({
@@ -25,6 +27,7 @@ export function LabSceneShell({
   'aria-label': ariaLabel,
   sectionClassName,
   networkColor = '0, 212, 255',
+  subtlePlexus = false,
 }: LabSceneShellProps) {
   return (
     <div
@@ -40,7 +43,7 @@ export function LabSceneShell({
         )}
         aria-label={ariaLabel}
       >
-        <PlexusBackground networkColor={networkColor} />
+        <PlexusBackground networkColor={networkColor} subtle={subtlePlexus} />
         <div
           className="pointer-events-none absolute inset-0 z-1 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] opacity-[0.12]"
           aria-hidden

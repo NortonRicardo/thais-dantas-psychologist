@@ -15,6 +15,13 @@ const baseSettings = {
   lineWidth: 0.6,
 } as const
 
+const subtleSettings = {
+  countMin: 100,
+  countMax: 150,
+  lineOpacityMax: 0.1,
+  dotOpacity: 0.15,
+} as const
+
 const defaultNetworkColor = '255, 120, 0' as const
 
 type Particle = { x: number; y: number; vx: number; vy: number; size: number }
@@ -54,6 +61,8 @@ function randomXRightHeavy(w: number, skew: number) {
 type PlexusBackgroundProps = {
   /** Cor RGB da rede, ex.: `"0, 212, 255"` (cyan) ou padrão laranja. */
   networkColor?: string
+  /** Menos pontos e mais transparentes — para páginas internas. */
+  subtle?: boolean
 }
 
 function bounceOffEdges(p: Particle, w: number, h: number) {
@@ -71,7 +80,9 @@ function bounceOffEdges(p: Particle, w: number, h: number) {
 
 export function PlexusBackground({
   networkColor = defaultNetworkColor,
+  subtle = false,
 }: PlexusBackgroundProps) {
+  const settings = subtle ? { ...baseSettings, ...subtleSettings } : baseSettings
   const wrapperRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -107,11 +118,17 @@ export function PlexusBackground({
 
     function initParticles() {
       const { width: w, height: h } = rectLayout(width, height)
-      const count = particleCountForSize(width, height)
+      const m = Math.min(width, height)
+      const ref = 420
+      const t = Math.max(1, m / ref)
+      const count = Math.min(
+        settings.countMax,
+        Math.max(settings.countMin, Math.round(settings.countMin * t))
+      )
       const minRatio = minSeparationForCount(
-        baseSettings.minSeparationRatio,
+        settings.minSeparationRatio,
         count,
-        baseSettings.countMin
+        settings.countMin
       )
       const minD = Math.max(width, height) * minRatio
       particles = []
@@ -120,7 +137,7 @@ export function PlexusBackground({
         let y = 0
         let guard = 0
         while (guard < 100) {
-          x = randomXRightHeavy(w, baseSettings.rightDensitySkew)
+          x = randomXRightHeavy(w, settings.rightDensitySkew)
           y = Math.random() * h
           const ok = particles.every(p => Math.hypot(p.x - x, p.y - y) >= minD)
           if (ok) break
@@ -129,8 +146,8 @@ export function PlexusBackground({
         particles.push({
           x,
           y,
-          vx: (Math.random() - 0.5) * baseSettings.speed,
-          vy: (Math.random() - 0.5) * baseSettings.speed,
+          vx: (Math.random() - 0.5) * settings.speed,
+          vy: (Math.random() - 0.5) * settings.speed,
           size: Math.random() * 1.2 + 1,
         })
       }
@@ -164,8 +181,8 @@ export function PlexusBackground({
           const dist = Math.hypot(p.x - p2.x, p.y - p2.y)
           if (dist < reach) {
             const opacity = 1 - dist / reach
-            drawCtx.strokeStyle = `rgba(${colorRgb}, ${opacity * baseSettings.lineOpacityMax})`
-            drawCtx.lineWidth = baseSettings.lineWidth
+            drawCtx.strokeStyle = `rgba(${colorRgb}, ${opacity * settings.lineOpacityMax})`
+            drawCtx.lineWidth = settings.lineWidth
             drawCtx.beginPath()
             drawCtx.moveTo(p.x, p.y)
             drawCtx.lineTo(p2.x, p2.y)
@@ -175,7 +192,7 @@ export function PlexusBackground({
       }
 
       for (const p of particles) {
-        drawCtx.fillStyle = `rgba(${colorRgb}, ${baseSettings.dotOpacity})`
+        drawCtx.fillStyle = `rgba(${colorRgb}, ${settings.dotOpacity})`
         drawCtx.beginPath()
         drawCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         drawCtx.fill()
@@ -198,7 +215,7 @@ export function PlexusBackground({
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [networkColor])
+  }, [networkColor, subtle])
 
   return (
     <div
