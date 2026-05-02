@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import {
   CloudSun,
   Cpu,
@@ -5,11 +6,11 @@ import {
   Globe,
   LayoutGrid,
   Layers,
-  MemoryStick,
-  MonitorCheck,
   Wrench,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+
+import { getLucideIcon } from '@/lib/lucide-resolve'
 
 const glass = {
   background:
@@ -38,32 +39,41 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Card({
-  icon: Icon,
+export type HardwareModulePublic = {
+  id: string
+  title: string
+  iconKey: string
+  description: string
+}
+
+export type HardwareBlockPublic = {
+  id: string
+  title: string
+  modules: HardwareModulePublic[]
+}
+
+function HardwareModuleCard({
   title,
   description,
-  badge,
-}: {
-  icon: LucideIcon
-  title: string
-  description: string
-  badge?: string
-}) {
+  iconKey,
+}: Omit<HardwareModulePublic, 'id'>) {
+  const showIcon = Boolean(iconKey?.trim())
+
   return (
     <div className="flex flex-col gap-4 px-6 py-8" style={glass}>
-      <div className="flex items-start justify-between gap-2">
+      {showIcon ? (
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
-          <Icon size={16} strokeWidth={1.5} />
+          {createElement(getLucideIcon(iconKey.trim()), {
+            size: 16,
+            strokeWidth: 1.5,
+          })}
         </span>
-        {badge && (
-          <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-white/40">
-            {badge}
-          </span>
-        )}
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-white/90">{title}</p>
-        <p className="mt-1 text-xs leading-relaxed text-white/50">
+      ) : null}
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-semibold leading-snug text-white/90">
+          {title.trim() || '—'}
+        </p>
+        <p className="text-xs leading-relaxed text-white/50 whitespace-pre-line">
           {description}
         </p>
       </div>
@@ -160,36 +170,47 @@ export type CollaborationPartnerPublic = {
 }
 
 type Props = {
+  hardwareBlocks: HardwareBlockPublic[]
   platforms: DevelopedPlatformPublic[]
   partners: CollaborationPartnerPublic[]
 }
 
-export function InfraestruturaSection({ platforms, partners }: Props) {
+export function InfraestruturaSection({
+  hardwareBlocks,
+  platforms,
+  partners,
+}: Props) {
   return (
     <div className="mt-10 flex h-full w-full flex-1 flex-col gap-10 pb-16">
-      {/* Hardware atual */}
-      <div>
-        <SectionTitle>Hardware atual</SectionTitle>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card
-            icon={Cpu}
-            title="AMD Ryzen Threadripper PRO 5965WX"
-            description="Processador de alto desempenho para workloads paralelos de modelagem e HPC."
-            badge="CPU"
-          />
-          <Card
-            icon={MemoryStick}
-            title="512 GB de Memória RAM"
-            description="Capacidade para processar grandes bases de dados climáticas e reanálises atmosféricas simultaneamente."
-            badge="RAM"
-          />
-          <Card
-            icon={MonitorCheck}
-            title="5× NVIDIA RTX A4000"
-            description="16 GB de VRAM cada. Suporte a treinamento de redes neurais, inferência e simulações com GPU."
-            badge="GPU"
-          />
-        </div>
+      <div className="space-y-10">
+        <SectionTitle>Hardware</SectionTitle>
+        {hardwareBlocks.length === 0 ? (
+          <p className="text-sm text-white/35">Hardware em atualização.</p>
+        ) : (
+          hardwareBlocks.map(block => (
+            <div key={block.id}>
+              <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-white/45">
+                {block.title}
+              </h3>
+              {block.modules.length === 0 ? (
+                <p className="text-sm text-white/30">
+                  Nenhum módulo neste equipamento.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  {block.modules.map(m => (
+                    <HardwareModuleCard
+                      key={m.id}
+                      title={m.title}
+                      description={m.description}
+                      iconKey={m.iconKey}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {/* Plataformas */}

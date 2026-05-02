@@ -4,6 +4,7 @@ import {
   text,
   timestamp,
   boolean,
+  integer,
   customType,
 } from 'drizzle-orm/pg-core'
 
@@ -89,3 +90,40 @@ export const developedPlatforms = pgTable('developed_platforms', {
 
 export type DevelopedPlatform = typeof developedPlatforms.$inferSelect
 export type NewDevelopedPlatform = typeof developedPlatforms.$inferInsert
+
+/** Equipamentos exibidos em Infraestrutura (vários registros; cada um com módulos) */
+export const hardware = pgTable('hardware', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type Hardware = typeof hardware.$inferSelect
+export type NewHardware = typeof hardware.$inferInsert
+
+/** Módulos do hardware (título + ícone + descrição; ordem pelo índice na lista) */
+export const hardwareModules = pgTable('hardware_modules', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  hardwareId: uuid('hardware_id')
+    .notNull()
+    .references(() => hardware.id, { onDelete: 'cascade' }),
+  title: text('title').notNull().default(''),
+  /** Vazio = sem ícone na UI */
+  iconKey: text('icon_key').notNull().default(''),
+  description: text('description').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type HardwareModule = typeof hardwareModules.$inferSelect
+export type NewHardwareModule = typeof hardwareModules.$inferInsert

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { getPublicCollaborationPartners } from '@/lib/http/collaboration-partners'
 import { getPublicDevelopedPlatforms } from '@/lib/http/developed-platforms'
+import { getPublicHardwareList } from '@/lib/http/hardware'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { InfraestruturaSection } from './_components/infraestrutura-section'
 
@@ -12,9 +13,10 @@ export const metadata: Metadata = {
 }
 
 export default async function InfraestruturaPage() {
-  const [platformList, partnerList] = await Promise.all([
+  const [platformList, partnerList, hardwareBlocks] = await Promise.all([
     getPublicDevelopedPlatforms(),
     getPublicCollaborationPartners(),
+    getPublicHardwareList(),
   ])
 
   const platforms = platformList.map(
@@ -49,7 +51,20 @@ export default async function InfraestruturaPage() {
       title="Infraestrutura"
       lead="Hardware de alto desempenho, plataformas proprietárias e rede de colaboração interinstitucional para pesquisa em modelagem climática, IA e otimização."
       fullWidthContent={
-        <InfraestruturaSection platforms={platforms} partners={partners} />
+        <InfraestruturaSection
+          hardwareBlocks={hardwareBlocks.map(({ id, title, modules }) => ({
+            id,
+            title,
+            modules: modules.map(m => ({
+              id: m.id,
+              title: m.title,
+              iconKey: m.iconKey,
+              description: m.description,
+            })),
+          }))}
+          platforms={platforms}
+          partners={partners}
+        />
       }
     />
   )

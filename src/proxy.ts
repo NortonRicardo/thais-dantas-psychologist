@@ -44,6 +44,12 @@ export function proxy(req: NextRequest) {
     }
   }
 
+  if (pathname.startsWith('/api/hardware') && req.method !== 'GET') {
+    if (session !== 'authenticated') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+  }
+
   return NextResponse.next()
 }
 
@@ -58,5 +64,7 @@ export const config = {
     '/api/collaboration-partners',
     '/api/developed-platforms/:path*',
     '/api/developed-platforms',
+    '/api/hardware/:path*',
+    '/api/hardware',
   ],
 }

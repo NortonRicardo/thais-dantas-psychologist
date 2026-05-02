@@ -32,6 +32,13 @@ const cards = [
     href: '/manager/plataformas',
   },
   {
+    id: 'hardware',
+    title: 'Hardware atual',
+    description:
+      'Um ou mais equipamentos; cada um com módulos (ícone + texto) na Infraestrutura.',
+    href: '/manager/hardware',
+  },
+  {
     id: 'rede-colaboracao',
     title: 'Rede de colaboração',
     description:

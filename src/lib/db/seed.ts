@@ -4,6 +4,8 @@ import {
   collaborationPartners,
   developedPlatforms,
   events,
+  hardware,
+  hardwareModules,
 } from './schema'
 
 const seedEvents = [
@@ -141,6 +143,48 @@ const seedDevelopedPlatforms = [
   },
 ]
 
+const seedHardwareBlocks = [
+  {
+    title: 'Estação de trabalho LEMM',
+    modules: [
+      {
+        iconKey: 'Cpu',
+        title: 'AMD Ryzen Threadripper PRO 5965WX',
+        description:
+          'Processador de alto desempenho para workloads paralelos de modelagem e HPC.',
+      },
+      {
+        iconKey: 'MemoryStick',
+        title: '512 GB de Memória RAM',
+        description:
+          'Capacidade para processar grandes bases de dados climáticas e reanálises atmosféricas simultaneamente.',
+      },
+      {
+        iconKey: 'MonitorCheck',
+        title: '5× NVIDIA RTX A4000',
+        description:
+          '16 GB de VRAM cada. Suporte a treinamento de redes neurais, inferência e simulações com GPU.',
+      },
+    ],
+  },
+  {
+    title: 'Armazenamento e rede',
+    modules: [
+      {
+        iconKey: 'HardDrive',
+        title: 'Armazenamento NVMe em RAID',
+        description: 'Backups incrementais e datasets climáticos versionados.',
+      },
+      {
+        iconKey: 'Network',
+        title: 'Conectividade com parceiros',
+        description:
+          'Link dedicado para troca de dados com parceiros (INPE, universidades).',
+      },
+    ],
+  },
+]
+
 const seedCollaborationPartners = [
   {
     name: 'INPE',
@@ -176,6 +220,28 @@ async function main() {
   await db.delete(developedPlatforms)
   await db.insert(developedPlatforms).values(seedDevelopedPlatforms)
   console.warn(`✅ ${seedDevelopedPlatforms.length} plataformas inseridas.`)
+
+  console.warn('🌱 Seeding hardware (vários equipamentos + módulos)…')
+  await db.delete(hardware)
+  for (const block of seedHardwareBlocks) {
+    const [hw] = await db
+      .insert(hardware)
+      .values({ title: block.title })
+      .returning({ id: hardware.id })
+    await db.insert(hardwareModules).values(
+      block.modules.map((m, i) => ({
+        hardwareId: hw.id,
+        title: m.title,
+        iconKey: m.iconKey,
+        description: m.description,
+        sortOrder: i,
+      }))
+    )
+  }
+  const modCount = seedHardwareBlocks.reduce((n, b) => n + b.modules.length, 0)
+  console.warn(
+    `✅ ${seedHardwareBlocks.length} equipamentos e ${modCount} módulos inseridos.`
+  )
 
   console.warn('🌱 Seeding rede de colaboração…')
   await db.delete(collaborationPartners)

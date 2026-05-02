@@ -1,12 +1,8 @@
 'use client'
 
 import { type ReactNode } from 'react'
-import { ThemeProvider } from 'next-themes'
 
+/** Layout root client boundary — sem next-themes (React 19 alerta sobre `<script>` injetado pelo ThemeProvider). */
 export function Providers({ children }: { children: ReactNode }) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      {children}
-    </ThemeProvider>
-  )
+  return <>{children}</>
 }
