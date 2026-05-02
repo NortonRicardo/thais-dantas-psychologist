@@ -1,20 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import { Orbitron } from 'next/font/google'
-
-import { cn } from '@/lib/utils'
-
-import { PlexusBackground } from '../../(public)/_components/plexus-background'
-
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  variable: '--font-orbitron',
-})
-
-const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'
 
 const navItems = [
+  { href: '/manager', label: 'Home' },
   { href: '#eventos', label: 'Eventos' },
   { href: '#projetos', label: 'Projetos' },
 ] as const
@@ -36,101 +23,112 @@ const cards = [
   },
 ] as const
 
+const glass = {
+  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  backdropFilter: 'blur(10px)',
+  WebkitBackdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255,255,255,0.18)',
+  boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
+} as const
+
+const headerShadow = [
+  '0 8px 8px rgba(0,0,0,0.1)',
+  '0 4px 4px rgba(0,0,0,0.1)',
+  '0 2px 2px rgba(0,0,0,0.1)',
+  '0 0 0 1px rgba(0,0,0,0.1)',
+  'inset 0 0 0 1px rgba(255,255,255,0.03)',
+  'inset 0 1px 0 rgba(255,255,255,0.03)',
+].join(', ')
+
 export function ManagerView() {
   return (
     <div
-      className={cn(
-        orbitron.variable,
-        'relative min-h-screen bg-[#050a0f] text-white'
-      )}
+      className="min-h-screen text-[#e4e4e7]"
+      style={{
+        background:
+          'radial-gradient(circle at left center, rgba(0,212,255,0.08) 0%, transparent 40%), radial-gradient(circle at 75% 50%, #002d5a 0%, #050a0f 65%)',
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+      }}
     >
-      <section
-        className="relative isolate flex min-h-screen w-full flex-col bg-[radial-gradient(circle_at_left_center,rgba(0,212,255,0.08)_0%,transparent_40%),radial-gradient(circle_at_75%_50%,#002d5a_0%,#050a0f_65%)] px-[6%] pb-16 pt-6 max-[900px]:px-[5%]"
-        aria-label="Área do gestor LEMM"
-      >
-        <PlexusBackground networkColor="0, 212, 255" />
-        <div
-          className="pointer-events-none absolute inset-0 z-1 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] opacity-[0.12]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-0 z-4 h-[40vh] w-full bg-linear-to-t from-black to-transparent"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute right-0 top-0 z-4 h-full w-[18vw] min-w-[120px] max-w-[240px] bg-linear-to-l from-black/45 to-transparent"
-          aria-hidden
-        />
-
+      <div className="mx-auto max-w-[1700px] px-4">
         <header
-          className={cn(
-            'relative z-10 mx-auto mb-10 w-full max-w-5xl rounded-b-2xl border border-white/10 border-t-0 bg-zinc-950/90 px-6 py-4 shadow-[0_12px_40px_rgba(0,0,0,0.55),0_0_1px_rgba(0,212,255,0.15)] backdrop-blur-md max-[900px]:px-4',
-            fontOrbitron
-          )}
+          className="flex w-full flex-wrap items-center gap-2 px-4 py-2"
+          style={{
+            background: '#071525',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: '0 0 1rem 1rem',
+            boxShadow: headerShadow,
+          }}
+          role="banner"
         >
-          <nav className="flex justify-center" aria-label="Navegação do gestor">
-            <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-8 p-0 sm:gap-12">
-              {navItems.map(({ href, label }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="text-[0.9rem] font-normal uppercase tracking-[2px] text-white transition-[color,text-shadow] duration-300 hover:text-[#00d4ff] hover:[text-shadow:0_0_8px_rgba(0,212,255,0.6)]"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Brand */}
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-[1.125rem] font-semibold leading-7 text-[#e4e4e7]">
+              LEMM
+            </span>
+          </div>
+
+          {/* Nav — centered */}
+          <nav
+            className="mx-auto flex flex-wrap items-center gap-1"
+            aria-label="Principal"
+          >
+            {navItems.map(({ href, label }, i) => (
+              <Link
+                key={label}
+                href={href}
+                className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm leading-5 transition-colors duration-150"
+                style={{
+                  color: i === 0 ? '#fafafa' : '#d4d4d8',
+                  fontWeight: i === 0 ? 600 : 400,
+                }}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
         </header>
+      </div>
 
-        <div className="relative z-6 flex flex-1 flex-col items-center">
-          <div className="mb-12 flex w-full max-w-lg justify-center px-4">
-            <Image
-              src="/add-files.svg"
-              alt=""
-              width={280}
-              height={259}
-              className="h-auto w-full max-w-[280px] drop-shadow-[0_0_24px_rgba(0,212,255,0.25)]"
-              priority
-            />
-          </div>
-
-          <div className="grid w-full max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
-            {cards.map(card => (
-              <article
-                key={card.id}
-                id={card.id}
-                className="flex flex-col rounded-xl border border-white/10 bg-[rgba(8,12,20,0.65)] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm"
-              >
-                <h2
-                  className={cn(
-                    'mb-2 text-lg font-bold tracking-wide text-white',
-                    fontOrbitron
-                  )}
-                >
-                  {card.title}
-                </h2>
-                <p className="mb-6 flex-1 text-sm leading-relaxed text-slate-400">
-                  {card.description}
-                </p>
-                <Link
-                  href={card.href}
-                  className={cn(
-                    'inline-flex w-fit items-center gap-1.5 text-sm font-medium text-[#5aebff] transition-[color,filter] hover:text-[#00d4ff]',
-                    fontOrbitron
-                  )}
-                >
-                  Acessar
-                  <span aria-hidden className="text-base leading-none">
-                    →
-                  </span>
-                </Link>
-              </article>
-            ))}
-          </div>
+      {/* Page content */}
+      <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-6 pb-16 pt-16">
+        <div className="mb-14 text-center">
+          <p className="mb-2 text-xs uppercase tracking-[3px] text-[#00d4ff]">
+            Área do Gestor
+          </p>
+          <h1 className="text-5xl font-black tracking-tight text-white/90">
+            LEMM
+          </h1>
+          <p className="mt-3 text-sm font-light text-white/40">
+            Laboratório de Estudos e Modelagem Matemática
+          </p>
         </div>
-      </section>
+
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+          {cards.map(card => (
+            <article
+              key={card.id}
+              id={card.id}
+              className="flex flex-col rounded-2xl p-6"
+              style={glass}
+            >
+              <h2 className="mb-2 text-base font-semibold text-white/90">
+                {card.title}
+              </h2>
+              <p className="mb-6 flex-1 text-sm leading-relaxed text-white/50">
+                {card.description}
+              </p>
+              <Link
+                href={card.href}
+                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/20 bg-white/8 px-4 py-1.5 text-xs font-medium text-white/75 transition-colors hover:bg-white/15 hover:text-white"
+              >
+                Acessar →
+              </Link>
+            </article>
+          ))}
+        </div>
+      </main>
     </div>
   )
 }
