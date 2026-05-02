@@ -16,6 +16,8 @@ const navItems = [
   { href: '#', label: 'Eventos' },
   { href: '#', label: 'Data SheLeads' },
   { href: '#', label: 'Sobre Nós' },
+  { href: '#', label: 'Infraestrutura' },
+  { href: '#', label: 'Contato' },
 ] as const
 
 const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'
@@ -80,7 +82,7 @@ export function LabLanding() {
               fontOrbitron
             )}
           >
-            LABORATÓRIO DE PESQUISA AVANÇADA
+            LABORATÓRIO DE ESTUDOS E PESQUISA AVANÇADA
           </p>
 
           <h1

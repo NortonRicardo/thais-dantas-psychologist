@@ -11,9 +11,10 @@ const orbitron = Orbitron({
 export function PublicFooter() {
   return (
     <footer
+      id="rodape"
       className={cn(
         orbitron.variable,
-        'bg-[#050a0f] px-6 py-16 text-center text-white'
+        'scroll-mt-8 bg-[#050a0f] px-6 py-16 text-center text-white'
       )}
     >
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-8">
@@ -32,19 +33,46 @@ export function PublicFooter() {
         <div className="h-px w-24 bg-white/20" />
 
         {/* Descrição */}
-        <p className="max-w-xl text-sm font-light leading-relaxed text-white/50">
-          Laboratório de Estudos em Modelagem e Meteorologia — uma parceria entre a{' '}
-          <span className="text-white/80 font-medium">PUC Goiás</span> e o{' '}
-          <span className="text-white/80 font-medium">Programa de Mestrado</span> em
-          Ciências Ambientais e Computacionais.
-        </p>
+        <div className="max-w-2xl space-y-4 text-sm font-light leading-relaxed text-white/55">
+          <p>
+            <span className="font-medium text-white/85">
+              Laboratório de Estudos e Modelagem Matemática (LEMM)
+            </span>
+            <br />
+            <span className="text-white/70">
+              Proposta vinculada à{' '}
+              <span className="text-white/80">
+                Pontifícia Universidade Católica de Goiás (PUC Goiás)
+              </span>
+              , no âmbito do{' '}
+              <span className="text-white/80">
+                Mestrado em Engenharia Industrial e Inteligência Artificial
+                (PPGEIIA)
+              </span>
+              . Foco em modelagem climática avançada, IA, otimização, HPC,
+              desenvolvimento de software e articulação com a pós-graduação e a
+              graduação.
+            </span>
+          </p>
+        </div>
 
         {/* Links */}
-        <nav className="flex flex-wrap justify-center gap-6 text-[0.7rem] uppercase tracking-[3px] text-white/40">
-          <Link href="#" className="transition-colors hover:text-white">Pesquisa</Link>
-          <Link href="#" className="transition-colors hover:text-white">Equipe</Link>
-          <Link href="#" className="transition-colors hover:text-white">Publicações</Link>
-          <Link href="#" className="transition-colors hover:text-white">Contato</Link>
+        <nav
+          className="flex flex-wrap justify-center gap-6 text-[0.7rem] uppercase tracking-[3px] text-white/40"
+          aria-label="Rodapé"
+        >
+          <Link href="#area1" className="transition-colors hover:text-white">
+            Formação
+          </Link>
+          <Link href="#area2" className="transition-colors hover:text-white">
+            Eventos
+          </Link>
+          <Link href="#area3" className="transition-colors hover:text-white">
+            Pesquisa
+          </Link>
+          <Link href="#area8" className="transition-colors hover:text-white">
+            Software
+          </Link>
         </nav>
 
         {/* Divisor */}

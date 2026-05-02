@@ -19,111 +19,115 @@ const overlayGradientLeft =
 const overlayGradientRight =
   'linear-gradient(90deg,transparent 0%,rgba(0,0,0,0.25) 35%,rgba(0,0,0,0.75) 65%,rgba(0,0,0,0.92) 100%)'
 
+/**
+ * Ordem visual: Formação → Eventos → linhas de pesquisa… Software antes do HPC (#area9).
+ */
 const areas = [
-  {
-    id: 'area8',
-    imageSrc:
-      'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070',
-    imageAlt: 'Laboratório e equipamentos — formação de recursos humanos',
-    tag: 'Educação & Pesquisa',
-    title: 'Formação de Recursos Humanos',
-    description:
-      'Integração estruturada entre graduação e pós-graduação, formando novos talentos em ciência de dados e modelagem avançada.',
-    cta: 'NOSSA EQUIPE',
-    href: '#',
-  },
   {
     id: 'area1',
     imageSrc:
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070',
-    imageAlt:
-      'Paisagem montanhosa — Ciência climática e modelagem ambiental no LEMM',
-    tag: 'Ciência Climática & Pesquisa',
-    title: 'Modelagem Climática e Ambiental',
+      'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070',
+    imageAlt: 'Formação em laboratório — IC, TCC e mestrado',
+    tag: 'Formação & Redes',
+    title: 'Formação e Articulação Institucional',
     description:
-      'Estudo de eventos extremos como secas e ondas de calor. Utilizamos modelos regionais (WRF, MPAS) e integração de dados do INMET e ERA5 para diagnósticos precisos.',
-    cta: 'CONHEÇA NOSSA PESQUISA',
+      'A infraestrutura sustenta IC, TCC e mestrado (PPGEIIA), com planos de trabalho articulados entre ciência de dados, IA, clima e otimização. Integramos graduação e pós-graduação e rede com INPE, UnB (LAMFO, SEM FOGO), UFCAT e outros parceiros estratégicos.',
+    cta: 'FORMAÇÃO',
     href: '#',
   },
   {
     id: 'area2',
-    imageSrc: '/dashboards-scaled-2.jpg',
-    imageAlt: 'Dashboard de dados — IA e ciência de dados no LEMM',
-    tag: 'Inteligência Artificial',
-    title: 'IA e Ciência de Dados',
+    imageSrc: '/class.png',
+    imageAlt: 'Eventos e sala de aula — extensão e capacitação',
+    tag: 'Extensão',
+    title: 'Eventos, Minicursos e Capacitação',
     description:
-      'Desenvolvimento de arquiteturas Transformers, modelos híbridos (IA + Física) e fluxos de RAG para recuperação de informação científica qualificada.',
-    cta: 'VER MODELOS',
+      'Organizamos eventos, mesas-redondas e encontros com a comunidade acadêmica e parceiros; conduzimos minicursos práticos (Python para dados, deep learning introdutório, modelagem climática, otimização e ferramentas alinhadas às linhas do laboratório), reforçando a ponte entre formação e pesquisa aplicada.',
+    cta: 'EVENTOS',
+    href: '#',
+  },
+  {
+    id: 'area3',
+    imageSrc:
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070',
+    imageAlt:
+      'Paisagem e clima — modelagem climática e ambiental no Centro-Oeste',
+    tag: 'Ciência Climática & Pesquisa',
+    title: 'Modelagem Climática e Ambiental',
+    description:
+      'A região Centro-Oeste concentra exposição a secas, ondas de calor e anomalias hidrometeorológicas; integramos dados do INMET, reanálises (ERA5), séries espaciais e modelos regionais (WRF, MPAS) para diagnósticos locais, eventos extremos e reconstrução observacional.',
+    cta: 'LINHA CLIMÁTICA',
     href: '#',
   },
   {
     id: 'area4',
-    imageSrc:
-      'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2000',
-    imageAlt: 'Visualização analítica — otimização e metaheurísticas',
-    tag: 'Matemática Aplicada',
-    title: 'Otimização e Metaheurísticas',
+    imageSrc: '/dashboards-scaled-2.jpg',
+    imageAlt:
+      'Painéis analíticos — IA, aprendizado profundo e ciência de dados',
+    tag: 'Inteligência Artificial',
+    title: 'IA e Ciência de Dados',
     description:
-      'Pesquisa operacional aplicada a problemas combinatórios de grande escala, finanças e tomada de decisão sob risco climático.',
-    cta: 'ALGORITMOS',
+      'Desenvolvemos Transformers, modelos híbridos IA–física e fluxos RAG sobre uma base curada com centenas de artigos em clima, em articulação com o repositório do LEMM — revisão assistida por IA, mineração de literatura e recuperação qualificada de conhecimento.',
+    cta: 'IA & DADOS',
     href: '#',
   },
   {
     id: 'area5',
     imageSrc:
-      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=2000',
-    imageAlt: 'Campo agrícola — aplicações agroindustriais e sustentabilidade',
-    tag: 'Agro & Sustentabilidade',
-    title: 'Aplicações Agroindustriais',
+      'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2000',
+    imageAlt: 'Visualização de dados — otimização e metaheurísticas',
+    tag: 'Matemática Aplicada',
+    title: 'Otimização e Metaheurísticas',
     description:
-      'Estudos sobre logística da soja, emissões de CO₂ e agricultura de precisão através de gêmeos digitais e visão computacional.',
-    cta: 'SOLUÇÕES AGRO',
+      'Pesquisa operacional, metaheurísticas e otimização matemática aplicadas a problemas combinatórios, finanças, logística de cadeias agroindustriais e decisão sob risco climático. Consolidamos rotinas e ferramentas de software registradas para apoio à decisão e reprodutibilidade.',
+    cta: 'OTIMIZAÇÃO',
     href: '#',
   },
   {
     id: 'area6',
     imageSrc:
-      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000',
-    imageAlt: 'Vista urbana — cidades inteligentes e clima urbano',
-    tag: 'Smart Cities',
-    title: 'Cidades Inteligentes e Clima Urbano',
+      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=2000',
+    imageAlt: 'Agronegócio — cadeias agroindustriais e sustentabilidade',
+    tag: 'Agro & Sustentabilidade',
+    title: 'Cadeias Agroindustriais e Precisão',
     description:
-      'Análise de ilhas de calor e microclimas para suporte ao planejamento urbano, infraestrutura verde e saúde pública.',
-    cta: 'PLANEJAMENTO',
+      'Estudos sobre logística da soja, emissões de CO₂, conservação de solo, rastreabilidade, gêmeos digitais e visão computacional voltados ao agronegócio do Centro-Oeste e à agricultura de precisão, em rede com Agronomia e parceiros.',
+    cta: 'LINHA AGRO',
     href: '#',
   },
   {
     id: 'area7',
-    imageSrc: '/system.png',
-    imageAlt: 'Interface digital — plataformas e produtos tecnológicos',
-    tag: 'Produtos Digitais',
-    title: 'Plataformas e Produtos Tecnológicos',
+    imageSrc:
+      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000',
+    imageAlt: 'Cidade e infraestrutura — clima urbano e smart cities',
+    tag: 'Smart Cities',
+    title: 'Clima Urbano e Cidades Inteligentes',
     description:
-      'Desenvolvimento e expansão de soluções como Weather Brasil e META TOOL BOX para automação analítica e apoio à decisão.',
-    cta: 'ACESSAR PLATAFORMAS',
+      'Ilhas de calor, microclimas e impactos em saúde e planejamento territorial: apoiamos decisões sobre infraestrutura verde, mitigação térmica e soluções de smart cities, em articulação com linhas de pesquisa em ondas de calor e microclima urbano.',
+    cta: 'CIDADES',
     href: '#',
   },
   {
-    id: 'area3',
-    imageSrc: '/data-center.png',
+    id: 'area8',
+    imageSrc: '/system.png',
     imageAlt:
-      'Data center e infraestrutura — computação de alto desempenho no LEMM',
-    tag: 'Alta Performance',
-    title: 'Computação de Alto Desempenho (HPC)',
+      'Interfaces de software — automação analítica e produtos computacionais',
+    tag: 'Software & Integração',
+    title: 'Software, Automação Analítica e Produtos Computacionais',
     description:
-      'Infraestrutura multiusuária escalável para processamento de Big Data espacial e treinamento intensivo em GPU para modelos complexos.',
-    cta: 'INFRAESTRUTURA',
+      'Desenvolvemos e integramos pipelines de dados, rotinas de imputação e qualidade, automação analítica e fluxos de recuperação de conhecimento aplicados à literatura científica — soluções multiusuárias para apoio à decisão, reprodutibilidade e cooperação institucional, sem depender de um único produto comercial.',
+    cta: 'SOLUÇÕES',
     href: '#',
   },
   {
     id: 'area9',
-    imageSrc: '/class.png',
-    imageAlt: 'Sala de aula — eventos, minicursos e workshops tecnológicos no LEMM',
-    tag: 'Eventos & Formação',
-    title: 'Eventos, Minicursos e Workshops Tecnológicos',
+    imageSrc: '/data-center.png',
+    imageAlt: 'Infraestrutura computacional — HPC, GPU e ambiente multiusuário',
+    tag: 'Alta Performance',
+    title: 'Computação de Alto Desempenho (HPC)',
     description:
-      'Promovemos eventos práticos de formação voltados à comunidade acadêmica e ao mercado. Nossos minicursos abrangem tópicos de vanguarda como programação em Python para dados, introdução ao Deep Learning, modelagem climática básica e uso de ferramentas de otimização.',
-    cta: 'VER EVENTOS',
+      'Ambiente multiusuário para armazenamento centralizado, filas e uso intensivo de GPU em Big Data espacial, treinamento e inferência. A ampliação com NAS e estação de IA de alta VRAM escala MPAS, WRF e experimentos que excedem a capacidade típica de VRAM.',
+    cta: 'INFRAESTRUTURA',
     href: '#',
   },
 ] as const
@@ -177,13 +181,17 @@ export function LabAreaSections() {
             {/* Gradiente de transição: topo */}
             <div
               className="pointer-events-none absolute inset-x-0 top-0 z-3 h-[22%]"
-              style={{ background: 'linear-gradient(to bottom, #050a0f, transparent)' }}
+              style={{
+                background: 'linear-gradient(to bottom, #050a0f, transparent)',
+              }}
               aria-hidden
             />
             {/* Gradiente de transição: base */}
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 z-3 h-[22%]"
-              style={{ background: 'linear-gradient(to top, #050a0f, transparent)' }}
+              style={{
+                background: 'linear-gradient(to top, #050a0f, transparent)',
+              }}
               aria-hidden
             />
 
