@@ -293,16 +293,20 @@ function EventCard({ event }: { event: PublicEvent }) {
 type Props = { events: PublicEvent[] }
 
 export function EventsSection({ events }: Props) {
-  const featured = events.find(e => e.featured)
+  const featuredList = events
+    .filter(e => e.featured)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   const rest = events
-    .filter(e => e.id !== featured?.id)
+    .filter(e => !e.featured)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   const upcoming = rest.filter(e => !isPast(e.date))
   const past = rest.filter(e => isPast(e.date))
 
   return (
     <div className="mt-8 flex w-full flex-col gap-10 pb-16">
-      {featured && <FeaturedCard event={featured} />}
+      {featuredList.map(event => (
+        <FeaturedCard key={event.id} event={event} />
+      ))}
 
       {upcoming.length > 0 && (
         <div>
