@@ -33,7 +33,7 @@ const areas = [
     description:
       'A infraestrutura sustenta IC, TCC e mestrado (PPGEIIA), com planos de trabalho articulados entre ciência de dados, IA, clima e otimização. Integramos graduação e pós-graduação e rede com INPE, UnB (LAMFO, SEM FOGO), UFCAT e outros parceiros estratégicos.',
     cta: 'FORMAÇÃO',
-    href: '#',
+    href: '/sobre-nos',
   },
   {
     id: 'area2',
@@ -44,7 +44,7 @@ const areas = [
     description:
       'Organizamos eventos, mesas-redondas e encontros com a comunidade acadêmica e parceiros; conduzimos minicursos práticos (Python para dados, deep learning introdutório, modelagem climática, otimização e ferramentas alinhadas às linhas do laboratório), reforçando a ponte entre formação e pesquisa aplicada.',
     cta: 'EVENTOS',
-    href: '#',
+    href: '/events',
   },
   {
     id: 'area3',
@@ -57,7 +57,7 @@ const areas = [
     description:
       'A região Centro-Oeste concentra exposição a secas, ondas de calor e anomalias hidrometeorológicas; integramos dados do INMET, reanálises (ERA5), séries espaciais e modelos regionais (WRF, MPAS) para diagnósticos locais, eventos extremos e reconstrução observacional.',
     cta: 'LINHA CLIMÁTICA',
-    href: '#',
+    href: '/projetos?tema=clima',
   },
   {
     id: 'area4',
@@ -69,7 +69,7 @@ const areas = [
     description:
       'Desenvolvemos Transformers, modelos híbridos IA–física e fluxos RAG sobre uma base curada com centenas de artigos em clima, em articulação com o repositório do LEMM — revisão assistida por IA, mineração de literatura e recuperação qualificada de conhecimento.',
     cta: 'IA & DADOS',
-    href: '#',
+    href: '/projetos?tema=matematica',
   },
   {
     id: 'area5',
@@ -81,7 +81,7 @@ const areas = [
     description:
       'Pesquisa operacional, metaheurísticas e otimização matemática aplicadas a problemas combinatórios, finanças, logística de cadeias agroindustriais e decisão sob risco climático. Consolidamos rotinas e ferramentas de software registradas para apoio à decisão e reprodutibilidade.',
     cta: 'OTIMIZAÇÃO',
-    href: '#',
+    href: '/projetos?tema=otimizacao',
   },
   {
     id: 'area6',
@@ -93,7 +93,7 @@ const areas = [
     description:
       'Estudos sobre logística da soja, emissões de CO₂, conservação de solo, rastreabilidade, gêmeos digitais e visão computacional voltados ao agronegócio do Centro-Oeste e à agricultura de precisão, em rede com Agronomia e parceiros.',
     cta: 'LINHA AGRO',
-    href: '#',
+    href: '/projetos?tema=agro',
   },
   {
     id: 'area7',
@@ -105,7 +105,7 @@ const areas = [
     description:
       'Ilhas de calor, microclimas e impactos em saúde e planejamento territorial: apoiamos decisões sobre infraestrutura verde, mitigação térmica e soluções de smart cities, em articulação com linhas de pesquisa em ondas de calor e microclima urbano.',
     cta: 'CIDADES',
-    href: '#',
+    href: '/projetos?tema=clima',
   },
   {
     id: 'area8',
@@ -117,7 +117,7 @@ const areas = [
     description:
       'Desenvolvemos e integramos pipelines de dados, rotinas de imputação e qualidade, automação analítica e fluxos de recuperação de conhecimento aplicados à literatura científica — soluções multiusuárias para apoio à decisão, reprodutibilidade e cooperação institucional, sem depender de um único produto comercial.',
     cta: 'SOLUÇÕES',
-    href: '#',
+    href: '/projetos',
   },
   {
     id: 'area9',
@@ -128,7 +128,7 @@ const areas = [
     description:
       'Ambiente multiusuário para armazenamento centralizado, filas e uso intensivo de GPU em Big Data espacial, treinamento e inferência. A ampliação com NAS e estação de IA de alta VRAM escala MPAS, WRF e experimentos que excedem a capacidade típica de VRAM.',
     cta: 'INFRAESTRUTURA',
-    href: '#',
+    href: '/infraestrutura',
   },
 ] as const
 
