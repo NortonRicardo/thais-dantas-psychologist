@@ -15,7 +15,7 @@ export default function Home() {
     <>
       <LabLanding />
       <LabAreaSections />
-      <PublicFooter />
+      <PublicFooter topBlur={false} />
     </>
   )
 }

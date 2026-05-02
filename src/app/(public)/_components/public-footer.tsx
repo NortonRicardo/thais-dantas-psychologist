@@ -8,15 +8,22 @@ const orbitron = Orbitron({
   variable: '--font-orbitron',
 })
 
-export function PublicFooter() {
+interface PublicFooterProps {
+  topBlur?: boolean
+}
+
+export function PublicFooter({ topBlur = true }: PublicFooterProps) {
   return (
     <footer
       id="rodape"
       className={cn(
         orbitron.variable,
-        'scroll-mt-8 bg-[#050a0f] px-6 py-16 text-center text-white'
+        'relative scroll-mt-8 bg-[#050a0f] px-6 py-16 text-center text-white'
       )}
     >
+      {topBlur && (
+        <div className="pointer-events-none absolute inset-x-0 -top-8 h-20 bg-gradient-to-b from-black to-transparent" />
+      )}
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-8">
         {/* Logo */}
         <Link
