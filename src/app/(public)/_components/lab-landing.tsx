@@ -13,9 +13,9 @@ const orbitron = Orbitron({
 
 const navItems = [
   { href: '#', label: 'Projetos' },
-  { href: '#', label: 'Artigos' },
   { href: '#', label: 'Eventos' },
   { href: '#', label: 'Data SheLeads' },
+  { href: '#', label: 'Sobre Nós' },
 ] as const
 
 const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'

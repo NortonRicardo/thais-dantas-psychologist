@@ -115,6 +115,17 @@ const areas = [
     cta: 'INFRAESTRUTURA',
     href: '#',
   },
+  {
+    id: 'area9',
+    imageSrc: '/class.png',
+    imageAlt: 'Sala de aula — eventos, minicursos e workshops tecnológicos no LEMM',
+    tag: 'Eventos & Formação',
+    title: 'Eventos, Minicursos e Workshops Tecnológicos',
+    description:
+      'Promovemos eventos práticos de formação voltados à comunidade acadêmica e ao mercado. Nossos minicursos abrangem tópicos de vanguarda como programação em Python para dados, introdução ao Deep Learning, modelagem climática básica e uso de ferramentas de otimização.',
+    cta: 'VER EVENTOS',
+    href: '#',
+  },
 ] as const
 
 export function LabAreaSections() {
@@ -160,6 +171,19 @@ export function LabAreaSections() {
                   ? overlayGradientRight
                   : overlayGradientLeft,
               }}
+              aria-hidden
+            />
+
+            {/* Gradiente de transição: topo */}
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 z-3 h-[22%]"
+              style={{ background: 'linear-gradient(to bottom, #050a0f, transparent)' }}
+              aria-hidden
+            />
+            {/* Gradiente de transição: base */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 z-3 h-[22%]"
+              style={{ background: 'linear-gradient(to top, #050a0f, transparent)' }}
               aria-hidden
             />
 

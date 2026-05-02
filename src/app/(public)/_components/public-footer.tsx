@@ -1,23 +1,59 @@
 import Link from 'next/link'
+import { Orbitron } from 'next/font/google'
+import { cn } from '@/lib/utils'
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  variable: '--font-orbitron',
+})
 
 export function PublicFooter() {
   return (
-    <footer className="bg-black px-4 py-12 sm:px-6 sm:py-16 md:px-8">
-      <div className="mx-auto flex max-w-2xl flex-col items-center gap-10 text-center sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:text-left">
+    <footer
+      className={cn(
+        orbitron.variable,
+        'bg-[#050a0f] px-6 py-16 text-center text-white'
+      )}
+    >
+      <div className="mx-auto flex max-w-4xl flex-col items-center gap-8">
+        {/* Logo */}
         <Link
           href="/"
-          className="inline-flex shrink-0 rounded-md outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-          aria-label="LEMM — home page"
+          className="outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050a0f]"
+          aria-label="LEMM — página inicial"
         >
-          <span className="text-lg font-black tracking-[0.35em] text-white sm:text-xl md:tracking-[6px]">
+          <span className="[font-family:var(--font-orbitron),sans-serif] text-2xl font-black tracking-[0.4em] text-white">
             LEMM
           </span>
         </Link>
-        <div className="flex min-w-0 w-full flex-col items-center gap-5 sm:items-end sm:gap-4">
-          <p className="max-w-[20rem] text-[10px] leading-relaxed tracking-wider text-white/40 sm:max-w-none sm:text-xs">
-            LEMM © 2026. ALL RIGHTS RESERVED.
-          </p>
-        </div>
+
+        {/* Divisor */}
+        <div className="h-px w-24 bg-white/20" />
+
+        {/* Descrição */}
+        <p className="max-w-xl text-sm font-light leading-relaxed text-white/50">
+          Laboratório de Estudos em Modelagem e Meteorologia — uma parceria entre a{' '}
+          <span className="text-white/80 font-medium">PUC Goiás</span> e o{' '}
+          <span className="text-white/80 font-medium">Programa de Mestrado</span> em
+          Ciências Ambientais e Computacionais.
+        </p>
+
+        {/* Links */}
+        <nav className="flex flex-wrap justify-center gap-6 text-[0.7rem] uppercase tracking-[3px] text-white/40">
+          <Link href="#" className="transition-colors hover:text-white">Pesquisa</Link>
+          <Link href="#" className="transition-colors hover:text-white">Equipe</Link>
+          <Link href="#" className="transition-colors hover:text-white">Publicações</Link>
+          <Link href="#" className="transition-colors hover:text-white">Contato</Link>
+        </nav>
+
+        {/* Divisor */}
+        <div className="h-px w-full max-w-xs bg-white/10" />
+
+        {/* Copyright */}
+        <p className="text-[0.65rem] uppercase tracking-[3px] text-white/25">
+          LEMM © 2026 — Todos os direitos reservados
+        </p>
       </div>
     </footer>
   )
