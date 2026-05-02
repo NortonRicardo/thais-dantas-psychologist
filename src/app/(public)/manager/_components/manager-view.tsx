@@ -39,10 +39,7 @@ export function ManagerView() {
             fontOrbitron
           )}
         >
-          <nav
-            className="flex justify-center"
-            aria-label="Navegação do gestor"
-          >
+          <nav className="flex justify-center" aria-label="Navegação do gestor">
             <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-8 p-0 sm:gap-12">
               {navItems.map(({ href, label }) => (
                 <li key={label}>

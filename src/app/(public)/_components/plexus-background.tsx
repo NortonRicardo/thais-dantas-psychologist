@@ -42,7 +42,8 @@ function minSeparationForCount(
   countMin: number
 ) {
   const t =
-    (count - countMin) / Math.max(1, baseSettings.countMax - baseSettings.countMin)
+    (count - countMin) /
+    Math.max(1, baseSettings.countMax - baseSettings.countMin)
   return Math.max(0.03, baseRatio * (1 - 0.2 * t))
 }
 
@@ -82,7 +83,9 @@ export function PlexusBackground({
   networkColor = defaultNetworkColor,
   subtle = false,
 }: PlexusBackgroundProps) {
-  const settings = subtle ? { ...baseSettings, ...subtleSettings } : baseSettings
+  const settings = subtle
+    ? { ...baseSettings, ...subtleSettings }
+    : baseSettings
   const wrapperRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 

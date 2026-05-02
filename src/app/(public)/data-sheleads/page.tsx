@@ -4,8 +4,7 @@ import { PublicPageShell } from '../_components/public-page-shell'
 
 export const metadata: Metadata = {
   title: 'Data SheLeads | LEMM',
-  description:
-    'Iniciativa Data SheLeads no âmbito do LEMM — PUC Goiás.',
+  description: 'Iniciativa Data SheLeads no âmbito do LEMM — PUC Goiás.',
 }
 
 export default function DataSheLeadsPage() {

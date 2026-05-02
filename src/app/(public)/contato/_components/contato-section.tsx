@@ -31,7 +31,11 @@ export function ContatoSection() {
           src="https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed"
           width="100%"
           height="500"
-          style={{ border: 0, display: 'block', filter: 'grayscale(1) invert(0.9) contrast(0.85)' }}
+          style={{
+            border: 0,
+            display: 'block',
+            filter: 'grayscale(1) invert(0.9) contrast(0.85)',
+          }}
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
@@ -44,7 +48,8 @@ export function ContatoSection() {
         <div
           className="flex flex-col items-center gap-3 px-4 py-6 text-center"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+            background:
+              'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
             borderRadius: '20px',
@@ -71,7 +76,8 @@ export function ContatoSection() {
             rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
             className="group flex flex-col items-center gap-3 px-4 py-6 text-center transition-colors"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+              background:
+                'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
               borderRadius: '20px',
