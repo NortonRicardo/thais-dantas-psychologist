@@ -2,13 +2,19 @@ export type Event = {
   id: string
   title: string
   description: string
-  date: string        // ISO string
-  link?: string       // saiba mais / página do evento
-  meetLink?: string   // link de sala (Google Meet, Teams, Zoom...)
+  date: string // ISO string
+  link?: string // saiba mais / página do evento
+  meetLink?: string // link de sala (Google Meet, Teams, Zoom...)
   image?: string
   organizer?: string
   speaker?: string
-  type: 'Conferência' | 'Workshop' | 'Seminário' | 'Desafio' | 'Minicurso' | 'Defesa'
+  type:
+    | 'Conferência'
+    | 'Workshop'
+    | 'Seminário'
+    | 'Desafio'
+    | 'Minicurso'
+    | 'Defesa'
   featured?: boolean
 }
 

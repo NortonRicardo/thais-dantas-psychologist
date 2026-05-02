@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { ProjectCard } from './project-card'
 import { projects, type ProjectTheme } from '../_data/projects-data'
@@ -12,27 +11,50 @@ const themes: ProjectTheme[] = [
   'Agro & Sustentabilidade',
 ]
 
-const themeColor: Record<ProjectTheme, { bg: string; border: string; text: string; activeBg: string }> = {
-  'Clima':                        { bg: 'rgba(0,180,255,0.08)',  border: 'rgba(0,180,255,0.25)',  text: 'rgb(80,200,255)',  activeBg: 'rgba(0,180,255,0.22)'  },
-  'Matemática':                   { bg: 'rgba(160,0,255,0.08)', border: 'rgba(160,0,255,0.25)', text: 'rgb(200,120,255)', activeBg: 'rgba(160,0,255,0.22)' },
-  'Otimização e Metaheurísticas': { bg: 'rgba(255,140,0,0.08)', border: 'rgba(255,140,0,0.25)', text: 'rgb(255,180,60)',  activeBg: 'rgba(255,140,0,0.22)'  },
-  'Agro & Sustentabilidade':      { bg: 'rgba(0,200,100,0.08)', border: 'rgba(0,200,100,0.25)', text: 'rgb(60,220,140)',  activeBg: 'rgba(0,200,100,0.22)'  },
+const themeColor: Record<
+  ProjectTheme,
+  { bg: string; border: string; text: string; activeBg: string }
+> = {
+  Clima: {
+    bg: 'rgba(0,180,255,0.08)',
+    border: 'rgba(0,180,255,0.25)',
+    text: 'rgb(80,200,255)',
+    activeBg: 'rgba(0,180,255,0.22)',
+  },
+  Matemática: {
+    bg: 'rgba(160,0,255,0.08)',
+    border: 'rgba(160,0,255,0.25)',
+    text: 'rgb(200,120,255)',
+    activeBg: 'rgba(160,0,255,0.22)',
+  },
+  'Otimização e Metaheurísticas': {
+    bg: 'rgba(255,140,0,0.08)',
+    border: 'rgba(255,140,0,0.25)',
+    text: 'rgb(255,180,60)',
+    activeBg: 'rgba(255,140,0,0.22)',
+  },
+  'Agro & Sustentabilidade': {
+    bg: 'rgba(0,200,100,0.08)',
+    border: 'rgba(0,200,100,0.25)',
+    text: 'rgb(60,220,140)',
+    activeBg: 'rgba(0,200,100,0.22)',
+  },
 }
 
 // Slug → ProjectTheme
 const slugToTheme: Record<string, ProjectTheme> = {
-  clima:       'Clima',
-  matematica:  'Matemática',
-  otimizacao:  'Otimização e Metaheurísticas',
-  agro:        'Agro & Sustentabilidade',
+  clima: 'Clima',
+  matematica: 'Matemática',
+  otimizacao: 'Otimização e Metaheurísticas',
+  agro: 'Agro & Sustentabilidade',
 }
 
 // ProjectTheme → slug
 const themeToSlug: Record<ProjectTheme, string> = {
-  'Clima':                        'clima',
-  'Matemática':                   'matematica',
+  Clima: 'clima',
+  Matemática: 'matematica',
   'Otimização e Metaheurísticas': 'otimizacao',
-  'Agro & Sustentabilidade':      'agro',
+  'Agro & Sustentabilidade': 'agro',
 }
 
 export function ProjectsGrid() {
@@ -40,23 +62,15 @@ export function ProjectsGrid() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const [active, setActive] = useState<ProjectTheme | null>(() => {
-    const slug = searchParams.get('tema')
-    return slug ? (slugToTheme[slug] ?? null) : null
-  })
-
-  // Sync with URL on mount / back-forward
-  useEffect(() => {
-    const slug = searchParams.get('tema')
-    setActive(slug ? (slugToTheme[slug] ?? null) : null)
-  }, [searchParams])
+  const slug = searchParams.get('tema')
+  const active = slug ? (slugToTheme[slug] ?? null) : null
 
   function select(theme: ProjectTheme | null) {
-    setActive(theme)
     const params = new URLSearchParams(searchParams.toString())
     if (theme) params.set('tema', themeToSlug[theme])
     else params.delete('tema')
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    const qs = params.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
   }
 
   const filtered = active
@@ -71,9 +85,15 @@ export function ProjectsGrid() {
           onClick={() => select(null)}
           className="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
           style={{
-            background: active === null ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)',
+            background:
+              active === null
+                ? 'rgba(255,255,255,0.15)'
+                : 'rgba(255,255,255,0.06)',
             border: '1px solid rgba(255,255,255,0.2)',
-            color: active === null ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)',
+            color:
+              active === null
+                ? 'rgba(255,255,255,0.95)'
+                : 'rgba(255,255,255,0.45)',
           }}
         >
           Todos
@@ -108,7 +128,9 @@ export function ProjectsGrid() {
       </div>
 
       {filtered.length === 0 && (
-        <p className="mt-12 text-center text-sm text-white/30">Nenhum projeto neste tema ainda.</p>
+        <p className="mt-12 text-center text-sm text-white/30">
+          Nenhum projeto neste tema ainda.
+        </p>
       )}
     </div>
   )

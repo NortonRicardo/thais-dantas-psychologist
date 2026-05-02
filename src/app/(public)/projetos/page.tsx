@@ -5,7 +5,8 @@ import { ProjectsGrid } from './_components/projects-grid'
 
 export const metadata: Metadata = {
   title: 'Projetos | LEMM',
-  description: 'Projetos de pesquisa, TCC, mestrado e plataformas do ecossistema LEMM — PUC Goiás.',
+  description:
+    'Projetos de pesquisa, TCC, mestrado e plataformas do ecossistema LEMM — PUC Goiás.',
 }
 
 export default function ProjetosPage() {

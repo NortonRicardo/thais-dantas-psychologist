@@ -1,10 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Github, CalendarDays, Users, ArrowRight } from 'lucide-react'
-import type { Project, ProjectCategory, ProjectTheme } from '../_data/projects-data'
+import type {
+  Project,
+  ProjectCategory,
+  ProjectTheme,
+} from '../_data/projects-data'
 
 const glass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
   border: '1px solid rgba(255,255,255,0.18)',
@@ -12,39 +17,43 @@ const glass = {
 } as const
 
 const categoryColor: Record<ProjectCategory, string> = {
-  'TCC':                  'rgba(0,180,255,0.18)',
+  TCC: 'rgba(0,180,255,0.18)',
   'Iniciação Científica': 'rgba(0,200,120,0.18)',
-  'Mestrado':             'rgba(160,0,255,0.18)',
-  'Plataforma':           'rgba(255,140,0,0.18)',
-  'Pesquisa':             'rgba(0,160,220,0.18)',
+  Mestrado: 'rgba(160,0,255,0.18)',
+  Plataforma: 'rgba(255,140,0,0.18)',
+  Pesquisa: 'rgba(0,160,220,0.18)',
 }
 const categoryBorder: Record<ProjectCategory, string> = {
-  'TCC':                  'rgba(0,180,255,0.4)',
+  TCC: 'rgba(0,180,255,0.4)',
   'Iniciação Científica': 'rgba(0,200,120,0.4)',
-  'Mestrado':             'rgba(160,0,255,0.4)',
-  'Plataforma':           'rgba(255,140,0,0.4)',
-  'Pesquisa':             'rgba(0,160,220,0.4)',
+  Mestrado: 'rgba(160,0,255,0.4)',
+  Plataforma: 'rgba(255,140,0,0.4)',
+  Pesquisa: 'rgba(0,160,220,0.4)',
 }
 const categoryText: Record<ProjectCategory, string> = {
-  'TCC':                  'rgb(80,200,255)',
+  TCC: 'rgb(80,200,255)',
   'Iniciação Científica': 'rgb(60,220,140)',
-  'Mestrado':             'rgb(200,120,255)',
-  'Plataforma':           'rgb(255,180,60)',
-  'Pesquisa':             'rgb(60,190,255)',
+  Mestrado: 'rgb(200,120,255)',
+  Plataforma: 'rgb(255,180,60)',
+  Pesquisa: 'rgb(60,190,255)',
 }
 
 const themeColor: Record<ProjectTheme, string> = {
-  'Clima':                        'rgba(0,180,255,0.6)',
-  'Matemática':                   'rgba(200,120,255,0.6)',
+  Clima: 'rgba(0,180,255,0.6)',
+  Matemática: 'rgba(200,120,255,0.6)',
   'Otimização e Metaheurísticas': 'rgba(255,180,60,0.6)',
-  'Agro & Sustentabilidade':      'rgba(60,220,140,0.6)',
+  'Agro & Sustentabilidade': 'rgba(60,220,140,0.6)',
 }
 
 function ThemePill({ theme }: { theme: ProjectTheme }) {
   return (
     <span
       className="rounded-full px-2 py-0.5 text-[0.55rem] font-medium uppercase tracking-[1.5px]"
-      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: themeColor[theme] }}
+      style={{
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.12)',
+        color: themeColor[theme],
+      }}
     >
       {theme}
     </span>
@@ -67,7 +76,10 @@ function CategoryBadge({ category }: { category: ProjectCategory }) {
 }
 
 function formatDateShort(iso: string) {
-  return new Date(iso).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 export function ProjectCard({ project }: { project: Project }) {
@@ -95,8 +107,12 @@ export function ProjectCard({ project }: { project: Project }) {
         </div>
 
         <div className="flex flex-1 flex-col gap-1.5">
-          <h3 className="text-sm font-bold leading-snug text-white/90">{project.title}</h3>
-          <p className="line-clamp-3 text-xs leading-relaxed text-white/50">{project.description}</p>
+          <h3 className="text-sm font-bold leading-snug text-white/90">
+            {project.title}
+          </h3>
+          <p className="line-clamp-3 text-xs leading-relaxed text-white/50">
+            {project.description}
+          </p>
         </div>
 
         {/* Autores */}

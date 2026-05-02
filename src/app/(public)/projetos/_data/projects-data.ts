@@ -19,8 +19,8 @@ export type Project = {
   description: string
   image?: string
   authors: string[]
-  startDate: string        // YYYY-MM-DD
-  endDate?: string         // undefined = em andamento
+  startDate: string // YYYY-MM-DD
+  endDate?: string // undefined = em andamento
   gitUrl?: string
   publicationUrl?: string
   advisor?: string
@@ -65,7 +65,10 @@ export const projects: Project[] = [
     themes: ['Otimização e Metaheurísticas', 'Matemática'],
     description:
       'Plataforma computacional com registro de software dedicada a algoritmos de otimização e metaheurísticas (PSO, GA, SA, ACO). Desenvolvida desde 2016, conta com módulos para problemas combinatórios, logística, portfólios financeiros e cadeias agroindustriais. Integra aprendizado de máquina com métodos exatos (Learning to Optimize) e serve como base para pesquisas de IC, TCC e mestrado.',
-    authors: ['Dra. Maria José Pereira Dantas', 'Prof. Dr. Wanderlei Malaquias Pereira Junior'],
+    authors: [
+      'Dra. Maria José Pereira Dantas',
+      'Prof. Dr. Wanderlei Malaquias Pereira Junior',
+    ],
     startDate: '2016-01-01',
     gitUrl: 'https://github.com/lemm-pucgoias/meta-tool-box',
     advisor: 'Dra. Maria José Pereira Dantas',

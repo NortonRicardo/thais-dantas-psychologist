@@ -24,7 +24,8 @@ const cards = [
 ] as const
 
 const glass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
   border: '1px solid rgba(255,255,255,0.18)',
@@ -47,7 +48,8 @@ export function ManagerView() {
       style={{
         background:
           'radial-gradient(circle at left center, rgba(0,212,255,0.08) 0%, transparent 40%), radial-gradient(circle at 75% 50%, #002d5a 0%, #050a0f 65%)',
-        fontFamily: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+        fontFamily:
+          'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
       }}
     >
       <div className="mx-auto max-w-[1700px] px-4">

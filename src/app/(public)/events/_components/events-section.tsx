@@ -1,11 +1,19 @@
 'use client'
 
 import Image from 'next/image'
-import { CalendarDays, ExternalLink, MapPin, Mic, Users, Video } from 'lucide-react'
+import {
+  CalendarDays,
+  ExternalLink,
+  MapPin,
+  Mic,
+  Users,
+  Video,
+} from 'lucide-react'
 import { events, type Event } from './events-data'
 
 const glass = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
   border: '1px solid rgba(255,255,255,0.18)',
@@ -13,33 +21,37 @@ const glass = {
 } as const
 
 const typeColor: Record<Event['type'], string> = {
-  'Conferência': 'rgba(0,180,255,0.18)',
-  'Workshop':    'rgba(160,0,255,0.18)',
-  'Seminário':   'rgba(0,200,120,0.18)',
-  'Desafio':     'rgba(255,140,0,0.18)',
-  'Minicurso':   'rgba(0,160,255,0.18)',
-  'Defesa':      'rgba(255,60,100,0.18)',
+  Conferência: 'rgba(0,180,255,0.18)',
+  Workshop: 'rgba(160,0,255,0.18)',
+  Seminário: 'rgba(0,200,120,0.18)',
+  Desafio: 'rgba(255,140,0,0.18)',
+  Minicurso: 'rgba(0,160,255,0.18)',
+  Defesa: 'rgba(255,60,100,0.18)',
 }
 const typeBorder: Record<Event['type'], string> = {
-  'Conferência': 'rgba(0,180,255,0.35)',
-  'Workshop':    'rgba(160,0,255,0.35)',
-  'Seminário':   'rgba(0,200,120,0.35)',
-  'Desafio':     'rgba(255,140,0,0.35)',
-  'Minicurso':   'rgba(0,160,255,0.35)',
-  'Defesa':      'rgba(255,60,100,0.35)',
+  Conferência: 'rgba(0,180,255,0.35)',
+  Workshop: 'rgba(160,0,255,0.35)',
+  Seminário: 'rgba(0,200,120,0.35)',
+  Desafio: 'rgba(255,140,0,0.35)',
+  Minicurso: 'rgba(0,160,255,0.35)',
+  Defesa: 'rgba(255,60,100,0.35)',
 }
 const typeText: Record<Event['type'], string> = {
-  'Conferência': 'rgb(100,210,255)',
-  'Workshop':    'rgb(210,130,255)',
-  'Seminário':   'rgb(80,220,150)',
-  'Desafio':     'rgb(255,180,60)',
-  'Minicurso':   'rgb(80,190,255)',
-  'Defesa':      'rgb(255,100,130)',
+  Conferência: 'rgb(100,210,255)',
+  Workshop: 'rgb(210,130,255)',
+  Seminário: 'rgb(80,220,150)',
+  Desafio: 'rgb(255,180,60)',
+  Minicurso: 'rgb(80,190,255)',
+  Defesa: 'rgb(255,100,130)',
 }
 
 function formatDate(iso: string) {
   const d = new Date(iso)
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+  return d.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function formatTime(iso: string) {
@@ -55,7 +67,11 @@ function TypeBadge({ type }: { type: Event['type'] }) {
   return (
     <span
       className="rounded-full px-2.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[2px]"
-      style={{ background: typeColor[type], border: `1px solid ${typeBorder[type]}`, color: typeText[type] }}
+      style={{
+        background: typeColor[type],
+        border: `1px solid ${typeBorder[type]}`,
+        color: typeText[type],
+      }}
     >
       {type}
     </span>
@@ -68,7 +84,12 @@ function FeaturedCard({ event }: { event: Event }) {
     <div className="relative overflow-hidden rounded-3xl" style={glass}>
       {event.image && (
         <div className="absolute inset-0">
-          <Image src={event.image} alt="" fill className="object-cover opacity-15" />
+          <Image
+            src={event.image}
+            alt=""
+            fill
+            className="object-cover opacity-15"
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-[#050a0f]/95 via-[#050a0f]/70 to-transparent" />
         </div>
       )}
@@ -76,9 +97,13 @@ function FeaturedCard({ event }: { event: Event }) {
         <div className="flex flex-wrap items-center gap-3">
           <TypeBadge type={event.type} />
           {past ? (
-            <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-white/40">Encerrado</span>
+            <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-white/40">
+              Encerrado
+            </span>
           ) : (
-            <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-2.5 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-cyan-300">Em destaque</span>
+            <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-2.5 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-cyan-300">
+              Em destaque
+            </span>
           )}
         </div>
 
@@ -86,7 +111,9 @@ function FeaturedCard({ event }: { event: Event }) {
           <h2 className="text-xl font-black leading-tight tracking-tight text-white sm:text-2xl">
             {event.title}
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-white/60">{event.description}</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/60">
+            {event.description}
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-5 text-xs text-white/45">
@@ -145,13 +172,19 @@ function EventCard({ event }: { event: Event }) {
       <div className="flex items-start justify-between gap-2">
         <TypeBadge type={event.type} />
         {past && (
-          <span className="text-[0.6rem] uppercase tracking-[2px] text-white/30">Encerrado</span>
+          <span className="text-[0.6rem] uppercase tracking-[2px] text-white/30">
+            Encerrado
+          </span>
         )}
       </div>
 
       <div className="flex flex-1 flex-col gap-2">
-        <h3 className="text-sm font-bold leading-snug text-white/90">{event.title}</h3>
-        <p className="line-clamp-3 text-xs leading-relaxed text-white/50">{event.description}</p>
+        <h3 className="text-sm font-bold leading-snug text-white/90">
+          {event.title}
+        </h3>
+        <p className="line-clamp-3 text-xs leading-relaxed text-white/50">
+          {event.description}
+        </p>
       </div>
 
       <div className="mt-auto flex items-center gap-4 border-t border-white/10 pt-4">
@@ -205,9 +238,9 @@ function EventCard({ event }: { event: Event }) {
 
 export function EventsSection() {
   const featured = events.find(e => e.featured)
-  const rest = events.filter(e => !e.featured).sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+  const rest = events
+    .filter(e => !e.featured)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   const upcoming = rest.filter(e => !isPast(e.date))
   const past = rest.filter(e => isPast(e.date))
 
@@ -223,7 +256,9 @@ export function EventsSection() {
             Próximos eventos
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map(e => <EventCard key={e.id} event={e} />)}
+            {upcoming.map(e => (
+              <EventCard key={e.id} event={e} />
+            ))}
           </div>
         </div>
       )}
@@ -235,7 +270,9 @@ export function EventsSection() {
             Eventos anteriores
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {past.map(e => <EventCard key={e.id} event={e} />)}
+            {past.map(e => (
+              <EventCard key={e.id} event={e} />
+            ))}
           </div>
         </div>
       )}
