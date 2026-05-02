@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { href: '/manager', label: 'Home' },
   { href: '/manager/eventos', label: 'Eventos' },
+  { href: '/manager/sobre-nos', label: 'Sobre Nós' },
 ]
 
 export function ManagerNav() {

@@ -36,3 +36,20 @@ export const events = pgTable('events', {
 
 export type Event = typeof events.$inferSelect
 export type NewEvent = typeof events.$inferInsert
+
+/** Marcos da linha do tempo na página Sobre Nós (mês/ano; ordenação pela data) */
+export const aboutTimelineEntries = pgTable('about_timeline_entries', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  date: timestamp('date', { withTimezone: true }).notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type AboutTimelineEntry = typeof aboutTimelineEntries.$inferSelect
+export type NewAboutTimelineEntry = typeof aboutTimelineEntries.$inferInsert

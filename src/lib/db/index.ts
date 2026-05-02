@@ -5,8 +5,7 @@ import * as schema from './schema'
 const globalForDb = globalThis as unknown as { client?: postgres.Sql }
 
 const client =
-  globalForDb.client ??
-  postgres(process.env.DATABASE_URL!, { max: 10 })
+  globalForDb.client ?? postgres(process.env.DATABASE_URL!, { max: 10 })
 
 if (process.env.NODE_ENV !== 'production') globalForDb.client = client
 

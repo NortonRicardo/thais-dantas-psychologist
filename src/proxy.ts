@@ -23,9 +23,21 @@ export function proxy(req: NextRequest) {
     }
   }
 
+  if (pathname.startsWith('/api/about-timeline') && req.method !== 'GET') {
+    if (session !== 'authenticated') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+  }
+
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/manager/:path*', '/api/events/:path*', '/api/events'],
+  matcher: [
+    '/manager/:path*',
+    '/api/events/:path*',
+    '/api/events',
+    '/api/about-timeline/:path*',
+    '/api/about-timeline',
+  ],
 }

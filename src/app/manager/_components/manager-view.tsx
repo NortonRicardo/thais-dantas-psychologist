@@ -18,6 +18,13 @@ const cards = [
     href: '/manager/eventos',
   },
   {
+    id: 'sobre-nos',
+    title: 'Sobre Nós',
+    description:
+      'Linha do tempo institucional exibida na página pública — marcos, anos e textos.',
+    href: '/manager/sobre-nos',
+  },
+  {
     id: 'projetos',
     title: 'Projetos',
     description:
