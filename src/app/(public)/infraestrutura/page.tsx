@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 
 import { PublicPageShell } from '../_components/public-page-shell'
+import { InfraestruturaSection } from './_components/infraestrutura-section'
 
 export const metadata: Metadata = {
   title: 'Infraestrutura | LEMM',
   description:
-    'Infraestrutura de computação e laboratórios do LEMM — PUC Goiás.',
+    'Infraestrutura computacional do LEMM — hardware, plataformas e rede de colaboração.',
 }
 
 export default function InfraestruturaPage() {
@@ -13,7 +14,8 @@ export default function InfraestruturaPage() {
     <PublicPageShell
       aria-label="Infraestrutura LEMM"
       title="Infraestrutura"
-      lead="Equipamentos, clusters e ambiente de pesquisa — detalhes em breve."
+      lead="Hardware de alto desempenho, plataformas proprietárias e rede de colaboração interinstitucional para pesquisa em modelagem climática, IA e otimização."
+      fullWidthContent={<InfraestruturaSection />}
     />
   )
 }

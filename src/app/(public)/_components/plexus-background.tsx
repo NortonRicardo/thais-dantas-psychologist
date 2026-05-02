@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 const baseSettings = {
   countMin: 100,
@@ -26,14 +26,16 @@ const defaultNetworkColor = '255, 120, 0' as const
 
 type Particle = { x: number; y: number; vx: number; vy: number; size: number }
 
-function particleCountForSize(w: number, h: number) {
+function particleCountForSize(
+  w: number,
+  h: number,
+  countMin: number,
+  countMax: number
+) {
   const m = Math.min(w, h)
   const ref = 420
   const t = Math.max(1, m / ref)
-  return Math.min(
-    baseSettings.countMax,
-    Math.max(baseSettings.countMin, Math.round(baseSettings.countMin * t))
-  )
+  return Math.min(countMax, Math.max(countMin, Math.round(countMin * t)))
 }
 
 function minSeparationForCount(
@@ -83,9 +85,10 @@ export function PlexusBackground({
   networkColor = defaultNetworkColor,
   subtle = false,
 }: PlexusBackgroundProps) {
-  const settings = subtle
-    ? { ...baseSettings, ...subtleSettings }
-    : baseSettings
+  const settings = useMemo(
+    () => (subtle ? { ...baseSettings, ...subtleSettings } : baseSettings),
+    [subtle]
+  )
   const wrapperRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -121,12 +124,11 @@ export function PlexusBackground({
 
     function initParticles() {
       const { width: w, height: h } = rectLayout(width, height)
-      const m = Math.min(width, height)
-      const ref = 420
-      const t = Math.max(1, m / ref)
-      const count = Math.min(
-        settings.countMax,
-        Math.max(settings.countMin, Math.round(settings.countMin * t))
+      const count = particleCountForSize(
+        width,
+        height,
+        settings.countMin,
+        settings.countMax
       )
       const minRatio = minSeparationForCount(
         settings.minSeparationRatio,
@@ -218,7 +220,7 @@ export function PlexusBackground({
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [networkColor, subtle])
+  }, [networkColor, settings])
 
   return (
     <div
