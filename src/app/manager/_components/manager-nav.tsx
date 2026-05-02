@@ -12,16 +12,10 @@ const navItems = [
 
 export function ManagerNav() {
   const pathname = usePathname()
-  const router = useRouter()
-
-  async function handleLogout() {
-    await fetch('/api/auth', { method: 'DELETE' })
-    router.replace('/manager/login')
-  }
 
   return (
     <nav
-      className="flex flex-1 flex-wrap items-center gap-1"
+      className="flex flex-wrap items-center justify-center gap-1 justify-self-center"
       aria-label="Principal"
     >
       {navItems.map(({ href, label }) => {
@@ -41,15 +35,27 @@ export function ManagerNav() {
           </Link>
         )
       })}
-
-      <button
-        onClick={handleLogout}
-        className="ml-auto flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-white/35 transition-colors hover:text-white/70"
-        title="Sair"
-      >
-        <LogOut size={14} />
-        Sair
-      </button>
     </nav>
+  )
+}
+
+export function ManagerLogout() {
+  const router = useRouter()
+
+  async function handleLogout() {
+    await fetch('/api/auth', { method: 'DELETE' })
+    router.replace('/manager/login')
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleLogout}
+      className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-white/35 transition-colors hover:text-white/70"
+      title="Sair"
+    >
+      <LogOut size={14} />
+      Sair
+    </button>
   )
 }

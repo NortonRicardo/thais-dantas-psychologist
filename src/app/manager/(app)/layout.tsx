@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ManagerNav } from '../_components/manager-nav'
+import { ManagerLogout, ManagerNav } from '../_components/manager-nav'
 
 const headerShadow = [
   '0 8px 8px rgba(0,0,0,0.1)',
@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <>
       <div className="mx-auto max-w-[1700px] px-4">
         <header
-          className="flex w-full flex-wrap items-center gap-2 px-4 py-2"
+          className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-2"
           style={{
             background: '#071525',
             borderRadius: '0 0 1rem 1rem',
@@ -23,12 +23,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           }}
           role="banner"
         >
-          <div className="flex shrink-0 items-center">
+          <div className="flex min-w-0 shrink-0 items-center justify-self-start">
             <span className="text-[1.125rem] font-semibold leading-7 text-[#e4e4e7]">
               LEMM
             </span>
           </div>
           <ManagerNav />
+          <div className="flex min-w-0 justify-end justify-self-end">
+            <ManagerLogout />
+          </div>
         </header>
       </div>
       {children}
