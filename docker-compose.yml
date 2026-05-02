@@ -16,11 +16,40 @@ services:
       - ./tsconfig.json:/app/tsconfig.json
       - ./postcss.config.mjs:/app/postcss.config.mjs
       - ./components.json:/app/components.json
+      - ./drizzle.config.ts:/app/drizzle.config.ts
+      - ./drizzle:/app/drizzle
     environment:
       NODE_ENV: development
       WATCHPACK_POLLING: 'true'
+      DATABASE_URL: postgres://lemm:lemm@db:5432/lemm
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - app-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: lemm-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lemm
+      POSTGRES_PASSWORD: lemm
+      POSTGRES_DB: lemm
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lemm -d lemm']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+volumes:
+  pg_data:
 
 networks:
   app-network:
