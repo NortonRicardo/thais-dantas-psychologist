@@ -25,8 +25,7 @@ const overlayGradientRight =
 const areas = [
   {
     id: 'area1',
-    imageSrc:
-      'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070',
+    imageSrc: '/area1-laboratorio.jpg',
     imageAlt: 'Formação em laboratório — IC, TCC e mestrado',
     tag: 'Formação & Redes',
     title: 'Formação e Articulação Institucional',
@@ -48,8 +47,7 @@ const areas = [
   },
   {
     id: 'area3',
-    imageSrc:
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070',
+    imageSrc: '/area3-clima.jpg',
     imageAlt:
       'Paisagem e clima — modelagem climática e ambiental no Centro-Oeste',
     tag: 'Ciência Climática & Pesquisa',
@@ -73,8 +71,7 @@ const areas = [
   },
   {
     id: 'area5',
-    imageSrc:
-      'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2000',
+    imageSrc: '/area5-otimizacao.jpg',
     imageAlt: 'Visualização de dados — otimização e metaheurísticas',
     tag: 'Matemática Aplicada',
     title: 'Otimização e Metaheurísticas',
@@ -85,8 +82,7 @@ const areas = [
   },
   {
     id: 'area6',
-    imageSrc:
-      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=2000',
+    imageSrc: '/area6-agro.jpg',
     imageAlt: 'Agronegócio — cadeias agroindustriais e sustentabilidade',
     tag: 'Agro & Sustentabilidade',
     title: 'Cadeias Agroindustriais e Precisão',
@@ -97,8 +93,7 @@ const areas = [
   },
   {
     id: 'area7',
-    imageSrc:
-      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000',
+    imageSrc: '/area7-cidades.jpg',
     imageAlt: 'Cidade e infraestrutura — clima urbano e smart cities',
     tag: 'Smart Cities',
     title: 'Clima Urbano e Cidades Inteligentes',
