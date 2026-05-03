@@ -46,6 +46,13 @@ const cards = [
     href: '/manager/rede-colaboracao',
   },
   {
+    id: 'equipe',
+    title: 'Equipe',
+    description:
+      'Professores, colaboradores e convidados exibidos na página pública /equipe.',
+    href: '/manager/equipe',
+  },
+  {
     id: 'contato',
     title: 'Contato',
     description:

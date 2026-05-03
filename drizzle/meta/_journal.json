@@ -78,6 +78,13 @@
       "when": 1777829429798,
       "tag": "0010_condemned_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1777830666136,
+      "tag": "0011_real_molly_hayes",
+      "breakpoints": true
     }
   ]
 }

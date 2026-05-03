@@ -148,3 +148,21 @@ export const contactInfo = pgTable('contact_info', {
 
 export type ContactInfo = typeof contactInfo.$inferSelect
 export type NewContactInfo = typeof contactInfo.$inferInsert
+
+/** Membros da equipe exibidos na página pública /equipe */
+export const teamMembers = pgTable('team_members', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  /** 'professores' | 'colaboradores' | 'convidados' */
+  category: text('category').notNull(),
+  name: text('name').notNull(),
+  qualification: text('qualification').notNull(),
+  description: text('description'),
+  photo: bytea('photo'),
+  photoMimeType: text('photo_mime_type'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export type TeamMember = typeof teamMembers.$inferSelect
+export type NewTeamMember = typeof teamMembers.$inferInsert

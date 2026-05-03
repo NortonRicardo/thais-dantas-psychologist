@@ -12,6 +12,7 @@ const navItems = [
   { href: '/manager/plataformas', label: 'Plataformas' },
   { href: '/manager/hardware', label: 'Hardware' },
   { href: '/manager/rede-colaboracao', label: 'Rede' },
+  { href: '/manager/equipe', label: 'Equipe' },
   { href: '/manager/contato', label: 'Contato' },
 ]
 

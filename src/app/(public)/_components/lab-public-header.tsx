@@ -47,7 +47,7 @@ export function LabPublicHeader({
         LEMM
       </Link>
       <nav className="max-[900px]:hidden" aria-label="Navegação principal">
-        <ul className="m-0 flex list-none gap-6 p-0 lg:gap-10">
+        <ul className="m-0 flex list-none gap-4 p-0 lg:gap-6">
           {labNavItems.map(({ href, label }) => {
             const active = linkActive(pathname, href)
             return (
