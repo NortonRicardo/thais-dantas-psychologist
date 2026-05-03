@@ -69,7 +69,7 @@ export function ManagerView() {
         </p>
       </div>
 
-      <div className="grid w-full max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {cards.map(card => (
           <article
             key={card.id}

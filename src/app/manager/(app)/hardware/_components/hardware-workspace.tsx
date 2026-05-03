@@ -4,6 +4,7 @@ import { createElement, useCallback, useEffect, useState } from 'react'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -42,6 +43,8 @@ type ModuleDraft = {
   iconKey: string
   description: string
 }
+
+type ModuleErrors = Record<string, { title?: string; description?: string }>
 
 type HardwareDraft = {
   key: string
@@ -178,6 +181,7 @@ export function HardwareWorkspace() {
   const [draft, setDraft] = useState<HardwareDraft>(() => emptyHardwareDraft())
 
   const [hardwareItems, setHardwareItems] = useState<HardwareDraft[]>([])
+  const [moduleErrors, setModuleErrors] = useState<ModuleErrors>({})
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -242,6 +246,7 @@ export function HardwareWorkspace() {
     if (!open) {
       setDraft(emptyHardwareDraft())
       setEditingServerId(null)
+      setModuleErrors({})
     }
   }
 
@@ -257,6 +262,11 @@ export function HardwareWorkspace() {
       ...prev,
       modules: prev.modules.filter(m => m.key !== modKey),
     }))
+    setModuleErrors(prev => {
+      const next = { ...prev }
+      delete next[modKey]
+      return next
+    })
   }
 
   function updateDraftTitle(title: string) {
@@ -270,10 +280,33 @@ export function HardwareWorkspace() {
         m.key === modKey ? { ...m, ...patch } : m
       ),
     }))
+    setModuleErrors(prev => {
+      const errs = prev[modKey]
+      if (!errs) return prev
+      const next = { ...errs }
+      if ('title' in patch && patch.title?.trim()) delete next.title
+      if ('description' in patch && patch.description?.trim()) delete next.description
+      const cleaned = { ...prev, [modKey]: next }
+      if (!next.title && !next.description) delete cleaned[modKey]
+      return cleaned
+    })
   }
 
   async function handleSubmitModal(e: React.FormEvent) {
     e.preventDefault()
+
+    const errors: ModuleErrors = {}
+    for (const m of draft.modules) {
+      const err: { title?: string; description?: string } = {}
+      if (!m.title.trim()) err.title = 'Obrigatório'
+      if (!m.description.trim()) err.description = 'Obrigatório'
+      if (err.title || err.description) errors[m.key] = err
+    }
+    if (Object.keys(errors).length > 0) {
+      setModuleErrors(errors)
+      return
+    }
+
     setSaving(true)
     try {
       const payload = {
@@ -435,7 +468,12 @@ export function HardwareWorkspace() {
                 {draft.modules.map((m, mi) => (
                   <div
                     key={m.key}
-                    className="rounded-lg border border-white/[0.1] bg-black/30 p-3"
+                    className={cn(
+                      'rounded-lg border bg-black/30 p-3',
+                      moduleErrors[m.key]
+                        ? 'border-rose-500/60'
+                        : 'border-white/[0.1]'
+                    )}
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
                       <span className="text-[0.6rem] tabular-nums text-white/35">
@@ -469,10 +507,18 @@ export function HardwareWorkspace() {
                                 title: e.target.value,
                               })
                             }
-                            required
                             placeholder="AMD Ryzen Threadripper PRO 5965WX"
-                            className={`${INPUT_CLS} h-10 text-sm`}
+                            className={cn(
+                              `${INPUT_CLS} h-10 text-sm`,
+                              moduleErrors[m.key]?.title &&
+                                'border-rose-500/70 focus-visible:border-rose-500/70'
+                            )}
                           />
+                          {moduleErrors[m.key]?.title && (
+                            <p className="text-[0.7rem] text-rose-400">
+                              {moduleErrors[m.key].title}
+                            </p>
+                          )}
                         </div>
                         <div className="shrink-0 space-y-1.5">
                           <Label className={FIELD_LABEL_CLS}>Ícone</Label>
@@ -502,8 +548,17 @@ export function HardwareWorkspace() {
                           }
                           rows={3}
                           placeholder="Processador de alto desempenho para workloads paralelos de modelagem e HPC."
-                          className={`${INPUT_CLS} min-h-[4.5rem] resize-none text-sm leading-relaxed`}
+                          className={cn(
+                            `${INPUT_CLS} min-h-[4.5rem] resize-none text-sm leading-relaxed`,
+                            moduleErrors[m.key]?.description &&
+                              'border-rose-500/70 focus-visible:border-rose-500/70'
+                          )}
                         />
+                        {moduleErrors[m.key]?.description && (
+                          <p className="text-[0.7rem] text-rose-400">
+                            {moduleErrors[m.key].description}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
