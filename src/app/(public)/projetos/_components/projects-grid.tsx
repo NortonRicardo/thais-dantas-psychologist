@@ -1,8 +1,9 @@
 'use client'
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { ProjectCard } from './project-card'
-import { projects, type ProjectTheme } from '../_data/projects-data'
+import { ProjectCard, type PublicProject } from './project-card'
+
+type ProjectTheme = 'Clima' | 'Matemática' | 'Otimização e Metaheurísticas' | 'Agro & Sustentabilidade'
 
 const themes: ProjectTheme[] = [
   'Clima',
@@ -41,7 +42,6 @@ const themeColor: Record<
   },
 }
 
-// Slug → ProjectTheme
 const slugToTheme: Record<string, ProjectTheme> = {
   clima: 'Clima',
   matematica: 'Matemática',
@@ -49,7 +49,6 @@ const slugToTheme: Record<string, ProjectTheme> = {
   agro: 'Agro & Sustentabilidade',
 }
 
-// ProjectTheme → slug
 const themeToSlug: Record<ProjectTheme, string> = {
   Clima: 'clima',
   Matemática: 'matematica',
@@ -57,7 +56,7 @@ const themeToSlug: Record<ProjectTheme, string> = {
   'Agro & Sustentabilidade': 'agro',
 }
 
-export function ProjectsGrid() {
+export function ProjectsGrid({ projects }: { projects: PublicProject[] }) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()

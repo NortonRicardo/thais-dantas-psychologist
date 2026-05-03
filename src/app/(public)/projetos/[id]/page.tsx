@@ -1,21 +1,47 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { eq } from 'drizzle-orm'
 
+import { db } from '@/lib/db'
+import { projects, teamMembers } from '@/lib/db/schema'
 import { LabSceneShell } from '../../_components/lab-scene-shell'
 import { LabPublicHeader } from '../../_components/lab-public-header'
 import { PublicFooter } from '../../_components/public-footer'
 import { ProjectDetail } from './_components/project-detail'
-import { getProjectById, projects } from '../_data/projects-data'
+
+export const dynamic = 'force-dynamic'
 
 type Props = { params: Promise<{ id: string }> }
 
-export async function generateStaticParams() {
-  return projects.map(p => ({ id: p.id }))
+async function fetchProject(slug: string) {
+  const [row] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.slug, slug))
+
+  if (!row) return null
+
+  const members = await db
+    .select({ id: teamMembers.id, name: teamMembers.name })
+    .from(teamMembers)
+  const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]))
+
+  return {
+    ...row,
+    image: undefined,
+    pdf: undefined,
+    startDate: row.startDate.toISOString(),
+    endDate: row.endDate ? row.endDate.toISOString() : null,
+    updatedAt: row.updatedAt.toISOString(),
+    advisorName: row.advisorId ? (memberMap[row.advisorId] ?? null) : null,
+    coAdvisorName: row.coAdvisorId ? (memberMap[row.coAdvisorId] ?? null) : null,
+    researchLeadName: row.researchLeadId ? (memberMap[row.researchLeadId] ?? null) : null,
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  const project = getProjectById(id)
+  const project = await fetchProject(id)
   if (!project) return { title: 'Projeto não encontrado | LEMM' }
   return {
     title: `${project.title} | LEMM`,
@@ -25,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { id } = await params
-  const project = getProjectById(id)
+  const project = await fetchProject(id)
   if (!project) notFound()
 
   return (

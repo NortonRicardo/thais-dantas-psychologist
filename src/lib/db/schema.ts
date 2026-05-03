@@ -7,6 +7,7 @@ import {
   integer,
   customType,
 } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
 const bytea = customType<{ data: Buffer }>({
   dataType() {
@@ -166,3 +167,32 @@ export const teamMembers = pgTable('team_members', {
 
 export type TeamMember = typeof teamMembers.$inferSelect
 export type NewTeamMember = typeof teamMembers.$inferInsert
+
+/** Projetos de pesquisa, TCC, dissertações e plataformas do LEMM */
+export const projects = pgTable('projects', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  /** 'TCC' | 'Iniciação Científica' | 'Mestrado' | 'Plataforma' | 'Pesquisa' */
+  category: text('category').notNull(),
+  themes: text('themes').array().notNull().default(sql`ARRAY[]::text[]`),
+  description: text('description').notNull(),
+  image: bytea('image'),
+  imageMimeType: text('image_mime_type'),
+  authors: text('authors').array().notNull().default(sql`ARRAY[]::text[]`),
+  startDate: timestamp('start_date', { withTimezone: true }).notNull(),
+  endDate: timestamp('end_date', { withTimezone: true }),
+  gitUrl: text('git_url'),
+  publicationUrl: text('publication_url'),
+  advisorId: uuid('advisor_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  coAdvisorId: uuid('co_advisor_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  researchLeadId: uuid('research_lead_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  pdf: bytea('pdf'),
+  pdfMimeType: text('pdf_mime_type'),
+  pdfPath: text('pdf_path'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export type Project = typeof projects.$inferSelect
+export type NewProject = typeof projects.$inferInsert

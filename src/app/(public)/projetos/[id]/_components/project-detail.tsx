@@ -9,7 +9,7 @@ import {
   FlaskConical,
   FileText,
 } from 'lucide-react'
-import type { Project } from '../../_data/projects-data'
+import type { PublicProject } from '../../_components/project-card'
 
 const glass = {
   background:
@@ -54,7 +54,7 @@ function MetaRow({
   )
 }
 
-export function ProjectDetail({ project }: { project: Project }) {
+export function ProjectDetail({ project }: { project: PublicProject }) {
   return (
     <div className="flex w-full flex-col gap-8 pb-16 lg:flex-row lg:items-start">
       {/* Sidebar — 1/4 */}
@@ -63,13 +63,13 @@ export function ProjectDetail({ project }: { project: Project }) {
           className="sticky top-6 flex flex-col gap-5 rounded-2xl px-5 py-6"
           style={glass}
         >
-          {project.authors.length > 0 && (
-            <MetaRow
-              icon={Users}
-              label={project.authors.length > 1 ? 'Autores' : 'Autor'}
-              value={project.authors.join(', ')}
-            />
-          )}
+          {(() => {
+            const all = [project.advisorName, project.coAdvisorName, project.researchLeadName, ...project.authors]
+              .filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
+            return all.length > 0 ? (
+              <MetaRow icon={Users} label={all.length > 1 ? 'Autores' : 'Autor'} value={all.join(', ')} />
+            ) : null
+          })()}
 
           <MetaRow
             icon={CalendarDays}
@@ -94,27 +94,27 @@ export function ProjectDetail({ project }: { project: Project }) {
             </div>
           )}
 
-          {project.advisor && (
+          {project.advisorName && (
             <MetaRow
               icon={GraduationCap}
               label="Orientador(a)"
-              value={project.advisor}
+              value={project.advisorName}
             />
           )}
 
-          {project.coAdvisor && (
+          {project.coAdvisorName && (
             <MetaRow
               icon={GraduationCap}
               label="Coorientador(a)"
-              value={project.coAdvisor}
+              value={project.coAdvisorName}
             />
           )}
 
-          {project.researchLead && (
+          {project.researchLeadName && (
             <MetaRow
               icon={FlaskConical}
               label="Responsável pela pesquisa"
-              value={project.researchLead}
+              value={project.researchLeadName}
             />
           )}
 
@@ -137,8 +137,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs text-white/60 transition-colors hover:border-white/25 hover:text-white/90"
                 >
-                  <ExternalLink size={13} strokeWidth={1.5} /> Publicação /
-                  Artigo
+                  <ExternalLink size={13} strokeWidth={1.5} /> Publicação / Artigo
                 </a>
               )}
             </div>
@@ -148,7 +147,6 @@ export function ProjectDetail({ project }: { project: Project }) {
 
       {/* Conteúdo principal — 3/4 */}
       <main className="flex min-w-0 flex-1 flex-col gap-8">
-        {/* Título e descrição */}
         <div className="flex flex-col gap-4">
           <h1 className="text-xl font-black leading-tight tracking-tight text-white sm:text-2xl">
             {project.title}
@@ -158,20 +156,19 @@ export function ProjectDetail({ project }: { project: Project }) {
           </p>
         </div>
 
-        {/* PDF */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-[0.7rem] uppercase tracking-[3px] text-white/40">
             <FileText size={12} strokeWidth={1.5} />
             Documento
           </div>
 
-          {project.pdfPath ? (
+          {project.pdfMimeType ? (
             <div
               className="overflow-hidden rounded-2xl border border-white/15"
               style={{ height: '70vh' }}
             >
               <iframe
-                src={project.pdfPath}
+                src={`/api/projects/${project.id}/pdf`}
                 className="h-full w-full"
                 title={`PDF — ${project.title}`}
               />

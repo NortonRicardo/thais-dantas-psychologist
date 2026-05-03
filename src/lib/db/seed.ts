@@ -6,6 +6,8 @@ import {
   events,
   hardware,
   hardwareModules,
+  teamMembers,
+  projects,
 } from './schema'
 
 const seedEvents = [
@@ -205,6 +207,156 @@ const seedCollaborationPartners = [
   },
 ]
 
+// ----- Equipe -----
+
+const seedTeamMembers = [
+  // Professores
+  { category: 'professores', name: 'Dra. Maria José Pereira Dantas', qualification: 'Doutora em Ciência da Computação', description: 'Coordenadora do LEMM. Pesquisa em IA, dados climáticos e otimização.', sortOrder: 0 },
+  { category: 'professores', name: 'Prof. Dr. Wanderlei Malaquias Pereira Junior', qualification: 'Doutor em Engenharia de Produção', description: 'Pesquisa em metaheurísticas, otimização combinatória e logística.', sortOrder: 1 },
+  { category: 'professores', name: 'Prof. Dr. Roussian Di Amaro Alves Gaioso', qualification: 'Doutor em Ciências Atmosféricas', description: 'Pesquisa em modelagem climática urbana e ondas de calor.', sortOrder: 2 },
+  { category: 'professores', name: 'Prof. Dr. Felipe Veloso', qualification: 'Doutor em Computação Aplicada', description: 'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.', sortOrder: 3 },
+  // Colaboradores
+  { category: 'colaboradores', name: 'Norton Ricardo Pereira', qualification: 'Pesquisador e Desenvolvedor Full-Stack', description: 'Desenvolvedor da plataforma Weather Brasil. Premiado no Troféu Seriema 2025.', sortOrder: 0 },
+  { category: 'colaboradores', name: 'Salatiel A. A. Jordão', qualification: 'Pesquisador em IA e Clima', description: 'Pesquisa em Transformers para predição de precipitação no Cerrado.', sortOrder: 1 },
+  { category: 'colaboradores', name: 'Mirela Marques', qualification: 'Pesquisadora em Clima e Urbanismo', description: 'Estudo sobre ondas de calor urbanas em centros goianos.', sortOrder: 2 },
+  { category: 'colaboradores', name: 'Matheus Henrique Campos', qualification: 'Pesquisador em Otimização e Agronegócio', description: 'Metaheurísticas aplicadas à logística em cadeias agroindustriais.', sortOrder: 3 },
+  { category: 'colaboradores', name: 'Davi Aquila', qualification: 'Pesquisador em Ciência de Dados Climáticos', description: 'Curadoria e imputação de dados meteorológicos do Centro-Oeste.', sortOrder: 4 },
+  { category: 'colaboradores', name: 'Gabriela', qualification: 'Iniciação Científica — Transformers e Clima', description: 'Investigação de arquiteturas Transformer para predição de precipitação.', sortOrder: 5 },
+  { category: 'colaboradores', name: 'Sophia', qualification: 'Iniciação Científica — Agricultura de Precisão', description: 'Desenvolvimento de gêmeos digitais para agricultura de precisão.', sortOrder: 6 },
+  { category: 'colaboradores', name: 'Mateus Newmann', qualification: 'Iniciação Científica — Gêmeo Digital', description: 'Arquiteturas fog computing para tomada de decisão distribuída.', sortOrder: 7 },
+  // Convidados
+  { category: 'convidados', name: 'Dr. Reinaldo Rosa (INPE)', qualification: 'Pesquisador Sênior, INPE', description: 'Colaboração em modelos híbridos IA-física para predição de seca no Cerrado.', sortOrder: 0 },
+]
+
+// ----- Projetos -----
+// IDs dos membros são resolvidos dinamicamente após inserção da equipe.
+// Cada entrada mapeia campos de projectsData para IDs de teamMembers.
+type ProjectSeed = {
+  slug: string
+  title: string
+  category: string
+  themes: string[]
+  description: string
+  authors: string[]
+  startDate: Date
+  endDate?: Date
+  gitUrl?: string
+  publicationUrl?: string
+  advisorName?: string
+  coAdvisorName?: string
+  researchLeadName?: string
+  pdfPath?: string
+}
+
+const seedProjectsData: ProjectSeed[] = [
+  {
+    slug: 'weather-brasil',
+    title: 'Weather Brasil',
+    category: 'Plataforma',
+    themes: ['Clima'],
+    description:
+      'Plataforma de curadoria, visualização e análise de dados climáticos brasileiros, integrando séries do INMET, mapas interativos e indicadores de risco climático. Desenvolvida no contexto do LEMM com foco em apoio à decisão em políticas públicas, agricultura e adaptação climática. Premiada no Troféu Seriema 2025 (2º lugar — Inovação) e aceita para apresentação no WCERE 2026, em Lisboa, Portugal.',
+    authors: [],
+    startDate: new Date('2023-03-01'),
+    gitUrl: 'https://github.com/lemm-pucgoias/weather-brasil',
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Norton Ricardo Pereira',
+  },
+  {
+    slug: 'tcc-davi-aquila',
+    title: 'Curadoria e Imputação de Dados Meteorológicos do Centro-Oeste',
+    category: 'TCC',
+    themes: ['Clima', 'Matemática'],
+    description:
+      'Trabalho de Conclusão de Curso focado na construção de um dataset curado e imputado de variáveis meteorológicas (temperatura, precipitação, umidade) para o Centro-Oeste brasileiro, utilizando dados do INMET e técnicas de machine learning para preenchimento de falhas. O dataset produzido serve de base para modelos de predição de eventos climáticos extremos e projetos de iniciação científica do LEMM.',
+    authors: [],
+    startDate: new Date('2024-03-01'),
+    endDate: new Date('2024-12-10'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Davi Aquila',
+    pdfPath: '/TCC1 - Davi Aquila.pdf',
+  },
+  {
+    slug: 'meta-tool-box',
+    title: 'META TOOL BOX — Plataforma de Otimização e Metaheurísticas',
+    category: 'Plataforma',
+    themes: ['Otimização e Metaheurísticas', 'Matemática'],
+    description:
+      'Plataforma computacional com registro de software dedicada a algoritmos de otimização e metaheurísticas (PSO, GA, SA, ACO). Desenvolvida desde 2016, conta com módulos para problemas combinatórios, logística, portfólios financeiros e cadeias agroindustriais. Integra aprendizado de máquina com métodos exatos (Learning to Optimize) e serve como base para pesquisas de IC, TCC e mestrado.',
+    authors: [],
+    startDate: new Date('2016-01-01'),
+    gitUrl: 'https://github.com/lemm-pucgoias/meta-tool-box',
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
+    researchLeadName: 'Dra. Maria José Pereira Dantas',
+  },
+  {
+    slug: 'ic-transformers-precipitacao',
+    title: 'Arquiteturas Transformer para Predição de Precipitação no Cerrado',
+    category: 'Iniciação Científica',
+    themes: ['Clima', 'Matemática'],
+    description:
+      'Investigação de arquiteturas Transformer e mecanismos de atenção aplicados à predição de precipitação no Cerrado Goiano. O trabalho compara múltiplos modelos de baseline, utiliza dados ERA5 e INMET e integra técnicas de HPC para processamento de séries temporais longas. Resultados preliminares submetidos ao COMPSAC 2026.',
+    authors: [],
+    startDate: new Date('2025-03-01'),
+    gitUrl: 'https://github.com/lemm-pucgoias/transformer-precipitacao',
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Salatiel A. A. Jordão',
+    researchLeadName: 'Gabriela',
+  },
+  {
+    slug: 'ic-ondas-de-calor',
+    title: 'Modelagem de Ondas de Calor Urbanas no Centro-Oeste',
+    category: 'Pesquisa',
+    themes: ['Clima'],
+    description:
+      'Estudo sobre identificação, modelagem e impacto de ondas de calor em centros urbanos goianos, com análise de perfis tipológicos, ilhas de calor e séries de temperatura. Articula dados do INMET com modelagem em WRF e aprendizado de máquina para predição de eventos extremos de temperatura.',
+    authors: [],
+    startDate: new Date('2025-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    researchLeadName: 'Mirela Marques',
+  },
+  {
+    slug: 'mestrado-ia-fisica-seca',
+    title: 'Modelos Híbridos IA-Física para Predição de Seca no Cerrado',
+    category: 'Mestrado',
+    themes: ['Clima', 'Matemática'],
+    description:
+      'Dissertação de mestrado que desenvolve e valida modelos híbridos combinando física atmosférica e aprendizado profundo (Transformers, LSTM) para predição de eventos de seca no Cerrado brasileiro. Utiliza dados ERA5-Land, INMET e pipeline de data healing desenvolvido no LEMM. Inclui experimentos em infraestrutura HPC e análise comparativa com modelos climáticos tradicionais.',
+    authors: ['Discente PPGEIIA'],  // não é membro da equipe, vai em "outros"
+    startDate: new Date('2024-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Dr. Reinaldo Rosa (INPE)',
+  },
+  {
+    slug: 'logistica-agro-metaheuristica',
+    title: 'Otimização Logística em Cadeias Agroindustriais do Centro-Oeste',
+    category: 'Pesquisa',
+    themes: ['Otimização e Metaheurísticas', 'Agro & Sustentabilidade'],
+    description:
+      'Pesquisa em modelagem matemática e metaheurísticas aplicadas a problemas de roteamento e logística em cadeias de soja e carne bovina no Centro-Oeste. Incorpora variáveis de risco climático e sustentabilidade na função objetivo, com foco em decisão sob incerteza e rastreabilidade.',
+    authors: [],
+    startDate: new Date('2025-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
+    researchLeadName: 'Matheus Henrique Campos',
+  },
+  {
+    slug: 'gemeo-digital-agro',
+    title: 'Gêmeo Digital para Agricultura de Precisão',
+    category: 'Iniciação Científica',
+    themes: ['Agro & Sustentabilidade', 'Matemática'],
+    description:
+      'Desenvolvimento de arquitetura híbrida voltada à tomada de decisão distribuída e adaptativa na agricultura de precisão, integrando fog computing, visão computacional e gêmeos digitais. Articula dados ambientais e sensoriamento remoto para apoio à decisão em campo.',
+    authors: [],
+    startDate: new Date('2025-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Felipe Veloso',
+    researchLeadName: 'Sophia',
+  },
+]
+
 async function main() {
   console.warn('🌱 Seeding events…')
   await db.delete(events)
@@ -247,6 +399,36 @@ async function main() {
   await db.delete(collaborationPartners)
   await db.insert(collaborationPartners).values(seedCollaborationPartners)
   console.warn(`✅ ${seedCollaborationPartners.length} parceiros inseridos.`)
+
+  console.warn('🌱 Seeding equipe…')
+  await db.delete(teamMembers)
+  const insertedMembers = await db
+    .insert(teamMembers)
+    .values(seedTeamMembers)
+    .returning({ id: teamMembers.id, name: teamMembers.name })
+  const memberNameToId = Object.fromEntries(insertedMembers.map(m => [m.name, m.id]))
+  console.warn(`✅ ${insertedMembers.length} membros inseridos.`)
+
+  console.warn('🌱 Seeding projetos…')
+  await db.delete(projects)
+  const projectValues = seedProjectsData.map(p => ({
+    slug: p.slug,
+    title: p.title,
+    category: p.category,
+    themes: p.themes,
+    description: p.description,
+    authors: p.authors,
+    startDate: p.startDate,
+    endDate: p.endDate ?? null,
+    gitUrl: p.gitUrl ?? null,
+    publicationUrl: p.publicationUrl ?? null,
+    advisorId: p.advisorName ? (memberNameToId[p.advisorName] ?? null) : null,
+    coAdvisorId: p.coAdvisorName ? (memberNameToId[p.coAdvisorName] ?? null) : null,
+    researchLeadId: p.researchLeadName ? (memberNameToId[p.researchLeadName] ?? null) : null,
+    pdfPath: p.pdfPath ?? null,
+  }))
+  await db.insert(projects).values(projectValues)
+  console.warn(`✅ ${projectValues.length} projetos inseridos.`)
 
   process.exit(0)
 }

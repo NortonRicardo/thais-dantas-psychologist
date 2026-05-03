@@ -64,7 +64,7 @@ const cards = [
     title: 'Projetos',
     description:
       'Linhas de pesquisa, equipes e entregas — organize e acompanhe os projetos do LEMM.',
-    href: '#projetos',
+    href: '/manager/projetos',
   },
 ] as const
 

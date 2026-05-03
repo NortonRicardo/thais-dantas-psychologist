@@ -14,6 +14,7 @@ const navItems = [
   { href: '/manager/rede-colaboracao', label: 'Rede' },
   { href: '/manager/equipe', label: 'Equipe' },
   { href: '/manager/contato', label: 'Contato' },
+  { href: '/manager/projetos', label: 'Projetos' },
 ]
 
 export function ManagerNav() {

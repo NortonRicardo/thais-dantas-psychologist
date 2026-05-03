@@ -85,6 +85,20 @@
       "when": 1777830666136,
       "tag": "0011_real_molly_hayes",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1777831924896,
+      "tag": "0012_lowly_yellow_claw",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1777833224831,
+      "tag": "0013_strong_nightshade",
+      "breakpoints": true
     }
   ]
 }
