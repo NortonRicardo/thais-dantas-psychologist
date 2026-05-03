@@ -127,3 +127,24 @@ export const hardwareModules = pgTable('hardware_modules', {
 
 export type HardwareModule = typeof hardwareModules.$inferSelect
 export type NewHardwareModule = typeof hardwareModules.$inferInsert
+
+/** Informações de contato exibidas na página pública /contato (registro único) */
+export const contactInfo = pgTable('contact_info', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  directorName: text('director_name').notNull().default(''),
+  directorRole: text('director_role').notNull().default(''),
+  email: text('email').notNull().default(''),
+  phone: text('phone').notNull().default(''),
+  linkedin: text('linkedin').notNull().default(''),
+  directorPhoto: bytea('director_photo'),
+  directorPhotoMimeType: text('director_photo_mime_type'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type ContactInfo = typeof contactInfo.$inferSelect
+export type NewContactInfo = typeof contactInfo.$inferInsert

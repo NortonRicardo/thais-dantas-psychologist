@@ -71,6 +71,13 @@
       "when": 1777760808591,
       "tag": "0009_sad_ghost_rider",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1777829429798,
+      "tag": "0010_condemned_alex_power",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { ContatoSection } from './_components/contato-section'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Contato | LEMM',
   description:

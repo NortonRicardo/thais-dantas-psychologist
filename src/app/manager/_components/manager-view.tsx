@@ -46,6 +46,13 @@ const cards = [
     href: '/manager/rede-colaboracao',
   },
   {
+    id: 'contato',
+    title: 'Contato',
+    description:
+      'Informações públicas de contato: diretor, e-mail, telefone, LinkedIn e foto.',
+    href: '/manager/contato',
+  },
+  {
     id: 'projetos',
     title: 'Projetos',
     description:
