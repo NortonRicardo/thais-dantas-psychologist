@@ -175,7 +175,9 @@ export function TeamTable() {
                           </div>
                         )}
                       </div>
-                      <span className="line-clamp-1">{row.name}</span>
+                      <div className="min-w-0 overflow-hidden">
+                        <span className="truncate block">{row.name}</span>
+                      </div>
                     </div>
                   </TableCell>
 
@@ -187,8 +189,10 @@ export function TeamTable() {
                     </Badge>
                   </TableCell>
 
-                  <TableCell className="text-sm text-white/55">
-                    <span className="line-clamp-1">{row.qualification}</span>
+                  <TableCell className="text-sm text-white/55 max-w-[200px]">
+                    <div className="overflow-hidden">
+                      <span className="truncate block">{row.qualification}</span>
+                    </div>
                   </TableCell>
 
                   <TableCell className="text-center text-sm text-white/45">

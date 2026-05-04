@@ -179,10 +179,14 @@ export function TimelineTable() {
                     {formatMonthYearPtUtc(row.date)}
                   </TableCell>
                   <TableCell className="font-medium text-white/90 max-w-[200px]">
-                    <span className="line-clamp-2">{row.title}</span>
+                    <div className="overflow-hidden">
+                      <span className="line-clamp-2">{row.title}</span>
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm text-white/45 max-w-md">
-                    <span className="line-clamp-2">{row.description}</span>
+                    <div className="overflow-hidden">
+                      <span className="line-clamp-2">{row.description}</span>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">

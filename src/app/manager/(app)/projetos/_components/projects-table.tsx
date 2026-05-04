@@ -172,9 +172,9 @@ export function ProjectsTable() {
                           </div>
                         )}
                       </div>
-                      <div className="min-w-0">
-                        <div className="line-clamp-1 text-sm">{row.title}</div>
-                        <div className="line-clamp-1 text-[0.68rem] text-white/35">
+                      <div className="min-w-0 overflow-hidden">
+                        <div className="truncate text-sm">{row.title}</div>
+                        <div className="truncate text-[0.68rem] text-white/35">
                           {[row.advisorName, row.coAdvisorName, row.researchLeadName, ...row.authors]
                             .filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
                             .join(', ') || '—'}

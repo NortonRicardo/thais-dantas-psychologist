@@ -180,12 +180,16 @@ export function DevelopedPlatformsTable() {
                   key={row.id}
                   className="border-white/[0.07] transition-colors hover:bg-white/[0.04]"
                 >
-                  <TableCell className="font-medium text-white/90">
-                    <span className="line-clamp-2">{row.title}</span>
+                  <TableCell className="font-medium text-white/90 max-w-[180px]">
+                    <div className="overflow-hidden">
+                      <span className="line-clamp-2">{row.title}</span>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-xs text-white/45">
+                  <TableCell className="text-xs text-white/45 max-w-[110px]">
                     {row.badge ? (
-                      <span className="line-clamp-2">{row.badge}</span>
+                      <div className="overflow-hidden">
+                        <span className="line-clamp-2">{row.badge}</span>
+                      </div>
                     ) : (
                       <span className="text-white/25">—</span>
                     )}
@@ -211,7 +215,9 @@ export function DevelopedPlatformsTable() {
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-white/45 max-w-xs">
-                    <span className="line-clamp-2">{row.description}</span>
+                    <div className="overflow-hidden">
+                      <span className="line-clamp-2">{row.description}</span>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">

@@ -198,8 +198,8 @@ export function EventsTable() {
                           </div>
                         )}
                       </div>
-                      <div className="min-w-0 max-w-[220px]">
-                        <span className="line-clamp-1 block truncate">
+                      <div className="min-w-0 max-w-[220px] overflow-hidden">
+                        <span className="block truncate">
                           {row.title}
                         </span>
                         {row.organizer && (
@@ -233,8 +233,10 @@ export function EventsTable() {
                     })()}
                   </TableCell>
 
-                  <TableCell className="text-sm text-white/55">
-                    <span className="line-clamp-1">{row.speaker ?? '—'}</span>
+                  <TableCell className="text-sm text-white/55 max-w-[160px]">
+                    <div className="overflow-hidden">
+                      <span className="truncate block">{row.speaker ?? '—'}</span>
+                    </div>
                   </TableCell>
 
                   <TableCell className="text-center">
