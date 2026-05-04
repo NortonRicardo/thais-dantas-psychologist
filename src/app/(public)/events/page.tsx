@@ -4,6 +4,8 @@ import { getPublicEvents } from '@/lib/http/events'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { EventsSection } from './_components/events-section'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Eventos | LEMM',
   description:

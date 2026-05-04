@@ -26,7 +26,7 @@ function resolveIcon(name: string): LucideIcon {
     'render' in C &&
     typeof (C as { render?: unknown }).render === 'function'
   )
-    return C as LucideIcon
+    return C as unknown as LucideIcon
   return Lucide.Cpu as LucideIcon
 }
 

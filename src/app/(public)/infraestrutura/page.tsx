@@ -6,6 +6,8 @@ import { getPublicHardwareList } from '@/lib/http/hardware'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { InfraestruturaSection } from './_components/infraestrutura-section'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Infraestrutura | LEMM',
   description:

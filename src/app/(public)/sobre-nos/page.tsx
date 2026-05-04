@@ -5,6 +5,8 @@ import { getPublicAboutTimeline } from '@/lib/http/about-timeline'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { Timeline } from './_components/timeline'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Sobre Nós | LEMM',
   description:
