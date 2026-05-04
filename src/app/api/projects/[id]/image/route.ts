@@ -19,7 +19,7 @@ export async function GET(_: Request, { params }: Ctx) {
   return new NextResponse(row.image as BodyInit, {
     headers: {
       'Content-Type': row.imageMimeType,
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
     },
   })
 }

@@ -18,7 +18,7 @@ export async function GET(
   return new NextResponse(row.image as unknown as BodyInit, {
     headers: {
       'Content-Type': row.imageMimeType ?? 'image/jpeg',
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
     },
   })
 }
