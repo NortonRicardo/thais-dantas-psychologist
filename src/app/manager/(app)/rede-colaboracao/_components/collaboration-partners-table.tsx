@@ -119,7 +119,7 @@ export function CollaborationPartnersTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[560px]">
+        <Table className="min-w-[560px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
@@ -128,10 +128,10 @@ export function CollaborationPartnersTable() {
               <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[28%]">
                 Nome
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[60%]">
                 Descrição
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[12%] text-right">
                 Ações
               </TableHead>
             </TableRow>

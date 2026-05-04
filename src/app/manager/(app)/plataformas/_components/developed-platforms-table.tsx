@@ -127,7 +127,7 @@ export function DevelopedPlatformsTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[800px]">
+        <Table className="min-w-[800px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
@@ -142,10 +142,10 @@ export function DevelopedPlatformsTable() {
               <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[16%]">
                 Links
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[38%]">
                 Descrição
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-right">
                 Ações
               </TableHead>
             </TableRow>

@@ -109,7 +109,7 @@ export function TeamTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[700px]">
+        <Table className="min-w-[700px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
@@ -118,16 +118,16 @@ export function TeamTable() {
               <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[35%]">
                 Nome
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[15%]">
                 Categoria
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[30%]">
                 Qualificação
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-center">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-center">
                 Ordem
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-right">
                 Ações
               </TableHead>
             </TableRow>

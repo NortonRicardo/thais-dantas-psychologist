@@ -126,7 +126,7 @@ export function EventsTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[1000px]">
+        <Table className="min-w-[1000px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
@@ -135,19 +135,19 @@ export function EventsTable() {
               <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[35%]">
                 Título
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[13%]">
                 Tipo
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-center">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[14%] text-center">
                 Data
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[20%]">
                 Palestrante
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-center">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-center">
                 Destaque
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[8%] text-right">
                 Ações
               </TableHead>
             </TableRow>

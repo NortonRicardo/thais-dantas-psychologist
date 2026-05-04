@@ -109,22 +109,22 @@ export function ProjectsTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[900px]">
+        <Table className="min-w-[900px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
               style={{ background: 'rgba(255,255,255,0.04)' }}
             >
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[40%]">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[45%]">
                 Título
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[18%]">
                 Categoria
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[25%]">
                 Período
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[12%] text-right">
                 Ações
               </TableHead>
             </TableRow>
