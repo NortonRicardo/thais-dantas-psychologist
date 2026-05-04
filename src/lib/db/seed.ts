@@ -207,30 +207,38 @@ const seedCollaborationPartners = [
   },
 ]
 
-// ----- Equipe -----
-
 const seedTeamMembers = [
   // Professores
   { category: 'professores', name: 'Dra. Maria José Pereira Dantas', qualification: 'Doutora em Ciência da Computação', description: 'Coordenadora do LEMM. Pesquisa em IA, dados climáticos e otimização.', sortOrder: 0 },
-  { category: 'professores', name: 'Prof. Dr. Wanderlei Malaquias Pereira Junior', qualification: 'Doutor em Engenharia de Produção', description: 'Pesquisa em metaheurísticas, otimização combinatória e logística.', sortOrder: 1 },
-  { category: 'professores', name: 'Prof. Dr. Roussian Di Amaro Alves Gaioso', qualification: 'Doutor em Ciências Atmosféricas', description: 'Pesquisa em modelagem climática urbana e ondas de calor.', sortOrder: 2 },
-  { category: 'professores', name: 'Prof. Dr. Felipe Veloso', qualification: 'Doutor em Computação Aplicada', description: 'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.', sortOrder: 3 },
+  { category: 'professores', name: 'Dr. José Elmo de Menezes', qualification: 'Doutor em Estatística', description: 'Vice-coordenador do LEMM. Apoio metodológico em estatística, modelagem quantitativa e articulação de estudos internacionais.', sortOrder: 1 },
+  { category: 'professores', name: 'Prof. Dr. Wanderlei Malaquias Pereira Junior', qualification: 'Doutor em Engenharia de Produção', description: 'Pesquisa em metaheurísticas, otimização combinatória e logística. Coorientador de ICs e colaborador no desenvolvimento da plataforma META TOOL BOX.', sortOrder: 2 },
+  { category: 'professores', name: 'Prof. Dr. Roussian Di Amaro Alves Gaioso', qualification: 'Doutor em Ciências Atmosféricas', description: 'Pesquisa em modelagem climática urbana, ondas de calor e HPC. Estuda modelos WRF e experimentos de alto desempenho.', sortOrder: 3 },
+  { category: 'professores', name: 'Prof. Dr. Felipe Veloso', qualification: 'Doutor em Computação Aplicada', description: 'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.', sortOrder: 4 },
   // Colaboradores
   { category: 'colaboradores', name: 'Norton Ricardo Pereira', qualification: 'Pesquisador e Desenvolvedor Full-Stack', description: 'Desenvolvedor da plataforma Weather Brasil. Premiado no Troféu Seriema 2025.', sortOrder: 0 },
-  { category: 'colaboradores', name: 'Salatiel A. A. Jordão', qualification: 'Pesquisador em IA e Clima', description: 'Pesquisa em Transformers para predição de precipitação no Cerrado.', sortOrder: 1 },
+  { category: 'colaboradores', name: 'Salatiel A. A. Jordão', qualification: 'Pesquisador em IA e Clima — Mestrando INPE', description: 'Pesquisa em Transformers para predição de precipitação no Cerrado. Egresso da PUC Goiás, mestrando em Computação Aplicada no INPE.', sortOrder: 1 },
   { category: 'colaboradores', name: 'Mirela Marques', qualification: 'Pesquisadora em Clima e Urbanismo', description: 'Estudo sobre ondas de calor urbanas em centros goianos.', sortOrder: 2 },
   { category: 'colaboradores', name: 'Matheus Henrique Campos', qualification: 'Pesquisador em Otimização e Agronegócio', description: 'Metaheurísticas aplicadas à logística em cadeias agroindustriais.', sortOrder: 3 },
   { category: 'colaboradores', name: 'Davi Aquila', qualification: 'Pesquisador em Ciência de Dados Climáticos', description: 'Curadoria e imputação de dados meteorológicos do Centro-Oeste.', sortOrder: 4 },
   { category: 'colaboradores', name: 'Gabriela', qualification: 'Iniciação Científica — Transformers e Clima', description: 'Investigação de arquiteturas Transformer para predição de precipitação.', sortOrder: 5 },
   { category: 'colaboradores', name: 'Sophia', qualification: 'Iniciação Científica — Agricultura de Precisão', description: 'Desenvolvimento de gêmeos digitais para agricultura de precisão.', sortOrder: 6 },
   { category: 'colaboradores', name: 'Mateus Newmann', qualification: 'Iniciação Científica — Gêmeo Digital', description: 'Arquiteturas fog computing para tomada de decisão distribuída.', sortOrder: 7 },
+  // IC 2026/2027
+  { category: 'colaboradores', name: 'Carlos', qualification: 'Iniciação Científica — Eventos Extremos do Clima', description: 'Estudo de eventos extremos do clima articulado ao projeto Tecnologias Disruptivas e à plataforma Weather Brasil.', sortOrder: 8 },
+  { category: 'colaboradores', name: 'Alysson', qualification: 'Iniciação Científica — HPC e WRF', description: 'Modelagem climática com HPC e WRF em colaboração com o INPE e o mestrando Salatiel Jordão.', sortOrder: 9 },
+  { category: 'colaboradores', name: 'Arthur Felipe', qualification: 'Iniciação Científica — IA e Mercado Financeiro', description: 'Pesquisa em IA aplicada ao mercado financeiro, continuidade de linha com publicações em congressos, Springer e revista Production. Alto potencial de gerar produto em trading com IA.', sortOrder: 10 },
+  { category: 'colaboradores', name: 'Vitor Hugo', qualification: 'Iniciação Científica — LSTM e Metaheurísticas Financeiras', description: 'Pesquisa em LSTM e metaheurísticas com variáveis de rastreabilidade e sustentabilidade incorporadas na função objetivo.', sortOrder: 11 },
+  { category: 'colaboradores', name: 'Gabriel Fonseca', qualification: 'Iniciação Científica — Eventos Climáticos Extremos', description: 'Estudo de eventos climáticos extremos com potencial de aplicação no Cerrado. Grande potencial de publicação.', sortOrder: 12 },
+  { category: 'colaboradores', name: 'Matheus Mendanha', qualification: 'Iniciação Científica — Clima Urbano e Smart Cities', description: 'Determinação de localizações ideais para infraestruturas verdes e soluções de Smart Cities, maximizando a redução térmica urbana.', sortOrder: 13 },
+  { category: 'colaboradores', name: 'Mateus Teixeira', qualification: 'Iniciação Científica — Precipitação e Estações Virtuais', description: 'Ampliação da cobertura de dados meteorológicos de temperatura e precipitação no Cerrado Goiano, com estações meteorológicas virtuais.', sortOrder: 14 },
+  { category: 'colaboradores', name: 'Pedro Mota', qualification: 'Iniciação Científica — Queimadas e Monitoramento Ambiental', description: 'Incorporação de variáveis climáticas a modelos de predição de incêndios no Cerrado, em articulação com o projeto SEM FOGO da UnB.', sortOrder: 15 },
+  { category: 'colaboradores', name: 'Rogério Torres', qualification: 'Iniciação Científica — Risco Aeronáutico e Meteorologia', description: 'Estimativa de risco de ocorrência aeronáutica a partir de variáveis meteorológicas observadas, com inclusão de variáveis de clima como elemento inovador.', sortOrder: 16 },
   // Convidados
   { category: 'convidados', name: 'Dr. Reinaldo Rosa (INPE)', qualification: 'Pesquisador Sênior, INPE', description: 'Colaboração em modelos híbridos IA-física para predição de seca no Cerrado.', sortOrder: 0 },
+  { category: 'convidados', name: 'Profa. Dra. Marta Luz', qualification: 'Pesquisadora — Furnas', description: 'Integração entre variáveis climáticas, conservação do solo, cadeias agroindustriais e políticas/regulações públicas e privadas.', sortOrder: 1 },
+  { category: 'convidados', name: 'Prof. Dr. Antônio Zamuner', qualification: 'Doutor em Engenharia de Produção — UFCAT', description: 'Pesquisa em cadeias agroindustriais, emissões de CO₂, microclima, ondas de calor urbano, blockchain e rastreabilidade logística.', sortOrder: 2 },
 ]
 
-// ----- Projetos -----
-// IDs dos membros são resolvidos dinamicamente após inserção da equipe.
-// Cada entrada mapeia campos de projectsData para IDs de teamMembers.
 type ProjectSeed = {
   slug: string
   title: string
@@ -249,13 +257,14 @@ type ProjectSeed = {
 }
 
 const seedProjectsData: ProjectSeed[] = [
+  // ── Plataformas ──────────────────────────────────────────────────────────────
   {
     slug: 'weather-brasil',
     title: 'Weather Brasil',
     category: 'Plataforma',
     themes: ['Clima'],
     description:
-      'Plataforma de curadoria, visualização e análise de dados climáticos brasileiros, integrando séries do INMET, mapas interativos e indicadores de risco climático. Desenvolvida no contexto do LEMM com foco em apoio à decisão em políticas públicas, agricultura e adaptação climática. Premiada no Troféu Seriema 2025 (2º lugar — Inovação) e aceita para apresentação no WCERE 2026, em Lisboa, Portugal.',
+      'Plataforma de curadoria, visualização e análise de dados climáticos brasileiros, integrando séries do INMET, mapas interativos e indicadores de risco climático. Premiada no Troféu Seriema 2025 (2º lugar — Inovação) e aceita para apresentação no WCERE 2026, em Lisboa, Portugal.',
     authors: [],
     startDate: new Date('2023-03-01'),
     gitUrl: 'https://github.com/lemm-pucgoias/weather-brasil',
@@ -263,26 +272,12 @@ const seedProjectsData: ProjectSeed[] = [
     researchLeadName: 'Norton Ricardo Pereira',
   },
   {
-    slug: 'tcc-davi-aquila',
-    title: 'Curadoria e Imputação de Dados Meteorológicos do Centro-Oeste',
-    category: 'TCC',
-    themes: ['Clima', 'Matemática'],
-    description:
-      'Trabalho de Conclusão de Curso focado na construção de um dataset curado e imputado de variáveis meteorológicas (temperatura, precipitação, umidade) para o Centro-Oeste brasileiro, utilizando dados do INMET e técnicas de machine learning para preenchimento de falhas. O dataset produzido serve de base para modelos de predição de eventos climáticos extremos e projetos de iniciação científica do LEMM.',
-    authors: [],
-    startDate: new Date('2024-03-01'),
-    endDate: new Date('2024-12-10'),
-    advisorName: 'Dra. Maria José Pereira Dantas',
-    researchLeadName: 'Davi Aquila',
-    pdfPath: '/TCC1 - Davi Aquila.pdf',
-  },
-  {
     slug: 'meta-tool-box',
     title: 'META TOOL BOX — Plataforma de Otimização e Metaheurísticas',
     category: 'Plataforma',
     themes: ['Otimização e Metaheurísticas', 'Matemática'],
     description:
-      'Plataforma computacional com registro de software dedicada a algoritmos de otimização e metaheurísticas (PSO, GA, SA, ACO). Desenvolvida desde 2016, conta com módulos para problemas combinatórios, logística, portfólios financeiros e cadeias agroindustriais. Integra aprendizado de máquina com métodos exatos (Learning to Optimize) e serve como base para pesquisas de IC, TCC e mestrado.',
+      'Plataforma computacional com registro de software dedicada a algoritmos de otimização e metaheurísticas (PSO, GA, SA, ACO). Desenvolvida desde 2016, conta com módulos para problemas combinatórios, logística, portfólios financeiros e cadeias agroindustriais. Integra aprendizado de máquina com métodos exatos (Learning to Optimize).',
     authors: [],
     startDate: new Date('2016-01-01'),
     gitUrl: 'https://github.com/lemm-pucgoias/meta-tool-box',
@@ -290,13 +285,56 @@ const seedProjectsData: ProjectSeed[] = [
     coAdvisorName: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
     researchLeadName: 'Dra. Maria José Pereira Dantas',
   },
+  // ── TCC ─────────────────────────────────────────────────────────────────────
+  {
+    slug: 'tcc-davi-aquila',
+    title: 'Curadoria e Imputação de Dados Meteorológicos do Centro-Oeste',
+    category: 'TCC',
+    themes: ['Clima', 'Matemática'],
+    description:
+      'Trabalho de Conclusão de Curso focado na construção de um dataset curado e imputado de variáveis meteorológicas (temperatura, precipitação, umidade) para o Centro-Oeste brasileiro, utilizando dados do INMET e técnicas de machine learning para preenchimento de falhas.',
+    authors: [],
+    startDate: new Date('2024-03-01'),
+    endDate: new Date('2024-12-10'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Davi Aquila',
+    pdfPath: '/TCC1 - Davi Aquila.pdf',
+  },
+  // ── Mestrado ─────────────────────────────────────────────────────────────────
+  {
+    slug: 'mestrado-ia-fisica-seca',
+    title: 'Modelos Híbridos IA-Física para Predição de Seca no Cerrado',
+    category: 'Mestrado',
+    themes: ['Clima', 'Matemática'],
+    description:
+      'Dissertação de mestrado que desenvolve e valida modelos híbridos combinando física atmosférica e aprendizado profundo (Transformers, LSTM) para predição de eventos de seca no Cerrado brasileiro. Utiliza dados ERA5-Land, INMET e pipeline de data healing desenvolvido no LEMM.',
+    authors: ['Discente PPGEIIA'],
+    startDate: new Date('2024-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Dr. Reinaldo Rosa (INPE)',
+  },
+  // ── Pesquisa ─────────────────────────────────────────────────────────────────
+  {
+    slug: 'logistica-agro-metaheuristica',
+    title: 'Otimização Logística em Cadeias Agroindustriais do Centro-Oeste',
+    category: 'Pesquisa',
+    themes: ['Otimização e Metaheurísticas', 'Agro & Sustentabilidade'],
+    description:
+      'Pesquisa em modelagem matemática e metaheurísticas aplicadas a problemas de roteamento e logística em cadeias de soja e carne bovina no Centro-Oeste. Incorpora variáveis de risco climático e sustentabilidade na função objetivo.',
+    authors: [],
+    startDate: new Date('2025-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
+    researchLeadName: 'Matheus Henrique Campos',
+  },
+  // ── Iniciação Científica ─────────────────────────────────────────────────────
   {
     slug: 'ic-transformers-precipitacao',
     title: 'Arquiteturas Transformer para Predição de Precipitação no Cerrado',
     category: 'Iniciação Científica',
     themes: ['Clima', 'Matemática'],
     description:
-      'Investigação de arquiteturas Transformer e mecanismos de atenção aplicados à predição de precipitação no Cerrado Goiano. O trabalho compara múltiplos modelos de baseline, utiliza dados ERA5 e INMET e integra técnicas de HPC para processamento de séries temporais longas. Resultados preliminares submetidos ao COMPSAC 2026.',
+      'Investigação de arquiteturas Transformer e mecanismos de atenção aplicados à predição de precipitação no Cerrado Goiano. Compara múltiplos modelos de baseline, utiliza dados ERA5 e INMET e integra técnicas de HPC. Resultados submetidos ao COMPSAC 2026.',
     authors: [],
     startDate: new Date('2025-03-01'),
     gitUrl: 'https://github.com/lemm-pucgoias/transformer-precipitacao',
@@ -310,7 +348,7 @@ const seedProjectsData: ProjectSeed[] = [
     category: 'Pesquisa',
     themes: ['Clima'],
     description:
-      'Estudo sobre identificação, modelagem e impacto de ondas de calor em centros urbanos goianos, com análise de perfis tipológicos, ilhas de calor e séries de temperatura. Articula dados do INMET com modelagem em WRF e aprendizado de máquina para predição de eventos extremos de temperatura.',
+      'Estudo sobre identificação, modelagem e impacto de ondas de calor em centros urbanos goianos, com análise de perfis tipológicos, ilhas de calor e séries de temperatura. Articula dados do INMET com modelagem em WRF e aprendizado de máquina.',
     authors: [],
     startDate: new Date('2025-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
@@ -318,32 +356,7 @@ const seedProjectsData: ProjectSeed[] = [
     researchLeadName: 'Mirela Marques',
   },
   {
-    slug: 'mestrado-ia-fisica-seca',
-    title: 'Modelos Híbridos IA-Física para Predição de Seca no Cerrado',
-    category: 'Mestrado',
-    themes: ['Clima', 'Matemática'],
-    description:
-      'Dissertação de mestrado que desenvolve e valida modelos híbridos combinando física atmosférica e aprendizado profundo (Transformers, LSTM) para predição de eventos de seca no Cerrado brasileiro. Utiliza dados ERA5-Land, INMET e pipeline de data healing desenvolvido no LEMM. Inclui experimentos em infraestrutura HPC e análise comparativa com modelos climáticos tradicionais.',
-    authors: ['Discente PPGEIIA'],  // não é membro da equipe, vai em "outros"
-    startDate: new Date('2024-03-01'),
-    advisorName: 'Dra. Maria José Pereira Dantas',
-    coAdvisorName: 'Dr. Reinaldo Rosa (INPE)',
-  },
-  {
-    slug: 'logistica-agro-metaheuristica',
-    title: 'Otimização Logística em Cadeias Agroindustriais do Centro-Oeste',
-    category: 'Pesquisa',
-    themes: ['Otimização e Metaheurísticas', 'Agro & Sustentabilidade'],
-    description:
-      'Pesquisa em modelagem matemática e metaheurísticas aplicadas a problemas de roteamento e logística em cadeias de soja e carne bovina no Centro-Oeste. Incorpora variáveis de risco climático e sustentabilidade na função objetivo, com foco em decisão sob incerteza e rastreabilidade.',
-    authors: [],
-    startDate: new Date('2025-03-01'),
-    advisorName: 'Dra. Maria José Pereira Dantas',
-    coAdvisorName: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
-    researchLeadName: 'Matheus Henrique Campos',
-  },
-  {
-    slug: 'gemeo-digital-agro',
+    slug: 'ic-gemeo-digital-agro',
     title: 'Gêmeo Digital para Agricultura de Precisão',
     category: 'Iniciação Científica',
     themes: ['Agro & Sustentabilidade', 'Matemática'],
@@ -354,6 +367,133 @@ const seedProjectsData: ProjectSeed[] = [
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Felipe Veloso',
     researchLeadName: 'Sophia',
+  },
+  {
+    slug: 'ic-fog-computing-agro',
+    title: 'Fog Computing para Tomada de Decisão em Cadeias Agroindustriais',
+    category: 'Iniciação Científica',
+    themes: ['Agro & Sustentabilidade'],
+    description:
+      'Estudo de arquiteturas fog computing voltadas à tomada de decisão distribuída em cadeias agroindustriais do Centro-Oeste. Segunda iniciação científica do aluno, com avanços importantes e artigo em redação para envio ao ENIAC 2026 (BRACIS 2026).',
+    authors: [],
+    startDate: new Date('2025-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Felipe Veloso',
+    researchLeadName: 'Mateus Newmann',
+  },
+  // ── IC 2026/2027 ─────────────────────────────────────────────────────────────
+  {
+    slug: 'ic-eventos-extremos-carlos',
+    title: 'Estudo de Eventos Extremos do Clima no Cerrado',
+    category: 'Iniciação Científica',
+    themes: ['Clima'],
+    description:
+      'Investigação de eventos extremos do clima no Cerrado Goiano, integrado ao projeto "Tecnologias Disruptivas..." e à plataforma Weather Brasil. Inclui estudos de modelagem atmosférica com suporte de HPC. Acompanhado pelo mestrando Norton Ricardo Pereira e pelo Prof. Dr. Roussian Di Amaro Alves Gaioso.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    researchLeadName: 'Carlos',
+  },
+  {
+    slug: 'ic-hpc-wrf-alysson',
+    title: 'Modelagem Climática com HPC e WRF no Cerrado',
+    category: 'Iniciação Científica',
+    themes: ['Clima'],
+    description:
+      'Estudo de modelagem climática utilizando computação de alto desempenho (HPC) e o modelo WRF, articulado ao projeto "Tecnologias Disruptivas..." e à rede INPE–PUC Goiás. Acompanhado pelo mestrando do INPE Salatiel A. A. Jordão e pelo Dr. Reinaldo Rosa.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    researchLeadName: 'Alysson',
+  },
+  {
+    slug: 'ic-mercado-financeiro-arthur',
+    title: 'IA e Metaheurísticas Aplicadas ao Mercado Financeiro',
+    category: 'Iniciação Científica',
+    themes: ['Otimização e Metaheurísticas'],
+    description:
+      'Pesquisa em inteligência artificial e trading aplicados ao mercado financeiro, em continuidade à linha do grupo desde 2020, com publicações em congressos nacionais, capítulo de livro Springer e revista Production. Alto potencial de gerar produto em trading com IA.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Arthur Felipe',
+  },
+  {
+    slug: 'ic-mercado-financeiro-vitor',
+    title: 'LSTM e Metaheurísticas com Rastreabilidade e Sustentabilidade Financeira',
+    category: 'Iniciação Científica',
+    themes: ['Otimização e Metaheurísticas'],
+    description:
+      'Pesquisa em mercado financeiro com uso de LSTM e metaheurísticas, incorporando variáveis de rastreabilidade e sustentabilidade diretamente na função objetivo. Articulado com artigo científico em desenvolvimento pelo egresso Danilo Milhomem.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Vitor Hugo',
+  },
+  {
+    slug: 'ic-eventos-extremos-gabriel',
+    title: 'Predição de Eventos Climáticos Extremos no Cerrado',
+    category: 'Iniciação Científica',
+    themes: ['Clima'],
+    description:
+      'Estudo de eventos climáticos extremos com potencial de aplicação no Cerrado, com grande potencial de publicação. Articulado com frentes de modelagem climática e agronomia do laboratório.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    researchLeadName: 'Gabriel Fonseca',
+  },
+  {
+    slug: 'ic-clima-urbano-smart-cities',
+    title: 'Infraestruturas Verdes e Smart Cities para Redução Térmica Urbana',
+    category: 'Iniciação Científica',
+    themes: ['Clima'],
+    description:
+      'Determinação de localizações ideais para implementação de infraestruturas verdes e soluções de Smart Cities, maximizando a redução térmica em centros urbanos. Articulado com estudos de ondas de calor e clima urbano do laboratório, com colaboração do Prof. Dr. Antônio Zamuner (UFCAT) e Prof. Dr. Roussian Di Amaro Alves Gaioso.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    researchLeadName: 'Matheus Mendanha',
+  },
+  {
+    slug: 'ic-precipitacao-cerrado-mateus-teixeira',
+    title: 'Ampliação da Cobertura Meteorológica no Cerrado Goiano',
+    category: 'Iniciação Científica',
+    themes: ['Clima'],
+    description:
+      'Pesquisa voltada à ampliação da cobertura de dados meteorológicos de temperatura e precipitação no Cerrado Goiano, com desenvolvimento de estações meteorológicas virtuais. Articulada com estudos do pós-doutoramento no INPE (supervisor Dr. Reinaldo Rosa) e com HPC pelo Prof. Dr. Roussian Di Amaro Alves Gaioso.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    researchLeadName: 'Mateus Teixeira',
+  },
+  {
+    slug: 'ic-queimadas-sem-fogo',
+    title: 'Predição de Incêndios no Cerrado com Variáveis Climáticas',
+    category: 'Iniciação Científica',
+    themes: ['Clima', 'Agro & Sustentabilidade'],
+    description:
+      'Incorporação de variáveis climáticas (temperatura, umidade, vento e precipitação) a modelos de predição de incêndios no bioma Cerrado, em articulação com o projeto SEM FOGO da UnB (Profa. Priscilla Solis). Utilizará dataset curado do Centro-Oeste produzido no TCC de Davi Aquila.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Pedro Mota',
+  },
+  {
+    slug: 'ic-risco-aeronautico',
+    title: 'Estimativa de Risco Aeronáutico a partir de Variáveis Meteorológicas',
+    category: 'Iniciação Científica',
+    themes: ['Clima'],
+    description:
+      'Pesquisa com objetivo de estimar o risco de ocorrência aeronáutica a partir de variáveis meteorológicas observadas. A inclusão de variáveis climáticas (temperatura, umidade, vento e precipitação) é elemento inovador ao modelo de predição, com grande potencial de publicação.',
+    authors: [],
+    startDate: new Date('2026-03-01'),
+    advisorName: 'Dra. Maria José Pereira Dantas',
+    researchLeadName: 'Rogério Torres',
   },
 ]
 
