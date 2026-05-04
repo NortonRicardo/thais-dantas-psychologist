@@ -151,8 +151,8 @@ export function LabAreaSections() {
                 fill
                 className="object-cover"
                 sizes="100vw"
-                priority={index === 0}
-                quality={85}
+                priority={index <= 1}
+                quality={75}
               />
             </div>
 
