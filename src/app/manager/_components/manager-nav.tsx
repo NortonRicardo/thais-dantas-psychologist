@@ -6,15 +6,14 @@ import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/manager', label: 'Home' },
-  { href: '/manager/eventos', label: 'Eventos' },
-  { href: '/manager/sobre-nos', label: 'Sobre Nós' },
-  { href: '/manager/plataformas', label: 'Plataformas' },
-  { href: '/manager/hardware', label: 'Hardware' },
-  { href: '/manager/rede-colaboracao', label: 'Rede' },
-  { href: '/manager/equipe', label: 'Equipe' },
-  { href: '/manager/contato', label: 'Contato' },
   { href: '/manager/projetos', label: 'Projetos' },
+  { href: '/manager/eventos', label: 'Eventos' },
+  { href: '/manager/equipe', label: 'Equipe' },
+  { href: '/manager/sobre-nos', label: 'Sobre Nós' },
+  { href: '/manager/contato', label: 'Contato' },
+  { href: '/manager/hardware', label: 'Hardware' },
+  { href: '/manager/plataformas', label: 'Plataformas' },
+  { href: '/manager/rede-colaboracao', label: 'Parcerias' },
 ]
 
 export function ManagerNav() {
