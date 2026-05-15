@@ -32,6 +32,7 @@ export async function TeamSection() {
       lattesUrl: teamMembers.lattesUrl,
       categoryId: teamCategories.id,
       categoryTitle: teamCategories.title,
+      categoryColor: teamCategories.color,
     })
     .from(teamMembers)
     .innerJoin(teamCategories, eq(teamMembers.categoryId, teamCategories.id))
@@ -119,17 +120,23 @@ export async function TeamSection() {
       sections.push({
         categoryId: r.categoryId,
         title: r.categoryTitle,
+        categoryColor: r.categoryColor,
         members: [],
       })
     }
     sections[idx].members.push({
       id: r.id,
+      name: r.name,
       displayName: teamMemberDisplayName(r.name, r.namePrefixLabel),
       professionalLine: teamMemberProfessionalLine({
         degreeLevelLabel: r.degreeLevelLabel,
         qualification: r.qualification,
         formationInstitution: r.formationInstitution,
       }),
+      categoryId: r.categoryId,
+      categoryTitle: r.categoryTitle,
+      categoryColor: r.categoryColor,
+      degreeLevelLabel: r.degreeLevelLabel,
       description: r.description,
       linkedinUrl: r.linkedinUrl,
       lattesUrl: r.lattesUrl,

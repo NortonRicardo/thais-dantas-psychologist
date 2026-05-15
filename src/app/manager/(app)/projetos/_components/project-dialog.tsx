@@ -248,7 +248,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       </DialogTrigger>
 
       <DialogContent
-        className="max-h-[90vh] max-w-2xl overflow-y-auto bg-[#071525] text-white border-white/10 [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
+        className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto border-white/10 bg-[#071525] text-white sm:max-w-4xl [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>

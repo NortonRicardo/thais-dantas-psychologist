@@ -1,16 +1,19 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowRight,
   BookOpen,
   CalendarDays,
+  ChevronDown,
   ExternalLink,
   FileText,
   Github,
   Linkedin,
+  Search,
   Users,
+  X,
 } from 'lucide-react'
 
 import {
@@ -36,8 +39,13 @@ export type EquipeProjectSummary = {
 
 export type EquipeMemberView = {
   id: string
+  name: string
   displayName: string
   professionalLine: string
+  categoryId: string
+  categoryTitle: string
+  categoryColor: string
+  degreeLevelLabel: string | null
   description: string | null
   linkedinUrl: string | null
   lattesUrl: string | null
@@ -48,11 +56,123 @@ export type EquipeMemberView = {
 export type EquipeSectionView = {
   categoryId: string
   title: string
+  categoryColor: string
   members: EquipeMemberView[]
 }
 
 type Props = {
   sections: EquipeSectionView[]
+}
+
+type TrayItem = { id: string; label: string; dotClass?: string }
+
+/** Mesmo padrão visual do filtro de tipo em `events-section` (botão + lista com busca). */
+function TrayFilterPopover({
+  value,
+  onChange,
+  items,
+  pillLabel,
+  allLabel,
+  widthClass = 'w-48',
+}: {
+  value: string
+  onChange: (id: string) => void
+  items: TrayItem[]
+  pillLabel: string
+  allLabel: string
+  widthClass?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const filtered = items.filter(i => i.label.toLowerCase().includes(search.toLowerCase()))
+
+  function select(id: string) {
+    onChange(id)
+    setOpen(false)
+    setSearch('')
+  }
+
+  const selected = items.find(i => i.id === value)
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(o => !o)
+          setTimeout(() => inputRef.current?.focus(), 0)
+        }}
+        className={`flex ${widthClass} items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10`}
+      >
+        {value ? (
+          <span className="flex min-w-0 items-center gap-2 text-white/80">
+            {selected?.dotClass ? (
+              <span className={`h-2 w-2 shrink-0 rounded-full ${selected.dotClass}`} />
+            ) : (
+              <span className="h-2 w-2 shrink-0 rounded-full bg-white/35" />
+            )}
+            <span className="truncate">{selected?.label ?? value}</span>
+          </span>
+        ) : (
+          <span className="text-white/40">{pillLabel}</span>
+        )}
+        <ChevronDown size={13} className="shrink-0 text-white/30" />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div
+            className={`absolute left-0 top-full z-20 mt-1 ${widthClass} overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl`}
+          >
+            <div className="border-b border-white/10 p-2">
+              <div className="relative">
+                <Search
+                  size={12}
+                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30"
+                />
+                <input
+                  ref={inputRef}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Buscar…"
+                  className="w-full rounded-lg bg-white/5 py-1.5 pl-7 pr-2 text-sm text-white/80 placeholder:text-white/25 outline-none"
+                />
+              </div>
+            </div>
+            <div className="max-h-52 overflow-y-auto p-1" onWheel={e => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() => select('')}
+                className={`w-full rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
+              >
+                {allLabel}
+              </button>
+              {filtered.map(i => (
+                <button
+                  key={i.id}
+                  type="button"
+                  onClick={() => select(i.id)}
+                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === i.id ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                >
+                  {i.dotClass ? (
+                    <span className={`h-2 w-2 shrink-0 rounded-full ${i.dotClass}`} />
+                  ) : (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-white/35" />
+                  )}
+                  <span className="truncate">{i.label}</span>
+                </button>
+              ))}
+              {filtered.length === 0 && (
+                <p className="py-2 text-center text-xs text-white/25">Sem resultados</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 const categoryBadgeStyle: Record<string, { bg: string; border: string; text: string }> = {
@@ -86,6 +206,54 @@ const categoryBadgeStyle: Record<string, { bg: string; border: string; text: str
 export function TeamEquipeInteractive({ sections }: Props) {
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<EquipeMemberView | null>(null)
+  const [filterName, setFilterName] = useState('')
+  const [filterCategoryId, setFilterCategoryId] = useState('')
+  const [filterDegree, setFilterDegree] = useState('')
+
+  const categoryItems = useMemo(
+    () =>
+      [...sections]
+        .sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
+        .map(s => ({
+          id: s.categoryId,
+          label: s.title,
+          dotClass: s.categoryColor,
+        })),
+    [sections]
+  )
+
+  const degreeItems = useMemo(() => {
+    const labels = new Set<string>()
+    for (const s of sections) {
+      for (const m of s.members) {
+        const d = m.degreeLevelLabel?.trim()
+        if (d) labels.add(d)
+      }
+    }
+    return [...labels]
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+      .map(label => ({ id: label, label, dotClass: 'bg-cyan-400/70' }))
+  }, [sections])
+
+  const hasFilters = !!(filterName.trim() || filterCategoryId || filterDegree)
+
+  const filteredSections = useMemo(() => {
+    const q = filterName.trim().toLowerCase()
+    return sections
+      .map(section => ({
+        ...section,
+        members: section.members.filter(m => {
+          if (q) {
+            const hay = `${m.displayName} ${m.name}`.toLowerCase()
+            if (!hay.includes(q)) return false
+          }
+          if (filterCategoryId && m.categoryId !== filterCategoryId) return false
+          if (filterDegree && (m.degreeLevelLabel?.trim() ?? '') !== filterDegree) return false
+          return true
+        }),
+      }))
+      .filter(s => s.members.length > 0)
+  }, [sections, filterName, filterCategoryId, filterDegree])
 
   const openMember = useCallback((m: EquipeMemberView) => {
     setSelected(m)
@@ -99,19 +267,83 @@ export function TeamEquipeInteractive({ sections }: Props) {
 
   return (
     <>
-      <div className="mt-10 w-full space-y-12 pb-16">
-        {sections.map(section => (
-          <section key={section.categoryId}>
-            <h2 className="mb-6 text-xs font-semibold uppercase tracking-[4px] text-white/40">
-              {section.title}
-            </h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {section.members.map(m => (
-                <MemberCard key={m.id} member={m} onSelect={() => openMember(m)} />
-              ))}
-            </div>
-          </section>
-        ))}
+      <div className="mt-10 flex w-full flex-col gap-8 pb-16">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2">
+          <div className="relative w-72 max-w-full min-w-0">
+            <Search
+              size={13}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
+            />
+            <input
+              type="text"
+              value={filterName}
+              onChange={e => setFilterName(e.target.value)}
+              placeholder="Buscar por nome…"
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/35 outline-none backdrop-blur-sm focus:border-white/20"
+            />
+            {filterName ? (
+              <button
+                type="button"
+                onClick={() => setFilterName('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+              >
+                <X size={12} />
+              </button>
+            ) : null}
+          </div>
+
+          <TrayFilterPopover
+            value={filterCategoryId}
+            onChange={setFilterCategoryId}
+            items={categoryItems}
+            pillLabel="Categoria"
+            allLabel="Todas as categorias"
+            widthClass="w-52"
+          />
+
+          <TrayFilterPopover
+            value={filterDegree}
+            onChange={setFilterDegree}
+            items={degreeItems}
+            pillLabel="Grau acadêmico"
+            allLabel="Todos os graus"
+            widthClass="w-52"
+          />
+
+          <button
+            type="button"
+            disabled={!hasFilters}
+            onClick={() => {
+              setFilterName('')
+              setFilterCategoryId('')
+              setFilterDegree('')
+            }}
+            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/40 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white/60 disabled:cursor-not-allowed disabled:text-white/20 disabled:opacity-50 disabled:hover:bg-white/5"
+          >
+            <X size={12} /> Limpar
+          </button>
+        </div>
+
+        {hasFilters && filteredSections.length === 0 ? (
+          <p className="text-center text-sm text-white/30">
+            Nenhum membro encontrado para os filtros aplicados.
+          </p>
+        ) : null}
+
+        <div className="flex flex-col gap-12">
+          {filteredSections.map(section => (
+            <section key={section.categoryId}>
+              <h2 className="mb-6 text-xs font-semibold uppercase tracking-[4px] text-white/40">
+                {section.title}
+              </h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {section.members.map(m => (
+                  <MemberCard key={m.id} member={m} onSelect={() => openMember(m)} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -193,9 +425,9 @@ export function TeamEquipeInteractive({ sections }: Props) {
                       Projetos
                     </h3>
                     {selected.projects.length > 0 ? (
-                      <ul className="mt-3 flex flex-col gap-3">
+                      <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {selected.projects.map(p => (
-                          <li key={p.slug}>
+                          <li key={p.slug} className="min-w-0">
                             <MemberProjectCard project={p} onNavigate={() => setOpen(false)} />
                           </li>
                         ))}
@@ -249,7 +481,7 @@ function MemberProjectCard({
           {project.category}
         </span>
         {project.roles.length > 0 ? (
-          <span className="max-w-[55%] text-right text-[0.65rem] leading-snug text-sky-300/90">
+          <span className="max-w-[min(100%,12rem)] text-right text-[0.65rem] leading-snug text-sky-300/90 sm:max-w-[55%]">
             {project.roles.join(' · ')}
           </span>
         ) : null}
