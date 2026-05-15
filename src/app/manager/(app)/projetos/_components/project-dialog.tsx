@@ -35,6 +35,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Textarea } from '@/components/ui/textarea'
 import { extractBgColorKey } from '@/lib/project-taxonomy-styles'
+import { readApiError } from '@/lib/read-api-error'
 import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 export type ProjectRow = {
@@ -356,16 +357,14 @@ export function ProjectDialog({ project, onSuccess }: Props) {
     try {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(
-          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
-        )
+        toast.error(await readApiError(res))
+        return
       }
       toast.success(isEdit ? 'Projeto atualizado!' : 'Projeto criado!')
       setOpen(false)
       onSuccess()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
+    } catch {
+      toast.error('Não foi possível salvar o projeto.')
     } finally {
       setLoading(false)
     }
@@ -515,42 +514,125 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             </div>
           </div>
 
-          {/* Responsável pela pesquisa */}
-          <div className="grid gap-1.5">
-            <Label className="text-white/70">Responsável pela pesquisa</Label>
-            <FilterCombobox
-              value={researchLeadId}
-              onChange={setResearchLeadId}
-              placeholder="Selecionar…"
-              clearLabel="Nenhum"
-              showClear={!!researchLeadId}
-              options={teamMembers.map(m => m.id)}
-              labelForValue={id => teamMembers.find(m => m.id === id)?.name ?? ''}
-              width="w-full min-w-0"
-              renderOption={id => {
-                const m = teamMembers.find(r => r.id === id)
-                const label = m?.name ?? id
-                return (
-                  <span className="flex min-w-0 items-center gap-2">
-                    <TeamMemberThumb memberId={id} displayName={label} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={22} frameClassName="border-white/10 bg-white/5" />
-                    <span className="truncate" title={label}>{label}</span>
-                  </span>
-                )
-              }}
-              renderValue={id => {
-                const m = teamMembers.find(r => r.id === id)
-                const label = m?.name ?? ''
-                return (
-                  <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                    <TeamMemberThumb memberId={id} displayName={label || id} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={24} frameClassName="border-white/10 bg-white/5" />
-                    <span className="block min-w-0 flex-1 truncate" title={label || undefined}>{label}</span>
-                  </span>
-                )
-              }}
-            />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-start">
+            {/* Responsável pela pesquisa */}
+            <div className="grid min-w-0 gap-1.5">
+              <Label className="text-white/70">Responsável pela pesquisa</Label>
+              <FilterCombobox
+                value={researchLeadId}
+                onChange={setResearchLeadId}
+                placeholder="Selecionar…"
+                clearLabel="Nenhum"
+                showClear={!!researchLeadId}
+                options={teamMembers.map(m => m.id)}
+                labelForValue={id =>
+                  teamMembers.find(m => m.id === id)?.name ?? ''
+                }
+                width="w-full min-w-0"
+                renderOption={id => {
+                  const m = teamMembers.find(r => r.id === id)
+                  const label = m?.name ?? id
+                  return (
+                    <span className="flex min-w-0 items-center gap-2">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={22}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span className="truncate" title={label}>
+                        {label}
+                      </span>
+                    </span>
+                  )
+                }}
+                renderValue={id => {
+                  const m = teamMembers.find(r => r.id === id)
+                  const label = m?.name ?? ''
+                  return (
+                    <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label || id}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={24}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span
+                        className="block min-w-0 flex-1 truncate"
+                        title={label || undefined}
+                      >
+                        {label}
+                      </span>
+                    </span>
+                  )
+                }}
+              />
+            </div>
+
+            {/* Orientador */}
+            <div className="grid min-w-0 gap-1.5">
+              <Label className="text-white/70">Orientador(a) *</Label>
+              <FilterCombobox
+                value={advisorId}
+                onChange={setAdvisorId}
+                placeholder="Selecionar…"
+                clearLabel="Nenhum(a)"
+                showClear={!!advisorId}
+                options={teamMembers.map(m => m.id)}
+                labelForValue={id =>
+                  teamMembers.find(m => m.id === id)?.name ?? ''
+                }
+                width="w-full min-w-0"
+                renderOption={id => {
+                  const m = teamMembers.find(r => r.id === id)
+                  const label = m?.name ?? id
+                  return (
+                    <span className="flex min-w-0 items-center gap-2">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={22}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span className="truncate" title={label}>
+                        {label}
+                      </span>
+                    </span>
+                  )
+                }}
+                renderValue={id => {
+                  const m = teamMembers.find(r => r.id === id)
+                  const label = m?.name ?? ''
+                  return (
+                    <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label || id}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={24}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span
+                        className="block min-w-0 flex-1 truncate"
+                        title={label || undefined}
+                      >
+                        {label}
+                      </span>
+                    </span>
+                  )
+                }}
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Data início */}
             <div className="grid gap-1.5">
               <Label htmlFor="startDate" className="text-white/70">
@@ -586,42 +668,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Orientador */}
-            <div className="grid min-w-0 gap-1.5">
-              <Label className="text-white/70">Orientador(a) *</Label>
-              <FilterCombobox
-                value={advisorId}
-                onChange={setAdvisorId}
-                placeholder="Selecionar…"
-                clearLabel="Nenhum(a)"
-                showClear={!!advisorId}
-                options={teamMembers.map(m => m.id)}
-                labelForValue={id => teamMembers.find(m => m.id === id)?.name ?? ''}
-                width="w-full min-w-0"
-                renderOption={id => {
-                  const m = teamMembers.find(r => r.id === id)
-                  const label = m?.name ?? id
-                  return (
-                    <span className="flex min-w-0 items-center gap-2">
-                      <TeamMemberThumb memberId={id} displayName={label} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={22} frameClassName="border-white/10 bg-white/5" />
-                      <span className="truncate" title={label}>{label}</span>
-                    </span>
-                  )
-                }}
-                renderValue={id => {
-                  const m = teamMembers.find(r => r.id === id)
-                  const label = m?.name ?? ''
-                  return (
-                    <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                      <TeamMemberThumb memberId={id} displayName={label || id} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={24} frameClassName="border-white/10 bg-white/5" />
-                      <span className="block min-w-0 flex-1 truncate" title={label || undefined}>{label}</span>
-                    </span>
-                  )
-                }}
-              />
-            </div>
-
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-start">
             {/* Coorientador */}
             <div className="grid min-w-0 gap-1.5">
               <Label className="text-white/70">Coorientador(a)</Label>
@@ -632,15 +679,26 @@ export function ProjectDialog({ project, onSuccess }: Props) {
                 clearLabel="Nenhum(a)"
                 showClear={!!coAdvisorId}
                 options={teamMembers.map(m => m.id)}
-                labelForValue={id => teamMembers.find(m => m.id === id)?.name ?? ''}
+                labelForValue={id =>
+                  teamMembers.find(m => m.id === id)?.name ?? ''
+                }
                 width="w-full min-w-0"
                 renderOption={id => {
                   const m = teamMembers.find(r => r.id === id)
                   const label = m?.name ?? id
                   return (
                     <span className="flex min-w-0 items-center gap-2">
-                      <TeamMemberThumb memberId={id} displayName={label} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={22} frameClassName="border-white/10 bg-white/5" />
-                      <span className="truncate" title={label}>{label}</span>
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={22}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span className="truncate" title={label}>
+                        {label}
+                      </span>
                     </span>
                   )
                 }}
@@ -649,30 +707,42 @@ export function ProjectDialog({ project, onSuccess }: Props) {
                   const label = m?.name ?? ''
                   return (
                     <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                      <TeamMemberThumb memberId={id} displayName={label || id} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={24} frameClassName="border-white/10 bg-white/5" />
-                      <span className="block min-w-0 flex-1 truncate" title={label || undefined}>{label}</span>
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label || id}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={24}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span
+                        className="block min-w-0 flex-1 truncate"
+                        title={label || undefined}
+                      >
+                        {label}
+                      </span>
                     </span>
                   )
                 }}
               />
             </div>
-          </div>
 
-          {/* Outros */}
-          <div className="grid gap-1.5">
-            <Label htmlFor="authors" className="text-white/70">
-              Outros{' '}
-              <span className="text-white/30 font-normal">
-                (nomes separados por vírgula)
-              </span>
-            </Label>
-            <Input
-              id="authors"
-              name="authors"
-              defaultValue={project?.authors.join(', ')}
-              placeholder="Discente PPGEIIA, Nome Sobrenome"
-              className={INPUT_CLS}
-            />
+            {/* Outros */}
+            <div className="grid min-w-0 gap-1.5">
+              <Label htmlFor="authors" className="text-white/70">
+                Outros{' '}
+                <span className="text-white/30 font-normal">
+                  (nomes separados por vírgula)
+                </span>
+              </Label>
+              <Input
+                id="authors"
+                name="authors"
+                defaultValue={project?.authors.join(', ')}
+                placeholder="Discente PPGEIIA, Nome Sobrenome"
+                className={INPUT_CLS}
+              />
+            </div>
           </div>
 
           {/* Descrição */}
@@ -795,6 +865,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             <Button
               type="submit"
               loading={loading}
+              loadingLabel="Salvando…"
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
               {isEdit ? 'Salvar alterações' : 'Criar'}

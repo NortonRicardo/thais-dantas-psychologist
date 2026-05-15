@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { extractBgColorKey } from '@/lib/project-taxonomy-styles'
+import { readApiError } from '@/lib/read-api-error'
 
 export type ProjectCategoryRow = {
   id: string
@@ -65,16 +66,14 @@ export function ProjectCategoryDialog({ category, onSuccess }: Props) {
     try {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(
-          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
-        )
+        toast.error(await readApiError(res))
+        return
       }
       toast.success(isEdit ? 'Categoria atualizada!' : 'Categoria criada!')
       setOpen(false)
       onSuccess()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
+    } catch {
+      toast.error('Não foi possível salvar a categoria.')
     } finally {
       setLoading(false)
     }
@@ -140,6 +139,7 @@ export function ProjectCategoryDialog({ category, onSuccess }: Props) {
             <Button
               type="submit"
               loading={loading}
+              loadingLabel="Salvando…"
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
               {isEdit ? 'Salvar alterações' : 'Criar'}

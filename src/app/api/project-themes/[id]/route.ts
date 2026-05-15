@@ -57,38 +57,64 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       })
 
     if (!updated)
-      return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Tema não encontrado.' },
+        { status: 404 }
+      )
     return NextResponse.json(updated)
   } catch (err) {
     console.error('[PUT /api/project-themes/:id]', err)
+    const duplicate = err instanceof Error && /unique/i.test(err.message)
     return NextResponse.json(
-      { error: 'Erro ao atualizar tema' },
-      { status: 500 }
+      {
+        error: duplicate
+          ? 'Nome ou slug já existe.'
+          : 'Erro ao atualizar tema.',
+      },
+      { status: duplicate ? 409 : 500 }
     )
   }
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
-  const { id } = await params
-  const idParsed = uuidParamSafeParse(id)
-  if (!idParsed.success)
-    return validationErrorResponse(idParsed.error)
+  try {
+    const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
 
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(projectProjectThemes)
-    .where(eq(projectProjectThemes.themeId, id))
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(projectProjectThemes)
+      .where(eq(projectProjectThemes.themeId, id))
 
-  if (count > 0) {
+    if (count > 0) {
+      return NextResponse.json(
+        {
+          error:
+            'Existem projetos usando este tema. Remova-o dos projetos antes de excluir.',
+        },
+        { status: 409 }
+      )
+    }
+
+    const deleted = await db
+      .delete(projectThemes)
+      .where(eq(projectThemes.id, id))
+      .returning({ id: projectThemes.id })
+
+    if (deleted.length === 0) {
+      return NextResponse.json(
+        { error: 'Tema não encontrado.' },
+        { status: 404 }
+      )
+    }
+
+    return new NextResponse(null, { status: 204 })
+  } catch (err) {
+    console.error('[DELETE /api/project-themes/:id]', err)
     return NextResponse.json(
-      {
-        error:
-          'Existem projetos usando este tema. Remova-o dos projetos antes de excluir.',
-      },
-      { status: 409 }
+      { error: 'Erro ao excluir tema.' },
+      { status: 500 }
     )
   }
-
-  await db.delete(projectThemes).where(eq(projectThemes.id, id))
-  return new NextResponse(null, { status: 204 })
 }

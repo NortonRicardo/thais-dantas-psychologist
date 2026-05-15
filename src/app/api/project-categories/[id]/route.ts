@@ -42,7 +42,10 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       })
 
     if (!updated)
-      return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Categoria não encontrada.' },
+        { status: 404 }
+      )
     return NextResponse.json(updated)
   } catch (err) {
     console.error('[PUT /api/project-categories/:id]', err)
@@ -54,26 +57,44 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
-  const { id } = await params
-  const idParsed = uuidParamSafeParse(id)
-  if (!idParsed.success)
-    return validationErrorResponse(idParsed.error)
+  try {
+    const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
 
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(projects)
-    .where(eq(projects.categoryId, id))
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(projects)
+      .where(eq(projects.categoryId, id))
 
-  if (count > 0) {
+    if (count > 0) {
+      return NextResponse.json(
+        {
+          error:
+            'Existem projetos nesta categoria. Reatribua-os antes de excluir.',
+        },
+        { status: 409 }
+      )
+    }
+
+    const deleted = await db
+      .delete(projectCategories)
+      .where(eq(projectCategories.id, id))
+      .returning({ id: projectCategories.id })
+
+    if (deleted.length === 0) {
+      return NextResponse.json(
+        { error: 'Categoria não encontrada.' },
+        { status: 404 }
+      )
+    }
+
+    return new NextResponse(null, { status: 204 })
+  } catch (err) {
+    console.error('[DELETE /api/project-categories/:id]', err)
     return NextResponse.json(
-      {
-        error:
-          'Existem projetos nesta categoria. Reatribua-os antes de excluir.',
-      },
-      { status: 409 }
+      { error: 'Erro ao excluir categoria.' },
+      { status: 500 }
     )
   }
-
-  await db.delete(projectCategories).where(eq(projectCategories.id, id))
-  return new NextResponse(null, { status: 204 })
 }

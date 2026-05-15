@@ -7,7 +7,10 @@ import { syncProjectThemes } from '@/lib/db/sync-project-themes'
 import { projectCategoryManagerBadgeClasses } from '@/lib/project-category-badge'
 import { projects } from '@/lib/db/schema'
 import { parseProjectForm } from '@/lib/validation/projects-api'
-import { validationErrorResponse } from '@/lib/validation/team-api'
+import {
+  uuidParamSafeParse,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 import {
   validateImageUpload,
   validatePdfUpload,
@@ -48,13 +51,23 @@ function serializeManagerProject(
 
 export async function GET(_: Request, { params }: Ctx) {
   const { id } = await params
+  const idParsed = uuidParamSafeParse(id)
+  if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
   const row = await fetchProjectHydratedById(id)
-  if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!row)
+    return NextResponse.json(
+      { error: 'Projeto não encontrado.' },
+      { status: 404 }
+    )
   return NextResponse.json(serializeManagerProject(row))
 }
 
 export async function PUT(req: Request, { params }: Ctx) {
   const { id } = await params
+  const idParsed = uuidParamSafeParse(id)
+  if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
   const fd = await req.formData()
 
   const parsed = parseProjectForm(fd)
@@ -104,13 +117,39 @@ export async function PUT(req: Request, { params }: Ctx) {
     update.pdfMimeType = pdfFile.type
   }
 
-  await db.update(projects).set(update).where(eq(projects.id, id))
+  const updated = await db
+    .update(projects)
+    .set(update)
+    .where(eq(projects.id, id))
+    .returning({ id: projects.id })
+
+  if (updated.length === 0) {
+    return NextResponse.json(
+      { error: 'Projeto não encontrado.' },
+      { status: 404 }
+    )
+  }
+
   await syncProjectThemes(id, d.themeIds)
   return NextResponse.json({ ok: true })
 }
 
 export async function DELETE(_: Request, { params }: Ctx) {
   const { id } = await params
-  await db.delete(projects).where(eq(projects.id, id))
+  const idParsed = uuidParamSafeParse(id)
+  if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
+  const deleted = await db
+    .delete(projects)
+    .where(eq(projects.id, id))
+    .returning({ id: projects.id })
+
+  if (deleted.length === 0) {
+    return NextResponse.json(
+      { error: 'Projeto não encontrado.' },
+      { status: 404 }
+    )
+  }
+
   return NextResponse.json({ ok: true })
 }

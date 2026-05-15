@@ -20,6 +20,7 @@ import {
   extractBgColorKey,
   slugifyThemeSlug,
 } from '@/lib/project-taxonomy-styles'
+import { readApiError } from '@/lib/read-api-error'
 
 export type ProjectThemeRow = {
   id: string
@@ -73,16 +74,14 @@ export function ProjectThemeDialog({ theme, onSuccess }: Props) {
     try {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(
-          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
-        )
+        toast.error(await readApiError(res))
+        return
       }
       toast.success(isEdit ? 'Tema atualizado!' : 'Tema criado!')
       setOpen(false)
       onSuccess()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
+    } catch {
+      toast.error('Não foi possível salvar o tema.')
     } finally {
       setLoading(false)
     }
@@ -167,6 +166,7 @@ export function ProjectThemeDialog({ theme, onSuccess }: Props) {
             <Button
               type="submit"
               loading={loading}
+              loadingLabel="Salvando…"
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
               {isEdit ? 'Salvar alterações' : 'Criar'}

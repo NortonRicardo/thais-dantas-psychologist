@@ -80,10 +80,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(created, { status: 201 })
   } catch (err) {
     console.error('[POST /api/project-themes]', err)
-    const msg =
-      err instanceof Error && /unique/i.test(err.message)
-        ? 'Nome ou slug já existe.'
-        : 'Erro ao criar tema'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    const duplicate = err instanceof Error && /unique/i.test(err.message)
+    return NextResponse.json(
+      {
+        error: duplicate ? 'Nome ou slug já existe.' : 'Erro ao criar tema.',
+      },
+      { status: duplicate ? 409 : 500 }
+    )
   }
 }

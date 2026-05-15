@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[POST /api/project-categories]', err)
     return NextResponse.json(
-      { error: 'Erro ao criar categoria' },
+      { error: 'Erro ao criar categoria.' },
       { status: 500 }
     )
   }

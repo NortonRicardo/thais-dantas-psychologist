@@ -6,27 +6,16 @@ import { toast } from 'sonner'
 
 import { FilterCombobox } from '@/components/filter-combobox'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import {
   Pagination,
   PaginationContent,
@@ -36,6 +25,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { readApiError } from '@/lib/read-api-error'
 import { ProjectDialog, type ProjectRow } from './project-dialog'
 
 const PAGE_SIZE = 10
@@ -62,15 +61,21 @@ export function ProjectsTable() {
   const [filterTitle, setFilterTitle] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [filterTheme, setFilterTheme] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<ProjectRow | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const fetchProjects = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/projects')
+      if (!res.ok) {
+        toast.error(await readApiError(res))
+        return
+      }
       const data = await res.json()
       setRows(data)
     } catch {
-      toast.error('Erro ao carregar projetos.')
+      toast.error('Não foi possível carregar os projetos.')
     } finally {
       setLoading(false)
     }
@@ -80,13 +85,24 @@ export function ProjectsTable() {
     fetchProjects()
   }, [fetchProjects])
 
-  async function handleDelete(id: string) {
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
     try {
-      await fetch(`/api/projects/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/projects/${deleteTarget.id}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok) {
+        toast.error(await readApiError(res))
+        return
+      }
       toast.success('Projeto removido.')
-      fetchProjects()
+      setDeleteTarget(null)
+      await fetchProjects()
     } catch {
-      toast.error('Erro ao remover projeto.')
+      toast.error('Não foi possível remover o projeto.')
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -301,39 +317,14 @@ export function ProjectsTable() {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <ProjectDialog project={row} onSuccess={fetchProjects} />
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Remover projeto?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="text-white/50">
-                              &ldquo;{row.title}&rdquo; será removido
-                              permanentemente.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white">
-                              Cancelar
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                              onClick={() => handleDelete(row.id)}
-                            >
-                              Remover
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
+                        onClick={() => setDeleteTarget(row)}
+                      >
+                        <Trash2 size={14} />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -341,6 +332,43 @@ export function ProjectsTable() {
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={open => {
+          if (!open && !deleteLoading) setDeleteTarget(null)
+        }}
+      >
+        <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover projeto?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
+              {deleteTarget ? (
+                <>
+                  &ldquo;{deleteTarget.title}&rdquo; será removido
+                  permanentemente.
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={deleteLoading}
+              className="bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <Button
+              className="border border-rose-500/30 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
+              loading={deleteLoading}
+              loadingLabel="Removendo…"
+              onClick={() => void handleConfirmDelete()}
+            >
+              Remover
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {totalPages > 1 && (
         <Pagination>

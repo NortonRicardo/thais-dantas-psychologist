@@ -8,12 +8,9 @@ function fd(form: FormData, key: string): string {
 const optionalUuid = z
   .string()
   .trim()
-  .transform((s): string | null => (!s || s === '__none__') ? null : s)
+  .transform((s): string | null => (!s || s === '__none__' ? null : s))
   .pipe(
-    z.union([
-      z.null(),
-      z.string().uuid({ error: 'ID de membro inválido.' }),
-    ])
+    z.union([z.null(), z.string().uuid({ error: 'ID de membro inválido.' })])
   )
 
 const optionalUrl = z
@@ -26,12 +23,30 @@ const optionalTailwind = (maxLen: number, label: string) =>
   z.string().trim().max(maxLen, `${label}: no máximo ${maxLen} caracteres.`)
 
 export const projectFormSchema = z.object({
-  slug: z.string().trim().min(1, 'Slug obrigatório.').max(200, 'Slug: no máximo 200 caracteres.'),
-  title: z.string().trim().min(1, 'Título obrigatório.').max(300, 'Título: no máximo 300 caracteres.'),
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'Slug obrigatório.')
+    .max(200, 'Slug: no máximo 200 caracteres.'),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Título obrigatório.')
+    .max(300, 'Título: no máximo 300 caracteres.'),
   categoryId: z.string().uuid('Categoria inválida.'),
-  themeIds: z.array(z.string().uuid('ID de tema inválido.')).min(1, 'Selecione ao menos um tema.'),
-  description: z.string().trim().min(1, 'Descrição obrigatória.').max(8000, 'Descrição: no máximo 8000 caracteres.'),
-  authors: z.array(z.string().trim().max(200, 'Nome de autor: no máximo 200 caracteres.')).default([]),
+  themeIds: z
+    .array(z.string().uuid('ID de tema inválido.'))
+    .min(1, 'Selecione ao menos um tema.'),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'Descrição obrigatória.')
+    .max(8000, 'Descrição: no máximo 8000 caracteres.'),
+  authors: z
+    .array(
+      z.string().trim().max(200, 'Nome de autor: no máximo 200 caracteres.')
+    )
+    .default([]),
   startDate: z
     .string()
     .trim()
@@ -44,12 +59,18 @@ export const projectFormSchema = z.object({
     .pipe(
       z.union([
         z.null(),
-        z.string().refine(s => !isNaN(Date.parse(s)), 'Data de término inválida.'),
+        z
+          .string()
+          .refine(s => !isNaN(Date.parse(s)), 'Data de término inválida.'),
       ])
     ),
   gitUrl: optionalUrl,
   publicationUrl: optionalUrl,
-  advisorId: optionalUuid,
+  advisorId: z
+    .string()
+    .trim()
+    .min(1, 'Selecione um orientador.')
+    .uuid({ error: 'Orientador inválido.' }),
   coAdvisorId: optionalUuid,
   researchLeadId: optionalUuid,
 })
@@ -58,8 +79,13 @@ export type ProjectFormParsed = z.infer<typeof projectFormSchema>
 
 export function parseProjectForm(form: FormData) {
   const authorsRaw = fd(form, 'authors')
-  const authors = authorsRaw.split(',').map(s => s.trim()).filter(Boolean)
-  const themeIds = (form.getAll('themeIds') as string[]).map(t => t.trim()).filter(Boolean)
+  const authors = authorsRaw
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+  const themeIds = (form.getAll('themeIds') as string[])
+    .map(t => t.trim())
+    .filter(Boolean)
 
   return projectFormSchema.safeParse({
     slug: fd(form, 'slug'),
@@ -79,8 +105,16 @@ export function parseProjectForm(form: FormData) {
 }
 
 export const projectCategoryFormSchema = z.object({
-  title: z.string().trim().min(1, 'Título obrigatório.').max(200, 'Título: no máximo 200 caracteres.'),
-  color: z.string().trim().min(1, 'Cor obrigatória.').max(240, 'Cor: no máximo 240 caracteres.'),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Título obrigatório.')
+    .max(200, 'Título: no máximo 200 caracteres.'),
+  color: z
+    .string()
+    .trim()
+    .min(1, 'Cor obrigatória.')
+    .max(240, 'Cor: no máximo 240 caracteres.'),
   chipBg: optionalTailwind(240, 'chipBg'),
   chipBorder: optionalTailwind(240, 'chipBorder'),
   chipText: optionalTailwind(240, 'chipText'),
@@ -97,9 +131,17 @@ export function parseProjectCategoryForm(form: FormData) {
 }
 
 export const projectThemeFormSchema = z.object({
-  name: z.string().trim().min(1, 'Nome obrigatório.').max(200, 'Nome: no máximo 200 caracteres.'),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Nome obrigatório.')
+    .max(200, 'Nome: no máximo 200 caracteres.'),
   slug: optionalTailwind(200, 'Slug'),
-  color: z.string().trim().min(1, 'Cor obrigatória.').max(240, 'Cor: no máximo 240 caracteres.'),
+  color: z
+    .string()
+    .trim()
+    .min(1, 'Cor obrigatória.')
+    .max(240, 'Cor: no máximo 240 caracteres.'),
   pillColor: optionalTailwind(240, 'pillColor'),
   filterBg: optionalTailwind(240, 'filterBg'),
   filterBorder: optionalTailwind(240, 'filterBorder'),

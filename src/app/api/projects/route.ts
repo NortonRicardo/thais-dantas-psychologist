@@ -101,7 +101,10 @@ export async function POST(req: Request) {
     .returning({ id: projects.id })
 
   if (!row) {
-    return NextResponse.json({ error: 'Erro ao criar projeto.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao criar projeto.' },
+      { status: 500 }
+    )
   }
 
   await syncProjectThemes(row.id, d.themeIds)
