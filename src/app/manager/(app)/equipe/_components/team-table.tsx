@@ -278,6 +278,69 @@ export function TeamTable() {
         </div>
       </div>
 
+      <div className="flex w-full flex-wrap items-center justify-end gap-2">
+        <div className="relative w-72 max-w-full min-w-0">
+          <Search
+            size={13}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
+          />
+          <input
+            type="text"
+            placeholder="Filtrar por nome…"
+            value={filterName}
+            onChange={e => handleFilterChange(setFilterName)(e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/25 outline-none focus:border-white/20"
+          />
+          {filterName ? (
+            <button
+              type="button"
+              onClick={() => handleFilterChange(setFilterName)('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+            >
+              <X size={13} />
+            </button>
+          ) : null}
+        </div>
+
+        <FilterCombobox
+          value={filterCategoryId}
+          onChange={handleFilterChange(setFilterCategoryId)}
+          placeholder="Todas as categorias"
+          clearLabel="Limpar categoria"
+          options={categoryIdsSorted}
+          width="w-52"
+          labelForValue={id => categoryMeta.get(id)?.title ?? id}
+          renderValue={id => (
+            <>
+              <span
+                className={`h-1.5 w-1.5 shrink-0 rounded-full ${categoryMeta.get(id)?.color ?? 'bg-white/30'}`}
+              />
+              <span className="truncate">{categoryMeta.get(id)?.title ?? id}</span>
+            </>
+          )}
+          renderOption={id => {
+            const meta = categoryMeta.get(id)
+            return (
+              <>
+                {meta ? (
+                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.color}`} />
+                ) : null}
+                {meta?.title ?? id}
+              </>
+            )
+          }}
+        />
+
+        <FilterCombobox
+          value={filterDegree}
+          onChange={handleFilterChange(setFilterDegree)}
+          placeholder="Todos os graus"
+          clearLabel="Limpar grau"
+          options={degreeOptions}
+          width="w-48"
+        />
+      </div>
+
       <div
         className="w-full overflow-x-auto rounded-xl"
         style={{
@@ -289,73 +352,7 @@ export function TeamTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <div className="min-w-[760px]">
-          <div className="border-b border-white/[0.08] px-4 py-3 sm:px-5">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative min-w-[10rem] flex-1">
-                <Search
-                  size={13}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
-                />
-                <input
-                  type="text"
-                  placeholder="Filtrar por nome…"
-                  value={filterName}
-                  onChange={e => handleFilterChange(setFilterName)(e.target.value)}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/25 outline-none focus:border-white/20"
-                />
-                {filterName ? (
-                  <button
-                    type="button"
-                    onClick={() => handleFilterChange(setFilterName)('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
-                  >
-                    <X size={13} />
-                  </button>
-                ) : null}
-              </div>
-
-              <FilterCombobox
-                value={filterCategoryId}
-                onChange={handleFilterChange(setFilterCategoryId)}
-                placeholder="Todas as categorias"
-                clearLabel="Limpar categoria"
-                options={categoryIdsSorted}
-                width="w-52"
-                labelForValue={id => categoryMeta.get(id)?.title ?? id}
-                renderValue={id => (
-                  <>
-                    <span
-                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${categoryMeta.get(id)?.color ?? 'bg-white/30'}`}
-                    />
-                    <span className="truncate">{categoryMeta.get(id)?.title ?? id}</span>
-                  </>
-                )}
-                renderOption={id => {
-                  const meta = categoryMeta.get(id)
-                  return (
-                    <>
-                      {meta ? (
-                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.color}`} />
-                      ) : null}
-                      {meta?.title ?? id}
-                    </>
-                  )
-                }}
-              />
-
-              <FilterCombobox
-                value={filterDegree}
-                onChange={handleFilterChange(setFilterDegree)}
-                placeholder="Todos os graus"
-                clearLabel="Limpar grau"
-                options={degreeOptions}
-                width="w-48"
-              />
-            </div>
-          </div>
-
-          <Table className="min-w-[760px] [table-layout:fixed] w-full">
+        <Table className="min-w-[760px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
@@ -524,7 +521,6 @@ export function TeamTable() {
               ))}
           </TableBody>
         </Table>
-        </div>
       </div>
 
       {totalPages > 1 && (
