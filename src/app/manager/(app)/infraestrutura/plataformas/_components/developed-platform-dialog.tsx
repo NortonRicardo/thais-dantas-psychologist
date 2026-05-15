@@ -15,6 +15,12 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -39,6 +45,21 @@ export type DevelopedPlatformRow = {
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
 
+/** Remove esquema e barras iniciais para exibir só o host/caminho no campo com máscara https:// */
+function stripUrlScheme(url: string): string {
+  return url
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^\/+/, '')
+}
+
+/** Monta URL absoluta com https (valor enviado à API). */
+function projectLinkToStored(suffix: string): string {
+  const t = stripUrlScheme(suffix)
+  if (!t) return ''
+  return `https://${t}`
+}
+
 type Props = {
   platform?: DevelopedPlatformRow
   onSuccess: () => void
@@ -48,6 +69,9 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [iconKey, setIconKey] = useState(platform?.iconKey ?? 'cloud-sun')
+  const [projectLinkSuffix, setProjectLinkSuffix] = useState(() =>
+    stripUrlScheme(platform?.projectLink ?? '')
+  )
 
   const isEdit = !!platform
 
@@ -68,6 +92,7 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
   function handleOpenChange(newOpen: boolean) {
     if (newOpen) {
       setIconKey(platform?.iconKey ?? 'cloud-sun')
+      setProjectLinkSuffix(stripUrlScheme(platform?.projectLink ?? ''))
     }
     setOpen(newOpen)
   }
@@ -79,6 +104,7 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
     const form = e.currentTarget
     const fd = new FormData(form)
     fd.set('iconKey', iconKey)
+    fd.set('projectLink', projectLinkToStored(projectLinkSuffix))
 
     const url = isEdit
       ? `/api/developed-platforms/${platform.id}`
@@ -206,14 +232,30 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
             <Label htmlFor="projectLink" className="text-white/70">
               Link do projeto
             </Label>
-            <Input
-              id="projectLink"
-              name="projectLink"
-              type="url"
-              placeholder="https://…"
-              defaultValue={platform?.projectLink ?? ''}
-              className={INPUT_CLS}
-            />
+            <InputGroup className="h-auto min-h-10 border-white/10 bg-white/5 shadow-none has-[[data-slot=input-group-control]:focus-visible]:border-white/30 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+              <InputGroupAddon
+                align="inline-start"
+                className="shrink-0 border-r border-white/10 py-2 pl-3 pr-2 text-white/45"
+              >
+                <InputGroupText className="text-white/50">
+                  {'https://'}
+                </InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
+                id="projectLink"
+                value={projectLinkSuffix}
+                onChange={e =>
+                  setProjectLinkSuffix(stripUrlScheme(e.target.value))
+                }
+                placeholder="exemplo.org/seu-projeto"
+                inputMode="url"
+                autoComplete="url"
+                className="min-h-10 py-2 text-white placeholder:text-white/30"
+              />
+            </InputGroup>
+            <p className="text-[0.65rem] text-white/35">
+              Digite só o domínio e o caminho; o endereço é salvo com https://.
+            </p>
           </div>
 
           <div className="grid gap-1.5">

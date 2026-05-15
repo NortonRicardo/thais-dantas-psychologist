@@ -10,8 +10,8 @@ const navItems = [
   { href: '/manager/eventos', label: 'Eventos' },
   { href: '/manager/equipe', label: 'Equipe' },
   { href: '/manager/sobre-nos', label: 'Sobre Nós' },
-  { href: '/manager/contato', label: 'Contato' },
   { href: '/manager/infraestrutura', label: 'Infraestrutura' },
+  { href: '/manager/contato', label: 'Contato' },
 ]
 
 export function ManagerNav() {
