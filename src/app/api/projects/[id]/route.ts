@@ -6,6 +6,13 @@ import { fetchProjectHydratedById } from '@/lib/db/project-queries'
 import { syncProjectThemes } from '@/lib/db/sync-project-themes'
 import { projectCategoryManagerBadgeClasses } from '@/lib/project-category-badge'
 import { projects } from '@/lib/db/schema'
+import { parseProjectForm } from '@/lib/validation/projects-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
+import {
+  validateImageUpload,
+  validatePdfUpload,
+  uploadErrorResponse,
+} from '@/lib/upload-validation'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -50,60 +57,28 @@ export async function PUT(req: Request, { params }: Ctx) {
   const { id } = await params
   const fd = await req.formData()
 
-  const slug = (fd.get('slug') as string | null)?.trim()
-  const title = (fd.get('title') as string | null)?.trim()
-  const categoryId = (fd.get('categoryId') as string | null)?.trim()
-  const themeIds = (fd.getAll('themeIds') as string[])
-    .map(t => t.trim())
-    .filter(Boolean)
-  const description = (fd.get('description') as string | null)?.trim()
-  const outrosRaw = (fd.get('authors') as string | null) ?? ''
-  const startDateStr = (fd.get('startDate') as string | null)?.trim()
-  const endDateStr = (fd.get('endDate') as string | null)?.trim()
-  const gitUrl = (fd.get('gitUrl') as string | null)?.trim() || null
-  const publicationUrl =
-    (fd.get('publicationUrl') as string | null)?.trim() || null
-  const advisorId = (fd.get('advisorId') as string | null)?.trim() || null
-  const coAdvisorId = (fd.get('coAdvisorId') as string | null)?.trim() || null
-  const researchLeadId =
-    (fd.get('researchLeadId') as string | null)?.trim() || null
+  const parsed = parseProjectForm(fd)
+  if (!parsed.success) return validationErrorResponse(parsed.error)
+
+  const d = parsed.data
   const imageFile = fd.get('image') as File | null
   const removeImage = fd.get('removeImage') === 'true'
   const pdfFile = fd.get('pdf') as File | null
   const removePdf = fd.get('removePdf') === 'true'
 
-  if (!slug || !title || !categoryId || !description || !startDateStr) {
-    return NextResponse.json(
-      { error: 'Campos obrigatórios faltando.' },
-      { status: 400 }
-    )
-  }
-
-  if (themeIds.length === 0) {
-    return NextResponse.json(
-      { error: 'Selecione ao menos um tema.' },
-      { status: 400 }
-    )
-  }
-
-  const authors = outrosRaw
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean)
-
   const update: Record<string, unknown> = {
-    slug,
-    title,
-    categoryId,
-    description,
-    authors,
-    startDate: new Date(startDateStr),
-    endDate: endDateStr ? new Date(endDateStr) : null,
-    gitUrl,
-    publicationUrl,
-    advisorId,
-    coAdvisorId,
-    researchLeadId,
+    slug: d.slug,
+    title: d.title,
+    categoryId: d.categoryId,
+    description: d.description,
+    authors: d.authors,
+    startDate: new Date(d.startDate),
+    endDate: d.endDate ? new Date(d.endDate) : null,
+    gitUrl: d.gitUrl,
+    publicationUrl: d.publicationUrl,
+    advisorId: d.advisorId,
+    coAdvisorId: d.coAdvisorId,
+    researchLeadId: d.researchLeadId,
     updatedAt: new Date(),
   }
 
@@ -111,7 +86,10 @@ export async function PUT(req: Request, { params }: Ctx) {
     update.image = null
     update.imageMimeType = null
   } else if (imageFile && imageFile.size > 0) {
-    update.image = Buffer.from(await imageFile.arrayBuffer())
+    const buf = new Uint8Array(await imageFile.arrayBuffer())
+    const err = validateImageUpload(imageFile, buf)
+    if (err) return uploadErrorResponse(err)
+    update.image = Buffer.from(buf)
     update.imageMimeType = imageFile.type
   }
 
@@ -119,12 +97,15 @@ export async function PUT(req: Request, { params }: Ctx) {
     update.pdf = null
     update.pdfMimeType = null
   } else if (pdfFile && pdfFile.size > 0) {
-    update.pdf = Buffer.from(await pdfFile.arrayBuffer())
+    const buf = new Uint8Array(await pdfFile.arrayBuffer())
+    const err = validatePdfUpload(pdfFile, buf)
+    if (err) return uploadErrorResponse(err)
+    update.pdf = Buffer.from(buf)
     update.pdfMimeType = pdfFile.type
   }
 
   await db.update(projects).set(update).where(eq(projects.id, id))
-  await syncProjectThemes(id, themeIds)
+  await syncProjectThemes(id, d.themeIds)
   return NextResponse.json({ ok: true })
 }
 

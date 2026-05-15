@@ -21,6 +21,7 @@ export async function GET(_: Request, { params }: Ctx) {
       'Content-Type': row.pdfMimeType,
       'Content-Disposition': 'inline',
       'Cache-Control': 'no-cache',
+      'X-Content-Type-Options': 'nosniff',
     },
   })
 }

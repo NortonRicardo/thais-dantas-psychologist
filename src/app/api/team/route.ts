@@ -10,6 +10,7 @@ import {
 } from '@/lib/db/schema'
 import { parseTeamMemberForm } from '@/lib/validation/team-api'
 import { teamMemberDisplayName } from '@/lib/team-member-display'
+import { validateImageUpload, uploadErrorResponse } from '@/lib/upload-validation'
 
 export async function GET() {
   try {
@@ -122,7 +123,10 @@ export async function POST(req: NextRequest) {
     let photoMimeType: string | undefined
 
     if (photoFile && photoFile.size > 0) {
-      photo = Buffer.from(await photoFile.arrayBuffer())
+      const buf = new Uint8Array(await photoFile.arrayBuffer())
+      const err = validateImageUpload(photoFile, buf)
+      if (err) return uploadErrorResponse(err)
+      photo = Buffer.from(buf)
       photoMimeType = photoFile.type
     }
 

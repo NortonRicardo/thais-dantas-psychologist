@@ -7,57 +7,47 @@ import {
   defaultThemeStylesFromManagerColor,
   slugifyThemeSlug,
 } from '@/lib/project-taxonomy-styles'
+import { parseProjectThemeForm } from '@/lib/validation/projects-api'
+import {
+  uuidParamSafeParse,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
   try {
     const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
     const fd = await req.formData()
-    const name = (fd.get('name') as string)?.trim()
-    let slug = (fd.get('slug') as string)?.trim()
-    const color = (fd.get('color') as string)?.trim()
+    const parsed = parseProjectThemeForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    if (!name || !color) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
+    const p = parsed.data
+    const slug = p.slug || slugifyThemeSlug(p.name)
+    const d = defaultThemeStylesFromManagerColor(p.color)
 
-    if (!slug) slug = slugifyThemeSlug(name)
-
-    const d = defaultThemeStylesFromManagerColor(color)
-
-    const pillColor = (fd.get('pillColor') as string)?.trim() || d.pillColor
-    const filterBg = (fd.get('filterBg') as string)?.trim() || d.filterBg
-    const filterBorder =
-      (fd.get('filterBorder') as string)?.trim() || d.filterBorder
-    const filterText = (fd.get('filterText') as string)?.trim() || d.filterText
-    const filterActiveBg =
-      (fd.get('filterActiveBg') as string)?.trim() || d.filterActiveBg
-
-    let finalColor = color
-    if (color.startsWith('bg-') && !color.includes('text-')) {
-      const m = /^bg-([a-z]+)-(\d+)$/.exec(color)
+    let finalColor = p.color
+    if (p.color.startsWith('bg-') && !p.color.includes('text-')) {
+      const m = /^bg-([a-z]+)-(\d+)$/.exec(p.color)
       if (m) {
-        const fam = m[1]
-        const shade = m[2]
-        finalColor = `bg-${fam}-${shade}/15 text-${fam}-300 border-${fam}-500/30`
+        finalColor = `bg-${m[1]}-${m[2]}/15 text-${m[1]}-300 border-${m[1]}-500/30`
       }
     }
 
     const [updated] = await db
       .update(projectThemes)
       .set({
-        name,
+        name: p.name,
         slug,
         color: finalColor,
-        pillColor,
-        filterBg,
-        filterBorder,
-        filterText,
-        filterActiveBg,
+        pillColor: p.pillColor || d.pillColor,
+        filterBg: p.filterBg || d.filterBg,
+        filterBorder: p.filterBorder || d.filterBorder,
+        filterText: p.filterText || d.filterText,
+        filterActiveBg: p.filterActiveBg || d.filterActiveBg,
         updatedAt: new Date(),
       })
       .where(eq(projectThemes.id, id))
@@ -80,6 +70,9 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const { id } = await params
+  const idParsed = uuidParamSafeParse(id)
+  if (!idParsed.success)
+    return validationErrorResponse(idParsed.error)
 
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)::int` })

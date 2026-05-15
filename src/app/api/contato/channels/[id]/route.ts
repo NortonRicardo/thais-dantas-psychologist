@@ -3,6 +3,10 @@ import { revalidateTag } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { contactChannels } from '@/lib/db/schema'
+import {
+  uuidParamSafeParse,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 
 export async function DELETE(
   _req: NextRequest,
@@ -10,6 +14,9 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
     await db.delete(contactChannels).where(eq(contactChannels.id, id))
     revalidateTag('contato', 'max')
     return new NextResponse(null, { status: 204 })

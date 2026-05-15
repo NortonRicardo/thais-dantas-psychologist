@@ -4,6 +4,8 @@ import { asc } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { projectCategories } from '@/lib/db/schema'
 import { defaultCategoryChipsFromManagerColor } from '@/lib/project-taxonomy-styles'
+import { parseProjectCategoryForm } from '@/lib/validation/projects-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
@@ -40,19 +42,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData()
-    const title = (fd.get('title') as string)?.trim()
-    const color = (fd.get('color') as string)?.trim()
-    const chipBg = (fd.get('chipBg') as string)?.trim()
-    const chipBorder = (fd.get('chipBorder') as string)?.trim()
-    const chipText = (fd.get('chipText') as string)?.trim()
+    const parsed = parseProjectCategoryForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    if (!title || !color) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
-
+    const { title, color, chipBg, chipBorder, chipText } = parsed.data
     const defaults = defaultCategoryChipsFromManagerColor(color)
 
     const [created] = await db

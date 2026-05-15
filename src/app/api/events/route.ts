@@ -10,6 +10,7 @@ import {
 import { eventSpeakerDisplayName } from '@/lib/events-speaker-display'
 import { parseEventForm } from '@/lib/validation/events-api'
 import { validationErrorResponse } from '@/lib/validation/team-api'
+import { validateImageUpload, uploadErrorResponse } from '@/lib/upload-validation'
 
 export async function GET() {
   try {
@@ -94,7 +95,10 @@ export async function POST(req: NextRequest) {
     let imageMimeType: string | undefined
 
     if (imageFile && imageFile.size > 0) {
-      image = Buffer.from(await imageFile.arrayBuffer())
+      const buf = new Uint8Array(await imageFile.arrayBuffer())
+      const err = validateImageUpload(imageFile, buf)
+      if (err) return uploadErrorResponse(err)
+      image = Buffer.from(buf)
       imageMimeType = imageFile.type
     }
 

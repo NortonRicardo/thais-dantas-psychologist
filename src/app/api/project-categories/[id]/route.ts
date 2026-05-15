@@ -4,26 +4,25 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { projectCategories, projects } from '@/lib/db/schema'
 import { defaultCategoryChipsFromManagerColor } from '@/lib/project-taxonomy-styles'
+import { parseProjectCategoryForm } from '@/lib/validation/projects-api'
+import {
+  uuidParamSafeParse,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
   try {
     const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
     const fd = await req.formData()
-    const title = (fd.get('title') as string)?.trim()
-    const color = (fd.get('color') as string)?.trim()
-    const chipBg = (fd.get('chipBg') as string)?.trim()
-    const chipBorder = (fd.get('chipBorder') as string)?.trim()
-    const chipText = (fd.get('chipText') as string)?.trim()
+    const parsed = parseProjectCategoryForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    if (!title || !color) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
-
+    const { title, color, chipBg, chipBorder, chipText } = parsed.data
     const defaults = defaultCategoryChipsFromManagerColor(color)
 
     const [updated] = await db
@@ -56,6 +55,9 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const { id } = await params
+  const idParsed = uuidParamSafeParse(id)
+  if (!idParsed.success)
+    return validationErrorResponse(idParsed.error)
 
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)::int` })

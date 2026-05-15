@@ -20,6 +20,7 @@ export async function GET(_: Request, { params }: Ctx) {
     headers: {
       'Content-Type': row.imageMimeType,
       'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+      'X-Content-Type-Options': 'nosniff',
     },
   })
 }

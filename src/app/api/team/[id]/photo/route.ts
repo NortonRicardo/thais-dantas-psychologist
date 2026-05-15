@@ -32,6 +32,7 @@ export async function GET(
     headers: {
       'Content-Type': row.photoMimeType ?? 'image/jpeg',
       'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+      'X-Content-Type-Options': 'nosniff',
     },
   })
 }

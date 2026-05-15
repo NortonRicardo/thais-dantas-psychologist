@@ -33,5 +33,8 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: '__Host',
+    defaultCookieAttributes: {
+      sameSite: 'strict',
+    },
   },
 })

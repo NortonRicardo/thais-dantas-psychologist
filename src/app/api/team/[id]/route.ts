@@ -13,6 +13,7 @@ import {
   parseTeamMemberForm,
   uuidParamSafeParse,
 } from '@/lib/validation/team-api'
+import { validateImageUpload, uploadErrorResponse } from '@/lib/upload-validation'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -106,7 +107,10 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
     const photoFile = fd.get('photo') as File | null
     if (photoFile && photoFile.size > 0) {
-      patch.photo = Buffer.from(await photoFile.arrayBuffer())
+      const buf = new Uint8Array(await photoFile.arrayBuffer())
+      const err = validateImageUpload(photoFile, buf)
+      if (err) return uploadErrorResponse(err)
+      patch.photo = Buffer.from(buf)
       patch.photoMimeType = photoFile.type
     }
 
