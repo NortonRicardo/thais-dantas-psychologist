@@ -11,7 +11,12 @@ import {
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_BASE_URL ?? process.env.BETTER_AUTH_URL,
-  trustedOrigins: process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : [],
+  trustedOrigins: process.env.BETTER_AUTH_URL
+    ? [
+        process.env.BETTER_AUTH_URL,
+        process.env.BETTER_AUTH_URL.replace(/^(https?:\/\/)(?!www\.)/, '$1www.'),
+      ]
+    : [],
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {

@@ -36,7 +36,7 @@ export async function proxy(req: NextRequest) {
 
   // Verifica sessão
   const { data: session } = await betterFetch<Session>('/api/auth/get-session', {
-    baseURL: req.nextUrl.origin,
+    baseURL: process.env.BETTER_AUTH_BASE_URL ?? req.nextUrl.origin,
     headers: { cookie: req.headers.get('cookie') ?? '' },
   })
 
