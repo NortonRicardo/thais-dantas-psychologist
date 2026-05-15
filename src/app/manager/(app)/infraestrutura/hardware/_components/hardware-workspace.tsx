@@ -380,11 +380,10 @@ export function HardwareWorkspace() {
   return (
     <>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold text-white/90">Hardware atual</h1>
+        <h1 className="text-xl font-semibold text-white/90">Hardware</h1>
         <Button
           type="button"
-          variant="outline"
-          className="gap-1.5 border-white/20 bg-white/5 text-white/90 hover:bg-white/10"
+          className="gap-1.5 border-0 bg-orange-800 text-orange-50 hover:bg-orange-700"
           onClick={openCreate}
         >
           <Plus size={16} strokeWidth={2} /> Adicionar equipamento

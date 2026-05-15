@@ -112,8 +112,19 @@ export function DevelopedPlatformsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <DevelopedPlatformDialog onSuccess={fetchPlatforms} />
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold text-white/90">
+            Plataformas desenvolvidas
+          </h1>
+          <p className="mt-0.5 text-sm text-white/40">
+            Cadastro exibido na página pública Infraestrutura — links do projeto e
+            da plataforma são opcionais.
+          </p>
+        </div>
+        <div className="flex shrink-0 self-end sm:self-auto">
+          <DevelopedPlatformDialog onSuccess={fetchPlatforms} />
+        </div>
       </div>
 
       <div
