@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { FileText, ImageIcon, Pencil, Plus, Trash2, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 export type ProjectRow = {
   id: string
@@ -91,6 +93,13 @@ export function ProjectDialog({ project, onSuccess }: Props) {
   const [removePdf, setRemovePdf] = useState(false)
   const pdfRef = useRef<HTMLInputElement>(null)
 
+  const [gitUrlSuffix, setGitUrlSuffix] = useState(() =>
+    stripUrlScheme(project?.gitUrl ?? '')
+  )
+  const [publicationUrlSuffix, setPublicationUrlSuffix] = useState(() =>
+    stripUrlScheme(project?.publicationUrl ?? '')
+  )
+
   const isEdit = !!project
 
   const existingImageUrl =
@@ -123,6 +132,8 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       setRemoveImage(false)
       setPdfFileName(null)
       setRemovePdf(false)
+      setGitUrlSuffix(stripUrlScheme(project?.gitUrl ?? ''))
+      setPublicationUrlSuffix(stripUrlScheme(project?.publicationUrl ?? ''))
       loadTeamMembers()
     }
     setOpen(newOpen)
@@ -180,6 +191,8 @@ export function ProjectDialog({ project, onSuccess }: Props) {
     fd.set('advisorId', advisorId === '__none__' ? '' : advisorId)
     fd.set('coAdvisorId', coAdvisorId === '__none__' ? '' : coAdvisorId)
     fd.set('researchLeadId', researchLeadId === '__none__' ? '' : researchLeadId)
+    fd.set('gitUrl', toHttpsStored(gitUrlSuffix))
+    fd.set('publicationUrl', toHttpsStored(publicationUrlSuffix))
     if (removeImage) fd.set('removeImage', 'true')
     if (removePdf) fd.set('removePdf', 'true')
 
@@ -476,30 +489,33 @@ export function ProjectDialog({ project, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-4">
             {/* Git URL */}
             <div className="grid gap-1.5">
-              <Label htmlFor="gitUrl" className="text-white/70">Git URL</Label>
-              <Input
+              <Label htmlFor="gitUrl" className="text-white/70">
+                Git URL
+              </Label>
+              <HttpsUrlSuffixField
                 id="gitUrl"
-                name="gitUrl"
-                type="url"
-                defaultValue={project?.gitUrl ?? ''}
-                placeholder="https://github.com/…"
-                className={INPUT_CLS}
+                value={gitUrlSuffix}
+                onChange={setGitUrlSuffix}
+                placeholder="github.com/org/repo"
               />
             </div>
 
             {/* Publicação */}
             <div className="grid gap-1.5">
-              <Label htmlFor="publicationUrl" className="text-white/70">URL de publicação</Label>
-              <Input
+              <Label htmlFor="publicationUrl" className="text-white/70">
+                URL de publicação
+              </Label>
+              <HttpsUrlSuffixField
                 id="publicationUrl"
-                name="publicationUrl"
-                type="url"
-                defaultValue={project?.publicationUrl ?? ''}
-                placeholder="https://…"
-                className={INPUT_CLS}
+                value={publicationUrlSuffix}
+                onChange={setPublicationUrlSuffix}
+                placeholder="doi.org/…"
               />
             </div>
           </div>
+          <p className="text-[0.65rem] text-white/35 -mt-2">
+            Digite só o domínio e o caminho; o endereço é salvo com https://.
+          </p>
 
           {/* PDF upload */}
           <div className="grid gap-1.5">

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -41,6 +42,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
@@ -352,10 +354,12 @@ function MapCard({
 }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [url, setUrl] = useState(data.mapUrl)
+  const [mapUrlSuffix, setMapUrlSuffix] = useState(() =>
+    stripUrlScheme(data.mapUrl)
+  )
 
   function openModal() {
-    setUrl(data.mapUrl)
+    setMapUrlSuffix(stripUrlScheme(data.mapUrl))
     setModalOpen(true)
   }
 
@@ -368,7 +372,7 @@ function MapCard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           directorTeamMemberId: data.directorTeamMemberId,
-          mapUrl: url.trim(),
+          mapUrl: toHttpsStored(mapUrlSuffix).trim(),
         }),
       })
       if (!res.ok) throw new Error()
@@ -421,15 +425,18 @@ function MapCard({
 
           <form onSubmit={handleSave} className="space-y-4 pt-1">
             <div className="grid gap-1.5">
-              <Label className="text-sm text-white/70">URL do Google Maps (embed)</Label>
-              <Input
-                value={url}
-                onChange={e => setUrl(e.target.value)}
-                placeholder="https://maps.google.com/maps?q=...&output=embed"
-                className={`${INPUT_CLS} h-10 text-sm`}
+              <Label className="text-sm text-white/70">
+                URL do Google Maps (embed)
+              </Label>
+              <HttpsUrlSuffixField
+                id="mapEmbedUrl"
+                value={mapUrlSuffix}
+                onChange={setMapUrlSuffix}
+                placeholder="maps.google.com/maps?...&output=embed"
               />
               <p className="text-xs text-white/30">
-                Cole a URL de incorporação do Google Maps.
+                Cole o caminho após https:// ou a URL completa; o valor é salvo
+                com https://.
               </p>
             </div>
 

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { DEVELOPED_PLATFORM_ICON_OPTIONS } from '@/lib/developed-platform-icon-options'
 import { getLucideIconNamed } from '@/lib/lucide-resolve'
+import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,13 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Input } from '@/components/ui/input'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-} from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -45,21 +41,6 @@ export type DevelopedPlatformRow = {
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
 
-/** Remove esquema e barras iniciais para exibir só o host/caminho no campo com máscara https:// */
-function stripUrlScheme(url: string): string {
-  return url
-    .trim()
-    .replace(/^https?:\/\//i, '')
-    .replace(/^\/+/, '')
-}
-
-/** Monta URL absoluta com https (valor enviado à API). */
-function projectLinkToStored(suffix: string): string {
-  const t = stripUrlScheme(suffix)
-  if (!t) return ''
-  return `https://${t}`
-}
-
 type Props = {
   platform?: DevelopedPlatformRow
   onSuccess: () => void
@@ -71,6 +52,9 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
   const [iconKey, setIconKey] = useState(platform?.iconKey ?? 'cloud-sun')
   const [projectLinkSuffix, setProjectLinkSuffix] = useState(() =>
     stripUrlScheme(platform?.projectLink ?? '')
+  )
+  const [platformLinkSuffix, setPlatformLinkSuffix] = useState(() =>
+    stripUrlScheme(platform?.platformLink ?? '')
   )
 
   const isEdit = !!platform
@@ -93,6 +77,7 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
     if (newOpen) {
       setIconKey(platform?.iconKey ?? 'cloud-sun')
       setProjectLinkSuffix(stripUrlScheme(platform?.projectLink ?? ''))
+      setPlatformLinkSuffix(stripUrlScheme(platform?.platformLink ?? ''))
     }
     setOpen(newOpen)
   }
@@ -104,7 +89,8 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
     const form = e.currentTarget
     const fd = new FormData(form)
     fd.set('iconKey', iconKey)
-    fd.set('projectLink', projectLinkToStored(projectLinkSuffix))
+    fd.set('projectLink', toHttpsStored(projectLinkSuffix))
+    fd.set('platformLink', toHttpsStored(platformLinkSuffix))
 
     const url = isEdit
       ? `/api/developed-platforms/${platform.id}`
@@ -232,27 +218,12 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
             <Label htmlFor="projectLink" className="text-white/70">
               Link do projeto
             </Label>
-            <InputGroup className="h-auto min-h-10 border-white/10 bg-white/5 shadow-none has-[[data-slot=input-group-control]:focus-visible]:border-white/30 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
-              <InputGroupAddon
-                align="inline-start"
-                className="shrink-0 border-r border-white/10 py-2 pl-3 pr-2 text-white/45"
-              >
-                <InputGroupText className="text-white/50">
-                  {'https://'}
-                </InputGroupText>
-              </InputGroupAddon>
-              <InputGroupInput
-                id="projectLink"
-                value={projectLinkSuffix}
-                onChange={e =>
-                  setProjectLinkSuffix(stripUrlScheme(e.target.value))
-                }
-                placeholder="exemplo.org/seu-projeto"
-                inputMode="url"
-                autoComplete="url"
-                className="min-h-10 py-2 text-white placeholder:text-white/30"
-              />
-            </InputGroup>
+            <HttpsUrlSuffixField
+              id="projectLink"
+              value={projectLinkSuffix}
+              onChange={setProjectLinkSuffix}
+              placeholder="exemplo.org/seu-projeto"
+            />
             <p className="text-[0.65rem] text-white/35">
               Digite só o domínio e o caminho; o endereço é salvo com https://.
             </p>
@@ -262,14 +233,15 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
             <Label htmlFor="platformLink" className="text-white/70">
               Link para acessar a plataforma
             </Label>
-            <Input
+            <HttpsUrlSuffixField
               id="platformLink"
-              name="platformLink"
-              type="url"
-              placeholder="https://…"
-              defaultValue={platform?.platformLink ?? ''}
-              className={INPUT_CLS}
+              value={platformLinkSuffix}
+              onChange={setPlatformLinkSuffix}
+              placeholder="app.exemplo.org"
             />
+            <p className="text-[0.65rem] text-white/35">
+              Digite só o domínio e o caminho; o endereço é salvo com https://.
+            </p>
           </div>
 
           <div className="flex justify-end gap-3 border-t border-white/10 pt-4">

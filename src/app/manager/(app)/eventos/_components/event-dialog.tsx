@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, ImageIcon, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 export type EventRow = {
   id: string
@@ -142,54 +144,6 @@ function TypeCombobox({
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
 
-function UrlInput({
-  id,
-  name,
-  defaultValue,
-  placeholder,
-  className,
-}: {
-  id?: string
-  name: string
-  defaultValue?: string
-  placeholder?: string
-  className?: string
-}) {
-  const [value, setValue] = useState(defaultValue ?? '')
-
-  function clean(v: string) {
-    return v.replace(/^https?:\/\//, '').replace(/^https?:\/?/, '')
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value
-    const body = clean(raw)
-    setValue(body ? `https://${body}` : '')
-  }
-
-  function handleFocus() {
-    if (!value) setValue('https://')
-  }
-
-  function handleBlur() {
-    if (!clean(value)) setValue('')
-  }
-
-  return (
-    <Input
-      id={id}
-      name={name}
-      value={value}
-      onChange={handleChange}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      placeholder={placeholder}
-      className={className}
-      autoComplete="off"
-    />
-  )
-}
-
 function toDatetimeLocal(iso: string) {
   const d = new Date(iso)
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -210,6 +164,16 @@ export function EventDialog({ event, onSuccess }: Props) {
   const [removeImage, setRemoveImage] = useState(false)
   const [eventTypeOptions, setEventTypeOptions] = useState<EventTypeOption[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const [linkSuffix, setLinkSuffix] = useState(() =>
+    stripUrlScheme(event?.link ?? '')
+  )
+  const [meetLinkSuffix, setMeetLinkSuffix] = useState(() =>
+    stripUrlScheme(event?.meetLink ?? '')
+  )
+  const [recordingLinkSuffix, setRecordingLinkSuffix] = useState(() =>
+    stripUrlScheme(event?.recordingLink ?? '')
+  )
 
   const isEdit = !!event
 
@@ -232,6 +196,9 @@ export function EventDialog({ event, onSuccess }: Props) {
       setType(event?.type ?? '')
       setImagePreview(null)
       setRemoveImage(false)
+      setLinkSuffix(stripUrlScheme(event?.link ?? ''))
+      setMeetLinkSuffix(stripUrlScheme(event?.meetLink ?? ''))
+      setRecordingLinkSuffix(stripUrlScheme(event?.recordingLink ?? ''))
     }
     setOpen(newOpen)
   }
@@ -257,6 +224,9 @@ export function EventDialog({ event, onSuccess }: Props) {
     const fd = new FormData(form)
     fd.set('featured', String(featured))
     fd.set('type', type)
+    fd.set('link', toHttpsStored(linkSuffix))
+    fd.set('meetLink', toHttpsStored(meetLinkSuffix))
+    fd.set('recordingLink', toHttpsStored(recordingLinkSuffix))
     if (removeImage) fd.set('removeImage', 'true')
 
     const url = isEdit ? `/api/events/${event.id}` : '/api/events'
@@ -386,31 +356,34 @@ export function EventDialog({ event, onSuccess }: Props) {
           </div>
 
           {/* Link + MeetLink */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-1.5">
-              <Label htmlFor="link" className="text-white/70">
-                Link (saiba mais)
-              </Label>
-              <UrlInput
-                id="link"
-                name="link"
-                defaultValue={event?.link ?? ''}
-                placeholder="https://…"
-                className={INPUT_CLS}
-              />
+          <div className="space-y-1">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <Label htmlFor="link" className="text-white/70">
+                  Link (saiba mais)
+                </Label>
+                <HttpsUrlSuffixField
+                  id="link"
+                  value={linkSuffix}
+                  onChange={setLinkSuffix}
+                  placeholder="exemplo.org/evento"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="meetLink" className="text-white/70">
+                  Link da sala
+                </Label>
+                <HttpsUrlSuffixField
+                  id="meetLink"
+                  value={meetLinkSuffix}
+                  onChange={setMeetLinkSuffix}
+                  placeholder="meet.google.com/…"
+                />
+              </div>
             </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="meetLink" className="text-white/70">
-                Link da sala
-              </Label>
-              <UrlInput
-                id="meetLink"
-                name="meetLink"
-                defaultValue={event?.meetLink ?? ''}
-                placeholder="https://…"
-                className={INPUT_CLS}
-              />
-            </div>
+            <p className="text-[0.65rem] text-white/35">
+              Digite só o domínio e o caminho; o endereço é salvo com https://.
+            </p>
           </div>
 
           {/* Recording link */}
@@ -418,13 +391,15 @@ export function EventDialog({ event, onSuccess }: Props) {
             <Label htmlFor="recordingLink" className="text-white/70">
               Gravação da aula
             </Label>
-            <UrlInput
+            <HttpsUrlSuffixField
               id="recordingLink"
-              name="recordingLink"
-              defaultValue={event?.recordingLink ?? ''}
-              placeholder="https://drive.google.com/… ou link da aula gravada"
-              className={INPUT_CLS}
+              value={recordingLinkSuffix}
+              onChange={setRecordingLinkSuffix}
+              placeholder="drive.google.com/file/…"
             />
+            <p className="text-[0.65rem] text-white/35">
+              Digite só o domínio e o caminho; o endereço é salvo com https://.
+            </p>
           </div>
 
           {/* Image */}
