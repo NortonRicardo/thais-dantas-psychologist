@@ -132,13 +132,28 @@ export type NewHardwareModule = typeof hardwareModules.$inferInsert
 /** Informações de contato exibidas na página pública /contato (registro único) */
 export const contactInfo = pgTable('contact_info', {
   id: uuid('id').defaultRandom().primaryKey(),
-  directorName: text('director_name').notNull().default(''),
-  directorRole: text('director_role').notNull().default(''),
-  email: text('email').notNull().default(''),
-  phone: text('phone').notNull().default(''),
-  linkedin: text('linkedin').notNull().default(''),
-  directorPhoto: bytea('director_photo'),
-  directorPhotoMimeType: text('director_photo_mime_type'),
+  directorTeamMemberId: uuid('director_team_member_id').references(
+    () => teamMembers.id,
+    { onDelete: 'set null' }
+  ),
+  mapUrl: text('map_url').notNull().default(''),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export type ContactInfo = typeof contactInfo.$inferSelect
+export type NewContactInfo = typeof contactInfo.$inferInsert
+
+/** Canais de contato dinâmicos (e-mail, telefone, redes sociais, etc.) */
+export const contactChannels = pgTable('contact_channels', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  contactInfoId: uuid('contact_info_id')
+    .notNull()
+    .references(() => contactInfo.id, { onDelete: 'cascade' }),
+  label: text('label').notNull(),
+  iconKey: text('icon_key').notNull().default('mail'),
+  value: text('value').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -147,8 +162,8 @@ export const contactInfo = pgTable('contact_info', {
     .notNull(),
 })
 
-export type ContactInfo = typeof contactInfo.$inferSelect
-export type NewContactInfo = typeof contactInfo.$inferInsert
+export type ContactChannel = typeof contactChannels.$inferSelect
+export type NewContactChannel = typeof contactChannels.$inferInsert
 
 /** Membros da equipe exibidos na página pública /equipe */
 export const teamMembers = pgTable('team_members', {

@@ -99,6 +99,13 @@
       "when": 1777833224831,
       "tag": "0013_strong_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1747267200000,
+      "tag": "0014_contact_channels",
+      "breakpoints": true
     }
   ]
 }

@@ -2,6 +2,7 @@ import { db } from './index'
 import {
   aboutTimelineEntries,
   collaborationPartners,
+  contactInfo,
   developedPlatforms,
   events,
   hardware,
@@ -548,6 +549,13 @@ async function main() {
     .returning({ id: teamMembers.id, name: teamMembers.name })
   const memberNameToId = Object.fromEntries(insertedMembers.map(m => [m.name, m.id]))
   console.warn(`✅ ${insertedMembers.length} membros inseridos.`)
+
+  console.warn('🌱 Seeding contato…')
+  await db.delete(contactInfo)
+  await db.insert(contactInfo).values({
+    mapUrl: 'https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed',
+  })
+  console.warn('✅ Contato inserido.')
 
   console.warn('🌱 Seeding projetos…')
   await db.delete(projects)

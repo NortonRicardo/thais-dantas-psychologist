@@ -12,6 +12,7 @@ async function reset() {
       END LOOP;
     END $$;
   `)
+  await client.unsafe(`DROP SCHEMA IF EXISTS drizzle CASCADE;`)
   console.log('Database reset complete.')
   await client.end()
 }
