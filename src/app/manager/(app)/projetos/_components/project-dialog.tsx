@@ -1,7 +1,17 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { FileText, ImageIcon, Pencil, Plus, Trash2, Upload } from 'lucide-react'
+import {
+  ChevronDown,
+  FileText,
+  ImageIcon,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
@@ -16,6 +26,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -23,6 +38,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { extractBgColorKey } from '@/lib/project-taxonomy-styles'
 import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 export type ProjectRow = {
@@ -30,7 +46,10 @@ export type ProjectRow = {
   slug: string
   title: string
   category: string
+  categoryId: string
+  categoryBadgeClass: string
   themes: string[]
+  themeIds: string[]
   description: string
   imageMimeType: string | null
   pdfMimeType: string | null
@@ -50,20 +69,116 @@ export type ProjectRow = {
 
 type TeamOption = { id: string; name: string }
 
-const CATEGORIES = [
-  'TCC',
-  'Iniciação Científica',
-  'Mestrado',
-  'Plataforma',
-  'Pesquisa',
-]
+type ProjectCategoryOption = { id: string; title: string; color: string }
 
-const THEMES = [
-  'Clima',
-  'Matemática',
-  'Otimização e Metaheurísticas',
-  'Agro & Sustentabilidade',
-]
+type ProjectThemeOption = { id: string; name: string; color: string }
+
+function CategoryCombobox({
+  value,
+  onChange,
+  options,
+}: {
+  value: string
+  onChange: (v: string) => void
+  options: ProjectCategoryOption[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const filtered = options.filter(o =>
+    o.title.toLowerCase().includes(search.toLowerCase())
+  )
+  const selected = options.find(o => o.id === value)
+  const dotClass = selected ? extractBgColorKey(selected.color) : 'bg-slate-500'
+
+  function select(id: string) {
+    onChange(id)
+    setOpen(false)
+    setSearch('')
+  }
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={o => {
+        setOpen(o)
+        if (o) setTimeout(() => inputRef.current?.focus(), 0)
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none hover:bg-white/[0.08] focus:border-white/20"
+        >
+          {selected ? (
+            <span className="flex items-center gap-2 text-white/90">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${dotClass}`} />
+              {selected.title}
+            </span>
+          ) : (
+            <span className="text-white/30">Buscar categoria…</span>
+          )}
+          <ChevronDown size={13} className="shrink-0 text-white/30" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        className="w-[--radix-popover-trigger-width] border-white/10 bg-[#071525] p-0 shadow-xl"
+      >
+        <div className="border-b border-white/10 px-2 py-2">
+          <div className="relative">
+            <Search
+              size={12}
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+            />
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Filtrar categorias…"
+              className="w-full rounded-md bg-white/5 py-1.5 pl-7 pr-7 text-sm text-white/80 placeholder:text-white/25 outline-none"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="max-h-48 overflow-y-auto overscroll-contain p-1">
+          {filtered.length === 0 && (
+            <p className="py-3 text-center text-xs text-white/30">
+              Nenhuma categoria encontrada.
+            </p>
+          )}
+          {filtered.map(o => (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => select(o.id)}
+              className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
+                value === o.id
+                  ? 'bg-white/10 text-white/90'
+                  : 'text-white/60 hover:bg-white/5 hover:text-white/85'
+              }`}
+            >
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ${extractBgColorKey(o.color)}`}
+              />
+              {o.title}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
@@ -76,11 +191,17 @@ type Props = {
 export function ProjectDialog({ project, onSuccess }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [category, setCategory] = useState(project?.category ?? '')
-  const [themes, setThemes] = useState<string[]>(project?.themes ?? [])
+  const [categoryId, setCategoryId] = useState(project?.categoryId ?? '')
+  const [themeIds, setThemeIds] = useState<string[]>(project?.themeIds ?? [])
+  const [categories, setCategories] = useState<ProjectCategoryOption[]>([])
+  const [themeOptions, setThemeOptions] = useState<ProjectThemeOption[]>([])
   const [advisorId, setAdvisorId] = useState(project?.advisorId ?? '__none__')
-  const [coAdvisorId, setCoAdvisorId] = useState(project?.coAdvisorId ?? '__none__')
-  const [researchLeadId, setResearchLeadId] = useState(project?.researchLeadId ?? '__none__')
+  const [coAdvisorId, setCoAdvisorId] = useState(
+    project?.coAdvisorId ?? '__none__'
+  )
+  const [researchLeadId, setResearchLeadId] = useState(
+    project?.researchLeadId ?? '__none__'
+  )
   const [teamMembers, setTeamMembers] = useState<TeamOption[]>([])
 
   // Image state
@@ -130,10 +251,25 @@ export function ProjectDialog({ project, onSuccess }: Props) {
     }
   }
 
+  async function loadTaxonomy() {
+    try {
+      const [catRes, themeRes] = await Promise.all([
+        fetch('/api/project-categories'),
+        fetch('/api/project-themes'),
+      ])
+      const catData = (await catRes.json()) as ProjectCategoryOption[]
+      const themeData = (await themeRes.json()) as ProjectThemeOption[]
+      if (Array.isArray(catData)) setCategories(catData)
+      if (Array.isArray(themeData)) setThemeOptions(themeData)
+    } catch {
+      toast.error('Erro ao carregar categorias e temas.')
+    }
+  }
+
   function handleOpenChange(newOpen: boolean) {
     if (newOpen) {
-      setCategory(project?.category ?? '')
-      setThemes(project?.themes ?? [])
+      setCategoryId(project?.categoryId ?? '')
+      setThemeIds(project?.themeIds ?? [])
       setAdvisorId(project?.advisorId ?? '__none__')
       setCoAdvisorId(project?.coAdvisorId ?? '__none__')
       setResearchLeadId(project?.researchLeadId ?? '__none__')
@@ -143,14 +279,15 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       setRemovePdf(false)
       setGitUrlSuffix(stripUrlScheme(project?.gitUrl ?? ''))
       setPublicationUrlSuffix(stripUrlScheme(project?.publicationUrl ?? ''))
-      loadTeamMembers()
+      void loadTeamMembers()
+      void loadTaxonomy()
     }
     setOpen(newOpen)
   }
 
-  function toggleTheme(theme: string) {
-    setThemes(prev =>
-      prev.includes(theme) ? prev.filter(t => t !== theme) : [...prev, theme]
+  function toggleThemeId(id: string) {
+    setThemeIds(prev =>
+      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
     )
   }
 
@@ -182,11 +319,11 @@ export function ProjectDialog({ project, onSuccess }: Props) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!category) {
+    if (!categoryId) {
       toast.error('Selecione uma categoria.')
       return
     }
-    if (themes.length === 0) {
+    if (themeIds.length === 0) {
       toast.error('Selecione ao menos um tema.')
       return
     }
@@ -194,12 +331,14 @@ export function ProjectDialog({ project, onSuccess }: Props) {
 
     const form = e.currentTarget
     const fd = new FormData(form)
-    fd.delete('themes')
-    themes.forEach(t => fd.append('themes', t))
-    fd.set('category', category)
+    fd.set('categoryId', categoryId)
+    themeIds.forEach(tid => fd.append('themeIds', tid))
     fd.set('advisorId', advisorId === '__none__' ? '' : advisorId)
     fd.set('coAdvisorId', coAdvisorId === '__none__' ? '' : coAdvisorId)
-    fd.set('researchLeadId', researchLeadId === '__none__' ? '' : researchLeadId)
+    fd.set(
+      'researchLeadId',
+      researchLeadId === '__none__' ? '' : researchLeadId
+    )
     fd.set('gitUrl', toHttpsStored(gitUrlSuffix))
     fd.set('publicationUrl', toHttpsStored(publicationUrlSuffix))
     if (removeImage) fd.set('removeImage', 'true')
@@ -212,7 +351,9 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(typeof err.error === 'string' ? err.error : 'Erro ao salvar')
+        throw new Error(
+          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
+        )
       }
       toast.success(isEdit ? 'Projeto atualizado!' : 'Projeto criado!')
       setOpen(false)
@@ -271,7 +412,11 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             {previewSrc ? (
               <div className="group relative h-32 w-full overflow-hidden rounded-xl border border-white/10">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={previewSrc} alt="Preview" className="h-full w-full object-cover" />
+                <img
+                  src={previewSrc}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/55 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
                     type="button"
@@ -298,7 +443,9 @@ export function ProjectDialog({ project, onSuccess }: Props) {
                 className="flex h-24 w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-white/15 bg-white/[0.02] transition hover:border-white/30 hover:bg-white/[0.05]"
               >
                 <ImageIcon size={20} className="text-white/25" />
-                <span className="text-xs text-white/40">Imagem de capa (opcional)</span>
+                <span className="text-xs text-white/40">
+                  Imagem de capa (opcional)
+                </span>
               </button>
             )}
           </div>
@@ -322,28 +469,19 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             {/* Categoria */}
             <div className="grid gap-1.5">
               <Label className="text-white/70">Categoria *</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                  <SelectValue placeholder="Selecionar…" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#071525] border-white/10 text-white">
-                  {CATEGORIES.map(c => (
-                    <SelectItem
-                      key={c}
-                      value={c}
-                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                    >
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategoryCombobox
+                value={categoryId}
+                onChange={setCategoryId}
+                options={categories}
+              />
             </div>
           </div>
 
           {/* Título */}
           <div className="grid gap-1.5">
-            <Label htmlFor="title" className="text-white/70">Título *</Label>
+            <Label htmlFor="title" className="text-white/70">
+              Título *
+            </Label>
             <Input
               id="title"
               name="title"
@@ -358,18 +496,18 @@ export function ProjectDialog({ project, onSuccess }: Props) {
           <div className="grid gap-1.5">
             <Label className="text-white/70">Temas *</Label>
             <div className="flex flex-wrap gap-2">
-              {THEMES.map(theme => (
+              {themeOptions.map(t => (
                 <button
-                  key={theme}
+                  key={t.id}
                   type="button"
-                  onClick={() => toggleTheme(theme)}
+                  onClick={() => toggleThemeId(t.id)}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-colors border ${
-                    themes.includes(theme)
+                    themeIds.includes(t.id)
                       ? 'bg-orange-800/50 border-orange-500/50 text-orange-200'
                       : 'bg-white/5 border-white/10 text-white/50 hover:border-white/25 hover:text-white/70'
                   }`}
                 >
-                  {theme}
+                  {t.name}
                 </button>
               ))}
             </div>
@@ -377,7 +515,9 @@ export function ProjectDialog({ project, onSuccess }: Props) {
 
           {/* Descrição */}
           <div className="grid gap-1.5">
-            <Label htmlFor="description" className="text-white/70">Descrição *</Label>
+            <Label htmlFor="description" className="text-white/70">
+              Descrição *
+            </Label>
             <Textarea
               id="description"
               name="description"
@@ -392,13 +532,17 @@ export function ProjectDialog({ project, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-4">
             {/* Data início */}
             <div className="grid gap-1.5">
-              <Label htmlFor="startDate" className="text-white/70">Data de início *</Label>
+              <Label htmlFor="startDate" className="text-white/70">
+                Data de início *
+              </Label>
               <Input
                 id="startDate"
                 name="startDate"
                 type="date"
                 required
-                defaultValue={project?.startDate ? project.startDate.slice(0, 10) : ''}
+                defaultValue={
+                  project?.startDate ? project.startDate.slice(0, 10) : ''
+                }
                 className={INPUT_CLS}
               />
             </div>
@@ -406,13 +550,16 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             {/* Data conclusão */}
             <div className="grid gap-1.5">
               <Label htmlFor="endDate" className="text-white/70">
-                Conclusão <span className="text-white/30 font-normal">(opcional)</span>
+                Conclusão{' '}
+                <span className="text-white/30 font-normal">(opcional)</span>
               </Label>
               <Input
                 id="endDate"
                 name="endDate"
                 type="date"
-                defaultValue={project?.endDate ? project.endDate.slice(0, 10) : ''}
+                defaultValue={
+                  project?.endDate ? project.endDate.slice(0, 10) : ''
+                }
                 className={INPUT_CLS}
               />
             </div>
@@ -484,7 +631,10 @@ export function ProjectDialog({ project, onSuccess }: Props) {
           {/* Outros */}
           <div className="grid gap-1.5">
             <Label htmlFor="authors" className="text-white/70">
-              Outros <span className="text-white/30 font-normal">(nomes separados por vírgula)</span>
+              Outros{' '}
+              <span className="text-white/30 font-normal">
+                (nomes separados por vírgula)
+              </span>
             </Label>
             <Input
               id="authors"

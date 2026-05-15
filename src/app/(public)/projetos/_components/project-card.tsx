@@ -6,7 +6,11 @@ export type PublicProject = {
   slug: string
   title: string
   category: string
+  categoryChipBg: string
+  categoryChipBorder: string
+  categoryChipText: string
   themes: string[]
+  themeTags: { name: string; pillColor: string }[]
   description: string
   imageMimeType: string | null
   pdfMimeType: string | null
@@ -30,58 +34,39 @@ const glass = {
   boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
 } as const
 
-const categoryColor: Record<string, string> = {
-  TCC: 'rgba(0,180,255,0.18)',
-  'Iniciação Científica': 'rgba(0,200,120,0.18)',
-  Mestrado: 'rgba(160,0,255,0.18)',
-  Plataforma: 'rgba(255,140,0,0.18)',
-  Pesquisa: 'rgba(0,160,220,0.18)',
-}
-const categoryBorder: Record<string, string> = {
-  TCC: 'rgba(0,180,255,0.4)',
-  'Iniciação Científica': 'rgba(0,200,120,0.4)',
-  Mestrado: 'rgba(160,0,255,0.4)',
-  Plataforma: 'rgba(255,140,0,0.4)',
-  Pesquisa: 'rgba(0,160,220,0.4)',
-}
-const categoryText: Record<string, string> = {
-  TCC: 'rgb(80,200,255)',
-  'Iniciação Científica': 'rgb(60,220,140)',
-  Mestrado: 'rgb(200,120,255)',
-  Plataforma: 'rgb(255,180,60)',
-  Pesquisa: 'rgb(60,190,255)',
-}
-
-const themeColor: Record<string, string> = {
-  Clima: 'rgba(0,180,255,0.6)',
-  Matemática: 'rgba(200,120,255,0.6)',
-  'Otimização e Metaheurísticas': 'rgba(255,180,60,0.6)',
-  'Agro & Sustentabilidade': 'rgba(60,220,140,0.6)',
-}
-
-function ThemePill({ theme }: { theme: string }) {
+function ThemePill({ name, pillColor }: { name: string; pillColor: string }) {
   return (
     <span
       className="rounded-full px-2 py-0.5 text-[0.55rem] font-medium uppercase tracking-[1.5px]"
       style={{
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
-        color: themeColor[theme] ?? 'rgba(255,255,255,0.5)',
+        color: pillColor,
       }}
     >
-      {theme}
+      {name}
     </span>
   )
 }
 
-function CategoryBadge({ category }: { category: string }) {
+function CategoryBadge({
+  category,
+  chipBg,
+  chipBorder,
+  chipText,
+}: {
+  category: string
+  chipBg: string
+  chipBorder: string
+  chipText: string
+}) {
   return (
     <span
       className="w-fit rounded-full px-2.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[2px]"
       style={{
-        background: categoryColor[category] ?? 'rgba(255,255,255,0.1)',
-        border: `1px solid ${categoryBorder[category] ?? 'rgba(255,255,255,0.2)'}`,
-        color: categoryText[category] ?? 'rgba(255,255,255,0.7)',
+        background: chipBg,
+        border: `1px solid ${chipBorder}`,
+        color: chipText,
       }}
     >
       {category}
@@ -101,6 +86,10 @@ export function ProjectCard({ project }: { project: PublicProject }) {
     ? `/api/projects/${project.id}/image?t=${new Date(project.updatedAt).getTime()}`
     : null
 
+  const tagByName = Object.fromEntries(
+    project.themeTags.map(t => [t.name, t.pillColor])
+  )
+
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl" style={glass}>
       {imgSrc && (
@@ -117,9 +106,18 @@ export function ProjectCard({ project }: { project: PublicProject }) {
 
       <div className="flex flex-1 flex-col gap-3 px-5 py-5">
         <div className="flex flex-wrap items-center gap-2">
-          <CategoryBadge category={project.category} />
-          {project.themes.map(t => (
-            <ThemePill key={t} theme={t} />
+          <CategoryBadge
+            category={project.category}
+            chipBg={project.categoryChipBg}
+            chipBorder={project.categoryChipBorder}
+            chipText={project.categoryChipText}
+          />
+          {project.themes.map(tn => (
+            <ThemePill
+              key={tn}
+              name={tn}
+              pillColor={tagByName[tn] ?? 'rgba(255,255,255,0.5)'}
+            />
           ))}
         </div>
 
@@ -135,7 +133,12 @@ export function ProjectCard({ project }: { project: PublicProject }) {
         <div className="flex items-center gap-1.5 text-[0.68rem] text-white/40">
           <Users size={11} strokeWidth={1.5} />
           <span className="line-clamp-1">
-            {[project.advisorName, project.coAdvisorName, project.researchLeadName, ...project.authors]
+            {[
+              project.advisorName,
+              project.coAdvisorName,
+              project.researchLeadName,
+              ...project.authors,
+            ]
               .filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
               .join(', ') || '—'}
           </span>

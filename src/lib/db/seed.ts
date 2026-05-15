@@ -8,11 +8,14 @@ import {
   events,
   hardware,
   hardwareModules,
+  projectCategories,
+  projectProjectThemes,
+  projectThemes,
+  projects,
   teamCategories,
   teamDegreeLevels,
   teamMembers,
   teamNamePrefixes,
-  projects,
 } from './schema'
 import { teamMemberDisplayName } from '@/lib/team-member-display'
 import { normalizeLattesUrl } from '@/lib/team-lattes'
@@ -469,6 +472,87 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
   },
 ]
 
+const seedProjectCategories = [
+  {
+    title: 'TCC',
+    color: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
+    chipBg: 'rgba(0,180,255,0.18)',
+    chipBorder: 'rgba(0,180,255,0.4)',
+    chipText: 'rgb(80,200,255)',
+  },
+  {
+    title: 'Iniciação Científica',
+    color: 'bg-teal-500/15 text-teal-300 border-teal-500/30',
+    chipBg: 'rgba(0,200,120,0.18)',
+    chipBorder: 'rgba(0,200,120,0.4)',
+    chipText: 'rgb(60,220,140)',
+  },
+  {
+    title: 'Mestrado',
+    color: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+    chipBg: 'rgba(160,0,255,0.18)',
+    chipBorder: 'rgba(160,0,255,0.4)',
+    chipText: 'rgb(200,120,255)',
+  },
+  {
+    title: 'Plataforma',
+    color: 'bg-orange-500/15 text-orange-300 border-orange-500/30',
+    chipBg: 'rgba(255,140,0,0.18)',
+    chipBorder: 'rgba(255,140,0,0.4)',
+    chipText: 'rgb(255,180,60)',
+  },
+  {
+    title: 'Pesquisa',
+    color: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+    chipBg: 'rgba(0,160,220,0.18)',
+    chipBorder: 'rgba(0,160,220,0.4)',
+    chipText: 'rgb(60,190,255)',
+  },
+] as const
+
+const seedProjectThemes = [
+  {
+    name: 'Clima',
+    slug: 'clima',
+    color: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+    pillColor: 'rgba(0,180,255,0.6)',
+    filterBg: 'rgba(0,180,255,0.08)',
+    filterBorder: 'rgba(0,180,255,0.25)',
+    filterText: 'rgb(80,200,255)',
+    filterActiveBg: 'rgba(0,180,255,0.22)',
+  },
+  {
+    name: 'Matemática',
+    slug: 'matematica',
+    color: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+    pillColor: 'rgba(200,120,255,0.6)',
+    filterBg: 'rgba(160,0,255,0.08)',
+    filterBorder: 'rgba(160,0,255,0.25)',
+    filterText: 'rgb(200,120,255)',
+    filterActiveBg: 'rgba(160,0,255,0.22)',
+  },
+  {
+    name: 'Otimização e Metaheurísticas',
+    slug: 'otimizacao',
+    color: 'bg-orange-500/15 text-orange-300 border-orange-500/30',
+    pillColor: 'rgba(255,180,60,0.6)',
+    filterBg: 'rgba(255,140,0,0.08)',
+    filterBorder: 'rgba(255,140,0,0.25)',
+    filterText: 'rgb(255,180,60)',
+    filterActiveBg: 'rgba(255,140,0,0.22)',
+  },
+  {
+    name: 'Agro & Sustentabilidade',
+    slug: 'agro',
+    color: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    pillColor: 'rgba(60,220,140,0.6)',
+    filterBg: 'rgba(0,200,100,0.08)',
+    filterBorder: 'rgba(0,200,100,0.25)',
+    filterText: 'rgb(60,220,140)',
+    filterActiveBg: 'rgba(0,200,100,0.22)',
+  },
+] as const
+
 type ProjectSeed = {
   slug: string
   title: string
@@ -859,30 +943,79 @@ async function main() {
   })
   console.warn('✅ Contato inserido.')
 
-  console.warn('🌱 Seeding projetos…')
+  console.warn('🌱 Seeding categorias e temas de projetos…')
+  await db.delete(projectProjectThemes)
   await db.delete(projects)
-  const projectValues = seedProjectsData.map(p => ({
-    slug: p.slug,
-    title: p.title,
-    category: p.category,
-    themes: p.themes,
-    description: p.description,
-    authors: p.authors,
-    startDate: p.startDate,
-    endDate: p.endDate ?? null,
-    gitUrl: p.gitUrl ?? null,
-    publicationUrl: p.publicationUrl ?? null,
-    advisorId: p.advisorName ? (memberNameToId[p.advisorName] ?? null) : null,
-    coAdvisorId: p.coAdvisorName
-      ? (memberNameToId[p.coAdvisorName] ?? null)
-      : null,
-    researchLeadId: p.researchLeadName
-      ? (memberNameToId[p.researchLeadName] ?? null)
-      : null,
-    pdfPath: p.pdfPath ?? null,
-  }))
-  await db.insert(projects).values(projectValues)
-  console.warn(`✅ ${projectValues.length} projetos inseridos.`)
+  await db.delete(projectThemes)
+  await db.delete(projectCategories)
+
+  const insertedProjCats = await db
+    .insert(projectCategories)
+    .values([...seedProjectCategories])
+    .returning({ id: projectCategories.id, title: projectCategories.title })
+  const projectCategoryTitleToId = Object.fromEntries(
+    insertedProjCats.map(c => [c.title, c.id])
+  )
+
+  const insertedProjThemes = await db
+    .insert(projectThemes)
+    .values([...seedProjectThemes])
+    .returning({ id: projectThemes.id, name: projectThemes.name })
+  const nameToThemeId = Object.fromEntries(
+    insertedProjThemes.map(t => [t.name, t.id])
+  )
+
+  console.warn('🌱 Seeding projetos…')
+  const projectValues = seedProjectsData.map(p => {
+    const categoryId = projectCategoryTitleToId[p.category]
+    if (!categoryId) {
+      throw new Error(
+        `Categoria de projeto desconhecida no seed: ${p.category}`
+      )
+    }
+    return {
+      slug: p.slug,
+      title: p.title,
+      categoryId,
+      description: p.description,
+      authors: p.authors,
+      startDate: p.startDate,
+      endDate: p.endDate ?? null,
+      gitUrl: p.gitUrl ?? null,
+      publicationUrl: p.publicationUrl ?? null,
+      advisorId: p.advisorName ? (memberNameToId[p.advisorName] ?? null) : null,
+      coAdvisorId: p.coAdvisorName
+        ? (memberNameToId[p.coAdvisorName] ?? null)
+        : null,
+      researchLeadId: p.researchLeadName
+        ? (memberNameToId[p.researchLeadName] ?? null)
+        : null,
+      pdfPath: p.pdfPath ?? null,
+    }
+  })
+  const insertedProjects = await db
+    .insert(projects)
+    .values(projectValues)
+    .returning({ id: projects.id })
+
+  const junctionRows: { projectId: string; themeId: string }[] = []
+  seedProjectsData.forEach((p, i) => {
+    const row = insertedProjects[i]
+    if (!row) return
+    for (const themeName of p.themes) {
+      const themeId = nameToThemeId[themeName]
+      if (!themeId) {
+        throw new Error(`Tema de projeto desconhecido no seed: ${themeName}`)
+      }
+      junctionRows.push({ projectId: row.id, themeId })
+    }
+  })
+  if (junctionRows.length > 0) {
+    await db.insert(projectProjectThemes).values(junctionRows)
+  }
+  console.warn(
+    `✅ ${insertedProjCats.length} categorias, ${insertedProjThemes.length} temas, ${projectValues.length} projetos inseridos.`
+  )
 
   process.exit(0)
 }

@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { ImageIcon, Trash2 } from 'lucide-react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { ChevronDown, ImageIcon, Search, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -36,15 +36,125 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { ProjectDialog, type ProjectRow } from './project-dialog'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 const PAGE_SIZE = 10
 
-const CATEGORY_COLORS: Record<string, string> = {
-  TCC: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
-  'Iniciação Científica': 'bg-teal-500/15 text-teal-300 border-teal-500/30',
-  Mestrado: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
-  Plataforma: 'bg-orange-500/15 text-orange-300 border-orange-500/30',
-  Pesquisa: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+function FilterCombobox({
+  value,
+  onChange,
+  placeholder,
+  clearLabel,
+  options,
+  width = 'w-44',
+  renderOption,
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder: string
+  clearLabel: string
+  options: string[]
+  width?: string
+  renderOption?: (opt: string) => React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const filtered = options.filter(o =>
+    o.toLowerCase().includes(search.toLowerCase())
+  )
+
+  function select(v: string) {
+    onChange(v)
+    setOpen(false)
+    setSearch('')
+  }
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={o => {
+        setOpen(o)
+        if (o) setTimeout(() => inputRef.current?.focus(), 0)
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={`flex ${width} items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none hover:bg-white/[0.08] focus:border-white/20`}
+        >
+          <span className={value ? 'text-white/80' : 'text-white/25'}>
+            {value || placeholder}
+          </span>
+          <ChevronDown size={13} className="shrink-0 text-white/30" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        className={`${width} border-white/10 bg-[#071525] p-0 shadow-xl`}
+      >
+        <div className="border-b border-white/10 px-2 py-2">
+          <div className="relative">
+            <Search
+              size={12}
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+            />
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar..."
+              className="w-full rounded-md bg-white/5 py-1.5 pl-7 pr-2 text-sm text-white/80 placeholder:text-white/25 outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="max-h-52 overflow-y-auto p-1">
+          <button
+            type="button"
+            onClick={() => select('')}
+            className={`w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
+          >
+            {placeholder}
+          </button>
+
+          {filtered.length === 0 && (
+            <p className="py-2 text-center text-xs text-white/25">
+              Nenhum resultado
+            </p>
+          )}
+
+          {filtered.map(opt => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => select(opt)}
+              className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${value === opt ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+            >
+              {renderOption ? renderOption(opt) : opt}
+            </button>
+          ))}
+        </div>
+
+        {value && (
+          <div className="border-t border-white/10 p-1">
+            <button
+              type="button"
+              onClick={() => select('')}
+              className="flex w-full items-center gap-1.5 rounded-md px-3 py-1.5 text-xs text-white/35 hover:bg-white/5 hover:text-white/60 transition-colors"
+            >
+              <X size={11} /> {clearLabel}
+            </button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  )
 }
 
 function buildPages(current: number, total: number): (number | 'ellipsis')[] {
@@ -56,13 +166,19 @@ function buildPages(current: number, total: number): (number | 'ellipsis')[] {
 }
 
 function formatDateShort(iso: string) {
-  return new Date(iso).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 export function ProjectsTable() {
   const [rows, setRows] = useState<ProjectRow[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [filterTitle, setFilterTitle] = useState('')
+  const [filterCategory, setFilterCategory] = useState('')
+  const [filterTheme, setFilterTheme] = useState('')
 
   const fetchProjects = useCallback(async () => {
     setLoading(true)
@@ -77,7 +193,9 @@ export function ProjectsTable() {
     }
   }, [])
 
-  useEffect(() => { fetchProjects() }, [fetchProjects])
+  useEffect(() => {
+    fetchProjects()
+  }, [fetchProjects])
 
   async function handleDelete(id: string) {
     try {
@@ -89,20 +207,97 @@ export function ProjectsTable() {
     }
   }
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
-  const paged = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const categoryOptions = [...new Set(rows.map(r => r.category))].sort((a, b) =>
+    a.localeCompare(b, 'pt-BR')
+  )
+  const themeOptions = [...new Set(rows.flatMap(r => r.themes))].sort((a, b) =>
+    a.localeCompare(b, 'pt-BR')
+  )
+
+  const filtered = rows.filter(row => {
+    if (
+      filterTitle &&
+      !row.title.toLowerCase().includes(filterTitle.toLowerCase())
+    )
+      return false
+    if (filterCategory && row.category !== filterCategory) return false
+    if (filterTheme && !row.themes.includes(filterTheme)) return false
+    return true
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
   const pages = buildPages(page, totalPages)
+
+  function handleFilterChange(setter: (v: string) => void) {
+    return (v: string) => {
+      setter(v)
+      setPage(1)
+    }
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <ProjectDialog onSuccess={fetchProjects} />
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold text-white/90">Projetos</h1>
+          <p className="mt-0.5 text-sm text-white/40">
+            Gerencie pesquisas, TCCs, dissertações e plataformas do laboratório.
+          </p>
+        </div>
+        <div className="flex shrink-0 self-end sm:self-start sm:pt-0.5">
+          <ProjectDialog onSuccess={fetchProjects} />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+        <div className="relative flex-1">
+          <Search
+            size={13}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+          />
+          <input
+            type="text"
+            placeholder="Filtrar por título…"
+            value={filterTitle}
+            onChange={e => handleFilterChange(setFilterTitle)(e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/25 outline-none focus:border-white/20"
+          />
+          {filterTitle && (
+            <button
+              type="button"
+              onClick={() => handleFilterChange(setFilterTitle)('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
+
+        <FilterCombobox
+          value={filterCategory}
+          onChange={handleFilterChange(setFilterCategory)}
+          placeholder="Todas as categorias"
+          clearLabel="Limpar categoria"
+          options={categoryOptions}
+          width="w-52"
+        />
+
+        <FilterCombobox
+          value={filterTheme}
+          onChange={handleFilterChange(setFilterTheme)}
+          placeholder="Todos os temas"
+          clearLabel="Limpar tema"
+          options={themeOptions}
+          width="w-56"
+        />
       </div>
 
       <div
         className="w-full overflow-x-auto rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(255,255,255,0.1)',
@@ -144,8 +339,22 @@ export function ProjectsTable() {
 
             {!loading && rows.length === 0 && (
               <TableRow className="border-white/[0.07] hover:bg-transparent">
-                <TableCell colSpan={4} className="py-12 text-center text-sm text-white/30">
+                <TableCell
+                  colSpan={4}
+                  className="py-12 text-center text-sm text-white/30"
+                >
                   Nenhum projeto cadastrado ainda.
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!loading && rows.length > 0 && filtered.length === 0 && (
+              <TableRow className="border-white/[0.07] hover:bg-transparent">
+                <TableCell
+                  colSpan={4}
+                  className="py-12 text-center text-sm text-white/30"
+                >
+                  Nenhum projeto corresponde aos filtros.
                 </TableCell>
               </TableRow>
             )}
@@ -175,8 +384,16 @@ export function ProjectsTable() {
                       <div className="min-w-0 overflow-hidden">
                         <div className="truncate text-sm">{row.title}</div>
                         <div className="truncate text-[0.68rem] text-white/35">
-                          {[row.advisorName, row.coAdvisorName, row.researchLeadName, ...row.authors]
-                            .filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
+                          {[
+                            row.advisorName,
+                            row.coAdvisorName,
+                            row.researchLeadName,
+                            ...row.authors,
+                          ]
+                            .filter(
+                              (n, i, a): n is string =>
+                                !!n && a.indexOf(n) === i
+                            )
                             .join(', ') || '—'}
                         </div>
                       </div>
@@ -185,7 +402,7 @@ export function ProjectsTable() {
 
                   <TableCell>
                     <Badge
-                      className={`border text-[0.65rem] uppercase tracking-wide ${CATEGORY_COLORS[row.category] ?? 'bg-white/10 text-white/60 border-white/20'}`}
+                      className={`border text-[0.65rem] uppercase tracking-wide ${row.categoryBadgeClass}`}
                     >
                       {row.category}
                     </Badge>
@@ -213,9 +430,12 @@ export function ProjectsTable() {
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remover projeto?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              Remover projeto?
+                            </AlertDialogTitle>
                             <AlertDialogDescription className="text-white/50">
-                              &ldquo;{row.title}&rdquo; será removido permanentemente.
+                              &ldquo;{row.title}&rdquo; será removido
+                              permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -245,9 +465,16 @@ export function ProjectsTable() {
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={e => { e.preventDefault(); setPage(p => Math.max(1, p - 1)) }}
+                onClick={e => {
+                  e.preventDefault()
+                  setPage(p => Math.max(1, p - 1))
+                }}
                 aria-disabled={page === 1}
-                className={page === 1 ? 'pointer-events-none opacity-40' : 'text-white/60 hover:text-white hover:bg-white/10'}
+                className={
+                  page === 1
+                    ? 'pointer-events-none opacity-40'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }
               />
             </PaginationItem>
             {pages.map((p, i) =>
@@ -260,8 +487,15 @@ export function ProjectsTable() {
                   <PaginationLink
                     href="#"
                     isActive={p === page}
-                    onClick={e => { e.preventDefault(); setPage(p) }}
-                    className={p === page ? 'bg-orange-800 text-orange-50 border-0 hover:bg-orange-700' : 'text-white/60 hover:text-white hover:bg-white/10 border-0'}
+                    onClick={e => {
+                      e.preventDefault()
+                      setPage(p)
+                    }}
+                    className={
+                      p === page
+                        ? 'bg-orange-800 text-orange-50 border-0 hover:bg-orange-700'
+                        : 'text-white/60 hover:text-white hover:bg-white/10 border-0'
+                    }
                   >
                     {p}
                   </PaginationLink>
@@ -271,9 +505,16 @@ export function ProjectsTable() {
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={e => { e.preventDefault(); setPage(p => Math.min(totalPages, p + 1)) }}
+                onClick={e => {
+                  e.preventDefault()
+                  setPage(p => Math.min(totalPages, p + 1))
+                }}
                 aria-disabled={page === totalPages}
-                className={page === totalPages ? 'pointer-events-none opacity-40' : 'text-white/60 hover:text-white hover:bg-white/10'}
+                className={
+                  page === totalPages
+                    ? 'pointer-events-none opacity-40'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }
               />
             </PaginationItem>
           </PaginationContent>

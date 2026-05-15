@@ -7,13 +7,12 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
-  { href: '/manager/equipe/membros', label: 'Equipe' },
-  { href: '/manager/equipe/categorias', label: 'Categorias' },
-  { href: '/manager/equipe/tratamentos', label: 'Tratamentos' },
-  { href: '/manager/equipe/graus', label: 'Graus' },
+  { href: '/manager/projetos/lista', label: 'Projetos' },
+  { href: '/manager/projetos/categorias', label: 'Categorias' },
+  { href: '/manager/projetos/temas', label: 'Temas' },
 ] as const
 
-export default function EquipeLayout({ children }: { children: ReactNode }) {
+export default function ProjetosLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
 
   return (
@@ -22,9 +21,9 @@ export default function EquipeLayout({ children }: { children: ReactNode }) {
         <aside className="mt-8 w-52 shrink-0 self-stretch rounded-xl bg-white/[0.08] p-3 pt-6">
           <div className="flex flex-col gap-1">
             <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/45">
-              Equipe
+              Projetos
             </p>
-            <nav aria-label="Equipe" className="flex flex-col gap-0.5">
+            <nav aria-label="Projetos" className="flex flex-col gap-0.5">
               {NAV_ITEMS.map(item => {
                 const isCurrent =
                   pathname === item.href || pathname.startsWith(`${item.href}/`)

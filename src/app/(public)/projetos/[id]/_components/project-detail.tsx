@@ -64,10 +64,18 @@ export function ProjectDetail({ project }: { project: PublicProject }) {
           style={glass}
         >
           {(() => {
-            const all = [project.advisorName, project.coAdvisorName, project.researchLeadName, ...project.authors]
-              .filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
+            const all = [
+              project.advisorName,
+              project.coAdvisorName,
+              project.researchLeadName,
+              ...project.authors,
+            ].filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
             return all.length > 0 ? (
-              <MetaRow icon={Users} label={all.length > 1 ? 'Autores' : 'Autor'} value={all.join(', ')} />
+              <MetaRow
+                icon={Users}
+                label={all.length > 1 ? 'Autores' : 'Autor'}
+                value={all.join(', ')}
+              />
             ) : null
           })()}
 
@@ -137,7 +145,8 @@ export function ProjectDetail({ project }: { project: PublicProject }) {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs text-white/60 transition-colors hover:border-white/25 hover:text-white/90"
                 >
-                  <ExternalLink size={13} strokeWidth={1.5} /> Publicação / Artigo
+                  <ExternalLink size={13} strokeWidth={1.5} /> Publicação /
+                  Artigo
                 </a>
               )}
             </div>

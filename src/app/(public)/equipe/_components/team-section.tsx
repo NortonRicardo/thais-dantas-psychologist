@@ -1,16 +1,22 @@
 import { db } from '@/lib/db'
 import {
-  projects,
   teamCategories,
   teamDegreeLevels,
   teamMembers,
   teamNamePrefixes,
 } from '@/lib/db/schema'
-import { teamMemberDisplayName, teamMemberProfessionalLine } from '@/lib/team-member-display'
+import { fetchProjectSummariesForEquipe } from '@/lib/db/project-queries'
+import {
+  teamMemberDisplayName,
+  teamMemberProfessionalLine,
+} from '@/lib/team-member-display'
 import { asc, eq } from 'drizzle-orm'
 
 import { TeamEquipeInteractive } from './team-equipe-interactive'
-import type { EquipeProjectSummary, EquipeSectionView } from './team-equipe-interactive'
+import type {
+  EquipeProjectSummary,
+  EquipeSectionView,
+} from './team-equipe-interactive'
 
 const ROLE_ADVISOR = 'Orientador(a)'
 const ROLE_COADVISOR = 'Coorientador(a)'
@@ -36,31 +42,25 @@ export async function TeamSection() {
     })
     .from(teamMembers)
     .innerJoin(teamCategories, eq(teamMembers.categoryId, teamCategories.id))
-    .leftJoin(teamNamePrefixes, eq(teamMembers.namePrefixId, teamNamePrefixes.id))
-    .leftJoin(teamDegreeLevels, eq(teamMembers.degreeLevelId, teamDegreeLevels.id))
+    .leftJoin(
+      teamNamePrefixes,
+      eq(teamMembers.namePrefixId, teamNamePrefixes.id)
+    )
+    .leftJoin(
+      teamDegreeLevels,
+      eq(teamMembers.degreeLevelId, teamDegreeLevels.id)
+    )
     .orderBy(asc(teamCategories.title), asc(teamMembers.name))
 
-  const projectRows = await db
-    .select({
-      slug: projects.slug,
-      title: projects.title,
-      category: projects.category,
-      description: projects.description,
-      themes: projects.themes,
-      authors: projects.authors,
-      startDate: projects.startDate,
-      endDate: projects.endDate,
-      gitUrl: projects.gitUrl,
-      publicationUrl: projects.publicationUrl,
-      advisorId: projects.advisorId,
-      coAdvisorId: projects.coAdvisorId,
-      researchLeadId: projects.researchLeadId,
-    })
-    .from(projects)
+  const projectRows = await fetchProjectSummariesForEquipe()
 
   const projectsByMember = new Map<string, EquipeProjectSummary[]>()
 
-  function attachMemberProject(memberId: string | null, summary: EquipeProjectSummary, role: string) {
+  function attachMemberProject(
+    memberId: string | null,
+    summary: EquipeProjectSummary,
+    role: string
+  ) {
     if (!memberId) return
     const list = projectsByMember.get(memberId) ?? []
     const existing = list.find(x => x.slug === summary.slug)
@@ -93,7 +93,8 @@ export async function TeamSection() {
 
   for (const list of projectsByMember.values()) {
     list.sort((a, b) => {
-      const ta = new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      const ta =
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
       if (ta !== 0) return ta
       return a.title.localeCompare(b.title, 'pt-BR')
     })
@@ -104,7 +105,9 @@ export async function TeamSection() {
   if (!hasAny) {
     return (
       <div className="mt-10 w-full pb-16">
-        <p className="text-center text-sm text-white/35">Equipe em atualização.</p>
+        <p className="text-center text-sm text-white/35">
+          Equipe em atualização.
+        </p>
       </div>
     )
   }
@@ -152,8 +155,12 @@ export async function TeamSection() {
   ])
 
   sections.sort((a, b) => {
-    const pa = SECTION_TITLE_ORDER.has(a.title) ? SECTION_TITLE_ORDER.get(a.title)! : 100
-    const pb = SECTION_TITLE_ORDER.has(b.title) ? SECTION_TITLE_ORDER.get(b.title)! : 100
+    const pa = SECTION_TITLE_ORDER.has(a.title)
+      ? SECTION_TITLE_ORDER.get(a.title)!
+      : 100
+    const pb = SECTION_TITLE_ORDER.has(b.title)
+      ? SECTION_TITLE_ORDER.get(b.title)!
+      : 100
     if (pa !== pb) return pa - pb
     return a.title.localeCompare(b.title, 'pt-BR')
   })

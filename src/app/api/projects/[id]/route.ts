@@ -1,29 +1,49 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
+
 import { db } from '@/lib/db'
+import { fetchProjectHydratedById } from '@/lib/db/project-queries'
+import { syncProjectThemes } from '@/lib/db/sync-project-themes'
+import { projectCategoryManagerBadgeClasses } from '@/lib/project-category-badge'
 import { projects } from '@/lib/db/schema'
-import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
 
 type Ctx = { params: Promise<{ id: string }> }
 
+function serializeManagerProject(
+  h: NonNullable<Awaited<ReturnType<typeof fetchProjectHydratedById>>>
+) {
+  return {
+    id: h.id,
+    slug: h.slug,
+    title: h.title,
+    category: h.categoryTitle,
+    categoryId: h.categoryId,
+    categoryBadgeClass: projectCategoryManagerBadgeClasses(h.categoryColor),
+    themes: h.themes,
+    themeIds: h.themeIds,
+    description: h.description,
+    imageMimeType: h.imageMimeType,
+    pdfMimeType: h.pdfMimeType,
+    authors: h.authors,
+    startDate: h.startDate,
+    endDate: h.endDate,
+    gitUrl: h.gitUrl,
+    publicationUrl: h.publicationUrl,
+    advisorId: h.advisorId,
+    coAdvisorId: h.coAdvisorId,
+    researchLeadId: h.researchLeadId,
+    advisorName: h.advisorName,
+    coAdvisorName: h.coAdvisorName,
+    researchLeadName: h.researchLeadName,
+    updatedAt: h.updatedAt,
+  }
+}
+
 export async function GET(_: Request, { params }: Ctx) {
   const { id } = await params
-  const [row] = await db.select().from(projects).where(eq(projects.id, id))
+  const row = await fetchProjectHydratedById(id)
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-
-  const memberMap = await fetchTeamMembersDisplayMap()
-
-  return NextResponse.json({
-    ...row,
-    image: undefined,
-    pdf: undefined,
-    startDate: row.startDate.toISOString(),
-    endDate: row.endDate ? row.endDate.toISOString() : null,
-    updatedAt: row.updatedAt.toISOString(),
-    advisorName: row.advisorId ? (memberMap[row.advisorId] ?? null) : null,
-    coAdvisorName: row.coAdvisorId ? (memberMap[row.coAdvisorId] ?? null) : null,
-    researchLeadName: row.researchLeadId ? (memberMap[row.researchLeadId] ?? null) : null,
-  })
+  return NextResponse.json(serializeManagerProject(row))
 }
 
 export async function PUT(req: Request, { params }: Ctx) {
@@ -32,24 +52,38 @@ export async function PUT(req: Request, { params }: Ctx) {
 
   const slug = (fd.get('slug') as string | null)?.trim()
   const title = (fd.get('title') as string | null)?.trim()
-  const category = (fd.get('category') as string | null)?.trim()
-  const themesRaw = fd.getAll('themes') as string[]
+  const categoryId = (fd.get('categoryId') as string | null)?.trim()
+  const themeIds = (fd.getAll('themeIds') as string[])
+    .map(t => t.trim())
+    .filter(Boolean)
   const description = (fd.get('description') as string | null)?.trim()
   const outrosRaw = (fd.get('authors') as string | null) ?? ''
   const startDateStr = (fd.get('startDate') as string | null)?.trim()
   const endDateStr = (fd.get('endDate') as string | null)?.trim()
   const gitUrl = (fd.get('gitUrl') as string | null)?.trim() || null
-  const publicationUrl = (fd.get('publicationUrl') as string | null)?.trim() || null
+  const publicationUrl =
+    (fd.get('publicationUrl') as string | null)?.trim() || null
   const advisorId = (fd.get('advisorId') as string | null)?.trim() || null
   const coAdvisorId = (fd.get('coAdvisorId') as string | null)?.trim() || null
-  const researchLeadId = (fd.get('researchLeadId') as string | null)?.trim() || null
+  const researchLeadId =
+    (fd.get('researchLeadId') as string | null)?.trim() || null
   const imageFile = fd.get('image') as File | null
   const removeImage = fd.get('removeImage') === 'true'
   const pdfFile = fd.get('pdf') as File | null
   const removePdf = fd.get('removePdf') === 'true'
 
-  if (!slug || !title || !category || !description || !startDateStr) {
-    return NextResponse.json({ error: 'Campos obrigatórios faltando.' }, { status: 400 })
+  if (!slug || !title || !categoryId || !description || !startDateStr) {
+    return NextResponse.json(
+      { error: 'Campos obrigatórios faltando.' },
+      { status: 400 }
+    )
+  }
+
+  if (themeIds.length === 0) {
+    return NextResponse.json(
+      { error: 'Selecione ao menos um tema.' },
+      { status: 400 }
+    )
   }
 
   const authors = outrosRaw
@@ -60,8 +94,7 @@ export async function PUT(req: Request, { params }: Ctx) {
   const update: Record<string, unknown> = {
     slug,
     title,
-    category,
-    themes: themesRaw,
+    categoryId,
     description,
     authors,
     startDate: new Date(startDateStr),
@@ -91,6 +124,7 @@ export async function PUT(req: Request, { params }: Ctx) {
   }
 
   await db.update(projects).set(update).where(eq(projects.id, id))
+  await syncProjectThemes(id, themeIds)
   return NextResponse.json({ ok: true })
 }
 

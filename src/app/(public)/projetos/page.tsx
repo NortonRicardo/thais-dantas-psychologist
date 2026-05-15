@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
-import { db } from '@/lib/db'
-import { projects } from '@/lib/db/schema'
-import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
+import {
+  fetchProjectThemesCatalog,
+  fetchProjectsHydrated,
+} from '@/lib/db/project-queries'
 import { PublicPageShell } from '../_components/public-page-shell'
-import { ProjectsGrid } from './_components/projects-grid'
+import {
+  ProjectsGrid,
+  type ThemeFilterOption,
+} from './_components/projects-grid'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,45 +19,49 @@ export const metadata: Metadata = {
     'Projetos de pesquisa, TCC, mestrado e plataformas do ecossistema LEMM — PUC Goiás.',
 }
 
-async function fetchProjects() {
-  const rows = await db
-    .select({
-      id: projects.id,
-      slug: projects.slug,
-      title: projects.title,
-      category: projects.category,
-      themes: projects.themes,
-      description: projects.description,
-      imageMimeType: projects.imageMimeType,
-      pdfMimeType: projects.pdfMimeType,
-      authors: projects.authors,
-      startDate: projects.startDate,
-      endDate: projects.endDate,
-      gitUrl: projects.gitUrl,
-      publicationUrl: projects.publicationUrl,
-      advisorId: projects.advisorId,
-      coAdvisorId: projects.coAdvisorId,
-      researchLeadId: projects.researchLeadId,
-      updatedAt: projects.updatedAt,
-    })
-    .from(projects)
-    .orderBy(projects.startDate)
-
-  const memberMap = await fetchTeamMembersDisplayMap()
-
-  return rows.map(r => ({
-    ...r,
-    startDate: r.startDate.toISOString(),
-    endDate: r.endDate ? r.endDate.toISOString() : null,
-    updatedAt: r.updatedAt.toISOString(),
-    advisorName: r.advisorId ? (memberMap[r.advisorId] ?? null) : null,
-    coAdvisorName: r.coAdvisorId ? (memberMap[r.coAdvisorId] ?? null) : null,
-    researchLeadName: r.researchLeadId ? (memberMap[r.researchLeadId] ?? null) : null,
+function mapToPublicProjects(
+  rows: Awaited<ReturnType<typeof fetchProjectsHydrated>>
+) {
+  return rows.map(h => ({
+    id: h.id,
+    slug: h.slug,
+    title: h.title,
+    category: h.categoryTitle,
+    categoryChipBg: h.categoryChipBg,
+    categoryChipBorder: h.categoryChipBorder,
+    categoryChipText: h.categoryChipText,
+    themes: h.themes,
+    themeTags: h.themeTags,
+    description: h.description,
+    imageMimeType: h.imageMimeType,
+    pdfMimeType: h.pdfMimeType,
+    authors: h.authors,
+    startDate: h.startDate,
+    endDate: h.endDate,
+    gitUrl: h.gitUrl,
+    publicationUrl: h.publicationUrl,
+    advisorName: h.advisorName,
+    coAdvisorName: h.coAdvisorName,
+    researchLeadName: h.researchLeadName,
+    updatedAt: h.updatedAt,
   }))
 }
 
 export default async function ProjetosPage() {
-  const data = await fetchProjects()
+  const [hydrated, themeRows] = await Promise.all([
+    fetchProjectsHydrated(),
+    fetchProjectThemesCatalog(),
+  ])
+
+  const data = mapToPublicProjects(hydrated)
+  const themeFilters: ThemeFilterOption[] = themeRows.map(t => ({
+    slug: t.slug,
+    name: t.name,
+    filterBg: t.filterBg,
+    filterBorder: t.filterBorder,
+    filterText: t.filterText,
+    filterActiveBg: t.filterActiveBg,
+  }))
 
   return (
     <PublicPageShell
@@ -62,7 +70,7 @@ export default async function ProjetosPage() {
       lead="Pesquisas, TCCs, dissertações e plataformas desenvolvidas no ecossistema LEMM."
       fullWidthContent={
         <Suspense>
-          <ProjectsGrid projects={data} />
+          <ProjectsGrid projects={data} themeFilters={themeFilters} />
         </Suspense>
       }
     />

@@ -6,6 +6,7 @@ import {
   boolean,
   integer,
   customType,
+  primaryKey,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
@@ -252,17 +253,59 @@ export const teamMembers = pgTable('team_members', {
 export type TeamMember = typeof teamMembers.$inferSelect
 export type NewTeamMember = typeof teamMembers.$inferInsert
 
+/** Categorias de projetos (TCC, Plataforma, …) — CRUD no gestor */
+export const projectCategories = pgTable('project_categories', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull().unique(),
+  /** Classes Tailwind para selos no gestor (ex.: bg-sky-500/15 text-sky-300 border-sky-500/30) */
+  color: text('color').notNull(),
+  /** Estilos inline do selo na página pública (rgba) */
+  chipBg: text('chip_bg').notNull(),
+  chipBorder: text('chip_border').notNull(),
+  chipText: text('chip_text').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type ProjectCategory = typeof projectCategories.$inferSelect
+export type NewProjectCategory = typeof projectCategories.$inferInsert
+
+/** Temas transversais (Clima, Matemática, …) — CRUD no gestor */
+export const projectThemes = pgTable('project_themes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull().unique(),
+  /** Slug estável para query ?tema= na página pública */
+  slug: text('slug').notNull().unique(),
+  color: text('color').notNull(),
+  pillColor: text('pill_color').notNull(),
+  /** Estilos dos botões de filtro na página pública /projetos */
+  filterBg: text('filter_bg').notNull(),
+  filterBorder: text('filter_border').notNull(),
+  filterText: text('filter_text').notNull(),
+  filterActiveBg: text('filter_active_bg').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type ProjectTheme = typeof projectThemes.$inferSelect
+export type NewProjectTheme = typeof projectThemes.$inferInsert
+
 /** Projetos de pesquisa, TCC, dissertações e plataformas do LEMM */
 export const projects = pgTable('projects', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
   title: text('title').notNull(),
-  /** 'TCC' | 'Iniciação Científica' | 'Mestrado' | 'Plataforma' | 'Pesquisa' */
-  category: text('category').notNull(),
-  themes: text('themes')
-    .array()
+  categoryId: uuid('category_id')
     .notNull()
-    .default(sql`ARRAY[]::text[]`),
+    .references(() => projectCategories.id, { onDelete: 'restrict' }),
   description: text('description').notNull(),
   image: bytea('image'),
   imageMimeType: text('image_mime_type'),
@@ -296,6 +339,21 @@ export const projects = pgTable('projects', {
 
 export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
+
+export const projectProjectThemes = pgTable(
+  'project_project_themes',
+  {
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    themeId: uuid('theme_id')
+      .notNull()
+      .references(() => projectThemes.id, { onDelete: 'cascade' }),
+  },
+  t => ({
+    pk: primaryKey({ columns: [t.projectId, t.themeId] }),
+  })
+)
 
 /** Tipos de evento gerenciados pelo gestor (ex: Palestra, Workshop) */
 export const eventTypes = pgTable('event_types', {
