@@ -6,7 +6,6 @@ import { db } from '@/lib/db'
 import { projects, teamMembers } from '@/lib/db/schema'
 import { LabSceneShell } from '../../_components/lab-scene-shell'
 import { LabPublicHeader } from '../../_components/lab-public-header'
-import { PublicFooter } from '../../_components/public-footer'
 import { ProjectDetail } from './_components/project-detail'
 
 export const dynamic = 'force-dynamic'
@@ -62,7 +61,6 @@ export default async function ProjectPage({ params }: Props) {
           <ProjectDetail project={project} />
         </div>
       </LabSceneShell>
-      <PublicFooter />
     </>
   )
 }

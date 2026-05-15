@@ -1,10 +1,16 @@
+'use client'
+
+import { useRef, useState } from 'react'
 import {
   CalendarDays,
+  ChevronDown,
   ExternalLink,
   MapPin,
   Mic,
+  Search,
   Users,
   Video,
+  X,
 } from 'lucide-react'
 import { COLOR_HEX_MAP } from '@/components/constants/colors'
 import type { PublicEventTypeData } from '@/lib/http/events'
@@ -296,10 +302,102 @@ function EventCard({ event, colorMap }: { event: PublicEvent; colorMap: ColorMap
   )
 }
 
+function TypeFilterPopover({
+  value,
+  onChange,
+  types,
+  colorMap,
+}: {
+  value: string
+  onChange: (v: string) => void
+  types: PublicEventTypeData[]
+  colorMap: ColorMap
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const filtered = types.filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
+
+  function select(v: string) { onChange(v); setOpen(false); setSearch('') }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => { setOpen(o => !o); setTimeout(() => inputRef.current?.focus(), 0) }}
+        className="flex w-48 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10"
+      >
+        {value ? (
+          <span className="flex items-center gap-2 text-white/80">
+            <span className="h-2 w-2 rounded-full" style={{ background: colorMap[value]?.text ?? '#fff' }} />
+            {value}
+          </span>
+        ) : (
+          <span className="text-white/40">Tipo</span>
+        )}
+        <ChevronDown size={13} className="text-white/30" />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl">
+            <div className="border-b border-white/10 p-2">
+              <div className="relative">
+                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+                <input
+                  ref={inputRef}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Buscar…"
+                  className="w-full rounded-lg bg-white/5 py-1.5 pl-7 pr-2 text-sm text-white/80 placeholder:text-white/25 outline-none"
+                />
+              </div>
+            </div>
+            <div className="max-h-52 overflow-y-auto p-1">
+              <button
+                type="button"
+                onClick={() => select('')}
+                className={`w-full rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
+              >
+                Todos os tipos
+              </button>
+              {filtered.map(t => (
+                <button
+                  key={t.name}
+                  type="button"
+                  onClick={() => select(t.name)}
+                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === t.name ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                >
+                  <span className="h-2 w-2 rounded-full shrink-0" style={{ background: colorMap[t.name]?.text ?? '#fff' }} />
+                  {t.name}
+                </button>
+              ))}
+              {filtered.length === 0 && <p className="py-2 text-center text-xs text-white/25">Sem resultados</p>}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 type Props = { events: PublicEvent[]; eventTypes: PublicEventTypeData[] }
 
 export function EventsSection({ events, eventTypes }: Props) {
   const colorMap = buildTypeColorMap(eventTypes)
+  const [filterTitle, setFilterTitle] = useState('')
+  const [filterType, setFilterType] = useState('')
+
+  const hasFilters = filterTitle || filterType
+
+  function applyFilters(list: PublicEvent[]) {
+    return list.filter(e => {
+      if (filterTitle && !e.title.toLowerCase().includes(filterTitle.toLowerCase())) return false
+      if (filterType && e.type !== filterType) return false
+      return true
+    })
+  }
 
   const featuredList = events
     .filter(e => e.featured)
@@ -307,14 +405,64 @@ export function EventsSection({ events, eventTypes }: Props) {
   const rest = events
     .filter(e => !e.featured)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  const upcoming = rest.filter(e => !isPast(e.date))
-  const past = rest.filter(e => isPast(e.date))
+  const upcoming = applyFilters(rest.filter(e => !isPast(e.date)))
+  const past = applyFilters(rest.filter(e => isPast(e.date)))
 
   return (
-    <div className="mt-8 flex w-full flex-col gap-10 pb-16">
-      {featuredList.map(event => (
-        <FeaturedCard key={event.id} event={event} colorMap={colorMap} />
-      ))}
+    <div className="flex w-full flex-col gap-10 pb-16">
+      {/* Header row: title+lead on left, filters on right */}
+      <div className="flex flex-wrap items-end justify-between gap-4 pt-2">
+        <div>
+          <h1 className="mb-2 text-xl font-black uppercase tracking-tight text-white sm:text-2xl [font-family:var(--font-orbitron),sans-serif]">
+            Eventos
+          </h1>
+          <p className="max-w-prose text-base leading-relaxed text-slate-300">
+            Conferências, workshops, seminários e desafios científicos do ecossistema LEMM.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <input
+              type="text"
+              value={filterTitle}
+              onChange={e => setFilterTitle(e.target.value)}
+              placeholder="Buscar por título…"
+              className="w-[26rem] rounded-xl border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/35 outline-none backdrop-blur-sm focus:border-white/20"
+            />
+            {filterTitle && (
+              <button onClick={() => setFilterTitle('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60">
+                <X size={12} />
+              </button>
+            )}
+          </div>
+
+          <TypeFilterPopover
+            value={filterType}
+            onChange={setFilterType}
+            types={eventTypes}
+            colorMap={colorMap}
+          />
+
+          <button
+            type="button"
+            disabled={!hasFilters}
+            onClick={() => {
+              setFilterTitle('')
+              setFilterType('')
+            }}
+            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/40 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white/60 disabled:cursor-not-allowed disabled:text-white/20 disabled:opacity-50 disabled:hover:bg-white/5"
+          >
+            <X size={12} /> Limpar
+          </button>
+        </div>
+      </div>
+
+      {!hasFilters &&
+        featuredList.map(event => (
+          <FeaturedCard key={event.id} event={event} colorMap={colorMap} />
+        ))}
 
       {upcoming.length > 0 && (
         <div>
@@ -340,6 +488,12 @@ export function EventsSection({ events, eventTypes }: Props) {
             ))}
           </div>
         </div>
+      )}
+
+      {hasFilters && upcoming.length === 0 && past.length === 0 && (
+        <p className="mt-4 text-center text-sm text-white/30">
+          Nenhum evento encontrado para os filtros aplicados.
+        </p>
       )}
 
       {events.length === 0 && (

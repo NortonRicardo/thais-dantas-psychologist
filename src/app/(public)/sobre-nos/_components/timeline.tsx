@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils'
+
 const glass = {
   background:
     'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
@@ -69,13 +71,16 @@ export function Timeline({ entries }: Props) {
       <div className="relative flex flex-col items-center">
         <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-linear-to-b from-transparent via-white/20 to-transparent" />
 
-        <div className="flex w-full flex-col gap-12">
+        <div className="flex w-full flex-col">
           {entries.map((event, i) => {
             const isLeft = i % 2 === 0
             return (
               <div
                 key={event.id}
-                className="relative flex items-center justify-center gap-0"
+                className={cn(
+                  'relative flex items-center justify-center gap-0',
+                  i > 0 && '-mt-4'
+                )}
               >
                 <div className="flex w-1/2 justify-end pr-8">
                   {isLeft ? (

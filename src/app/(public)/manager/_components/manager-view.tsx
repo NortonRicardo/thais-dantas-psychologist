@@ -2,7 +2,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { LabSceneShell } from '../../_components/lab-scene-shell'
-import { PublicFooter } from '../../_components/public-footer'
 import { cn } from '@/lib/utils'
 
 const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'
@@ -102,7 +101,6 @@ export function ManagerView() {
           </div>
         </div>
       </LabSceneShell>
-      <PublicFooter />
     </>
   )
 }

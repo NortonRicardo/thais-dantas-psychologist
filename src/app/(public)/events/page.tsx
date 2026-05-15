@@ -18,8 +18,6 @@ export default async function EventsPage() {
   return (
     <PublicPageShell
       aria-label="Eventos LEMM"
-      title="Eventos"
-      lead="Conferências, workshops, seminários e desafios científicos do ecossistema LEMM."
       fullWidthContent={<EventsSection events={data} eventTypes={types} />}
     />
   )
