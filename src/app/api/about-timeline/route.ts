@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { asc } from 'drizzle-orm'
 import { parseMonthInputToUtcDate } from '@/lib/about-timeline-date'
 import { db } from '@/lib/db'
 import { aboutTimelineEntries } from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
+import { parseAboutTimelineForm } from '@/lib/validation/about-timeline-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
@@ -31,20 +33,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData()
+    const parsed = parseAboutTimelineForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    const monthRaw = (fd.get('date') as string)?.trim()
-    const title = (fd.get('title') as string)?.trim()
-    const description = (fd.get('description') as string)?.trim()
-
-    const date = parseMonthInputToUtcDate(monthRaw ?? '')
-    if (!date || !title || !description) {
-      return NextResponse.json(
-        {
-          error: 'Campos obrigatórios faltando ou data inválida (use mês/ano).',
-        },
-        { status: 400 }
-      )
-    }
+    const date = parseMonthInputToUtcDate(parsed.data.date)!
+    const { title, description } = parsed.data
 
     const [created] = await db
       .insert(aboutTimelineEntries)
