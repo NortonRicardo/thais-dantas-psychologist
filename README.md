@@ -160,6 +160,215 @@ make prod-seed
 
 ---
 
+## Segurança em Produção
+
+Checklist obrigatório antes de qualquer acesso público. Dividido entre configurações do **servidor (Contabo)** e do **Coolify**.
+
+---
+
+### Servidor (Contabo)
+
+#### 1. Firewall com UFW
+
+Bloquear tudo exceto SSH, HTTP e HTTPS:
+
+```bash
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22/tcp        # ou a porta SSH customizada
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw enable
+ufw status verbose
+```
+
+> A porta `5432` (PostgreSQL) **não deve** estar exposta. O banco só é acessível internamente via rede Docker.
+
+#### 2. Endurecer o SSH
+
+Editar `/etc/ssh/sshd_config`:
+
+```
+Port 2222                        # trocar para porta não-padrão
+PermitRootLogin no
+PasswordAuthentication no        # apenas chave pública
+PubkeyAuthentication yes
+MaxAuthTries 3
+```
+
+Reiniciar o serviço:
+
+```bash
+systemctl restart sshd
+```
+
+> Antes de desabilitar senha, garantir que a chave pública está em `~/.ssh/authorized_keys`.
+
+#### 3. Fail2Ban
+
+Instalar e configurar proteção contra brute force:
+
+```bash
+apt install fail2ban -y
+```
+
+Criar `/etc/fail2ban/jail.local`:
+
+```ini
+[DEFAULT]
+bantime  = 3600
+findtime = 600
+maxretry = 5
+
+[sshd]
+enabled = true
+port    = 2222          # mesma porta do SSH acima
+
+[nginx-http-auth]
+enabled = true
+port    = http,https
+filter  = nginx-http-auth
+logpath = /var/log/nginx/error.log
+
+[nginx-limit-req]
+enabled = true
+port    = http,https
+filter  = nginx-limit-req
+logpath = /var/log/nginx/error.log
+maxretry = 10
+bantime  = 600
+```
+
+```bash
+systemctl enable fail2ban
+systemctl start fail2ban
+fail2ban-client status
+```
+
+#### 4. Verificar exposição do `.git`
+
+```bash
+curl -s https://seu-dominio.com/.git/config
+# Se retornar conteúdo → CRÍTICO, o repositório está exposto
+```
+
+Se estiver exposto, bloquear imediatamente no Nginx (ver seção Coolify abaixo) e **revogar e regenerar todos os tokens de acesso ao repositório**.
+
+---
+
+### Coolify
+
+#### 5. Bloquear acesso externo ao painel do Coolify
+
+O painel do Coolify (porta 8000 ou 3000) não deve estar acessível pela internet. Restringir via UFW:
+
+```bash
+ufw deny 8000/tcp
+ufw deny 8080/tcp
+```
+
+Acesse o painel apenas via **SSH tunnel**:
+
+```bash
+ssh -L 8000:localhost:8000 usuario@servidor -p 2222
+# Depois abrir http://localhost:8000 no browser local
+```
+
+#### 6. Configuração Nginx no Coolify
+
+No Coolify, em **Configurações → Custom Nginx Config** (ou via arquivo de proxy reverso), adicionar:
+
+```nginx
+# Bloquear acesso ao .git
+location ~ /\.git {
+    deny all;
+    return 404;
+}
+
+# Bloquear acesso a arquivos ocultos
+location ~ /\. {
+    deny all;
+    return 403;
+}
+
+# Desabilitar directory listing
+autoindex off;
+
+# Assets estáticos do Next.js — cache longo + sem indexação
+location /_next/static/ {
+    add_header X-Robots-Tag "noindex, nofollow" always;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    access_log off;
+}
+
+# Bloquear acesso direto à porta do banco (camada extra)
+location ~ ^/(5432|5433) {
+    deny all;
+    return 403;
+}
+```
+
+#### 7. Verificar o diretório `/media`
+
+O pentester identificou conteúdo acessível em `../media`. Verificar:
+
+```bash
+# No servidor, checar se há diretório media exposto
+ls -la /var/www/
+ls -la /opt/coolify/
+
+# Confirmar que o Nginx não serve nenhum alias com caminho relativo
+grep -r "alias\|root\|media" /etc/nginx/sites-enabled/
+```
+
+Garantir que o `root` do Nginx aponta **apenas** para o diretório da aplicação, sem paths com `..`.
+
+---
+
+### DNS / Domínio
+
+#### 8. Cloudflare (recomendado)
+
+Colocar o domínio atrás do Cloudflare oculta o IP real do servidor e ativa WAF automático:
+
+1. Criar conta em [cloudflare.com](https://cloudflare.com)
+2. Adicionar o domínio e apontar os **nameservers** para o Cloudflare
+3. Garantir que o proxy está ativo (ícone laranja ☁️) para os registros A/CNAME
+4. Em **Security → WAF**: ativar regras gerenciadas (plano Free já inclui proteção básica)
+5. Em **SSL/TLS**: modo **Full (strict)**
+
+#### 9. Privacy Protection no Whois
+
+O email do registrante fica público no Whois e pode ser alvo de phishing.
+
+- **Registro.br**: no painel, atualizar contato para email da organização ou ativar proteção de dados
+- **GoDaddy / Namecheap**: ativar **Domain Privacy / WHOIS Privacy** (geralmente gratuito)
+
+Verificar exposição atual:
+
+```bash
+whois seu-dominio.com | grep -i "email\|registrant"
+```
+
+---
+
+### Checklist rápido
+
+| Item | Onde | Prioridade |
+| ---- | ---- | ---------- |
+| UFW bloqueando todas as portas exceto 80, 443, SSH | Servidor | CRÍTICO |
+| Porta `5432` não exposta externamente | Servidor / docker-compose.yml | CRÍTICO |
+| `.git` bloqueado no Nginx | Coolify | CRÍTICO |
+| SSH apenas por chave pública, porta não-padrão | Servidor | ALTO |
+| Fail2Ban instalado e ativo | Servidor | ALTO |
+| Painel Coolify inacessível externamente | Servidor | ALTO |
+| Cloudflare na frente do domínio | DNS | ALTO |
+| Verificar e corrigir exposição do `/media` | Servidor | ALTO |
+| `autoindex off` no Nginx | Coolify | MÉDIO |
+| Privacy Protection no Whois | Registrador | MÉDIO |
+
+---
+
 ## Estrutura de rotas
 
 ### Público

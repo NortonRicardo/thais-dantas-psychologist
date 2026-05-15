@@ -7,6 +7,7 @@ import {
   integer,
   customType,
   primaryKey,
+  index,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
@@ -31,49 +32,61 @@ export const eventOrganizations = pgTable('event_organizations', {
 export type EventOrganization = typeof eventOrganizations.$inferSelect
 export type NewEventOrganization = typeof eventOrganizations.$inferInsert
 
-export const events = pgTable('events', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  date: timestamp('date', { withTimezone: true }).notNull(),
-  type: text('type').notNull(), // 'Palestra' | 'Minicurso' | 'Mesa-Redonda' | 'Workshop' | 'Defesa' | 'Encontro'
-  speakerMemberId: uuid('speaker_member_id').references(() => teamMembers.id, {
-    onDelete: 'set null',
-  }),
-  organizationId: uuid('organization_id').references(
-    () => eventOrganizations.id,
-    { onDelete: 'set null' }
-  ),
-  link: text('link'),
-  meetLink: text('meet_link'),
-  recordingLink: text('recording_link'),
-  featured: boolean('featured').default(false).notNull(),
-  image: bytea('image'),
-  imageMimeType: text('image_mime_type'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-})
+export const events = pgTable(
+  'events',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    date: timestamp('date', { withTimezone: true }).notNull(),
+    type: text('type').notNull(),
+    speakerMemberId: uuid('speaker_member_id').references(() => teamMembers.id, {
+      onDelete: 'set null',
+    }),
+    organizationId: uuid('organization_id').references(
+      () => eventOrganizations.id,
+      { onDelete: 'set null' }
+    ),
+    link: text('link'),
+    meetLink: text('meet_link'),
+    recordingLink: text('recording_link'),
+    featured: boolean('featured').default(false).notNull(),
+    image: bytea('image'),
+    imageMimeType: text('image_mime_type'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [
+    index('idx_events_date').on(t.date),
+    index('idx_events_featured').on(t.featured),
+    index('idx_events_organization_id').on(t.organizationId),
+  ]
+)
 
 export type Event = typeof events.$inferSelect
 export type NewEvent = typeof events.$inferInsert
 
 /** Marcos da linha do tempo na página Sobre Nós (mês/ano; ordenação pela data) */
-export const aboutTimelineEntries = pgTable('about_timeline_entries', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  date: timestamp('date', { withTimezone: true }).notNull(),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-})
+export const aboutTimelineEntries = pgTable(
+  'about_timeline_entries',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    date: timestamp('date', { withTimezone: true }).notNull(),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [index('idx_timeline_date').on(t.date)]
+)
 
 export type AboutTimelineEntry = typeof aboutTimelineEntries.$inferSelect
 export type NewAboutTimelineEntry = typeof aboutTimelineEntries.$inferInsert
@@ -130,23 +143,27 @@ export type Hardware = typeof hardware.$inferSelect
 export type NewHardware = typeof hardware.$inferInsert
 
 /** Módulos do hardware (título + ícone + descrição; ordem pelo índice na lista) */
-export const hardwareModules = pgTable('hardware_modules', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  hardwareId: uuid('hardware_id')
-    .notNull()
-    .references(() => hardware.id, { onDelete: 'cascade' }),
-  title: text('title').notNull().default(''),
-  /** Vazio = sem ícone na UI */
-  iconKey: text('icon_key').notNull().default(''),
-  description: text('description').notNull(),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-})
+export const hardwareModules = pgTable(
+  'hardware_modules',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    hardwareId: uuid('hardware_id')
+      .notNull()
+      .references(() => hardware.id, { onDelete: 'cascade' }),
+    title: text('title').notNull().default(''),
+    /** Vazio = sem ícone na UI */
+    iconKey: text('icon_key').notNull().default(''),
+    description: text('description').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [index('idx_hardware_modules_hardware_id').on(t.hardwareId, t.sortOrder)]
+)
 
 export type HardwareModule = typeof hardwareModules.$inferSelect
 export type NewHardwareModule = typeof hardwareModules.$inferInsert
@@ -171,22 +188,26 @@ export type ContactInfo = typeof contactInfo.$inferSelect
 export type NewContactInfo = typeof contactInfo.$inferInsert
 
 /** Canais de contato dinâmicos (e-mail, telefone, redes sociais, etc.) */
-export const contactChannels = pgTable('contact_channels', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  contactInfoId: uuid('contact_info_id')
-    .notNull()
-    .references(() => contactInfo.id, { onDelete: 'cascade' }),
-  label: text('label').notNull(),
-  iconKey: text('icon_key').notNull().default('mail'),
-  value: text('value').notNull(),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-})
+export const contactChannels = pgTable(
+  'contact_channels',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    contactInfoId: uuid('contact_info_id')
+      .notNull()
+      .references(() => contactInfo.id, { onDelete: 'cascade' }),
+    label: text('label').notNull(),
+    iconKey: text('icon_key').notNull().default('mail'),
+    value: text('value').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [index('idx_contact_channels_info_id').on(t.contactInfoId, t.sortOrder)]
+)
 
 export type ContactChannel = typeof contactChannels.$inferSelect
 export type NewContactChannel = typeof contactChannels.$inferInsert
@@ -239,38 +260,46 @@ export type TeamDegreeLevel = typeof teamDegreeLevels.$inferSelect
 export type NewTeamDegreeLevel = typeof teamDegreeLevels.$inferInsert
 
 /** Membros da equipe exibidos na página pública /equipe */
-export const teamMembers = pgTable('team_members', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  categoryId: uuid('category_id')
-    .notNull()
-    .references(() => teamCategories.id, { onDelete: 'restrict' }),
-  namePrefixId: uuid('name_prefix_id').references(() => teamNamePrefixes.id, {
-    onDelete: 'set null',
-  }),
-  degreeLevelId: uuid('degree_level_id').references(() => teamDegreeLevels.id, {
-    onDelete: 'set null',
-  }),
-  /** Instituição de formação principal (faculdade, centro, INPE, …) */
-  formationInstitution: text('formation_institution'),
-  name: text('name').notNull(),
-  /** Área, cargo ou resumo profissional (complementa grau + instituição) */
-  qualification: text('qualification').notNull(),
-  description: text('description'),
-  /** Se false, oculto na equipe pública; mantém vínculos em projetos. */
-  active: boolean('active').default(true).notNull(),
-  /** URL completa do perfil (https://www.linkedin.com/in/…) */
-  linkedinUrl: text('linkedin_url'),
-  /** Currículo Lattes (lattes.cnpq.br ou buscatextual.cnpq.br) */
-  lattesUrl: text('lattes_url'),
-  photo: bytea('photo'),
-  photoMimeType: text('photo_mime_type'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-})
+export const teamMembers = pgTable(
+  'team_members',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    categoryId: uuid('category_id')
+      .notNull()
+      .references(() => teamCategories.id, { onDelete: 'restrict' }),
+    namePrefixId: uuid('name_prefix_id').references(() => teamNamePrefixes.id, {
+      onDelete: 'set null',
+    }),
+    degreeLevelId: uuid('degree_level_id').references(
+      () => teamDegreeLevels.id,
+      { onDelete: 'set null' }
+    ),
+    /** Instituição de formação principal (faculdade, centro, INPE, …) */
+    formationInstitution: text('formation_institution'),
+    name: text('name').notNull(),
+    /** Área, cargo ou resumo profissional (complementa grau + instituição) */
+    qualification: text('qualification').notNull(),
+    description: text('description'),
+    /** Se false, oculto na equipe pública; mantém vínculos em projetos. */
+    active: boolean('active').default(true).notNull(),
+    /** URL completa do perfil (https://www.linkedin.com/in/…) */
+    linkedinUrl: text('linkedin_url'),
+    /** Currículo Lattes (lattes.cnpq.br ou buscatextual.cnpq.br) */
+    lattesUrl: text('lattes_url'),
+    photo: bytea('photo'),
+    photoMimeType: text('photo_mime_type'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [
+    index('idx_team_members_category_id').on(t.categoryId),
+    index('idx_team_members_active').on(t.active),
+  ]
+)
 
 export type TeamMember = typeof teamMembers.$inferSelect
 export type NewTeamMember = typeof teamMembers.$inferInsert
@@ -321,43 +350,50 @@ export type ProjectTheme = typeof projectThemes.$inferSelect
 export type NewProjectTheme = typeof projectThemes.$inferInsert
 
 /** Projetos de pesquisa, TCC, dissertações e plataformas do LEMM */
-export const projects = pgTable('projects', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  slug: text('slug').notNull().unique(),
-  title: text('title').notNull(),
-  categoryId: uuid('category_id')
-    .notNull()
-    .references(() => projectCategories.id, { onDelete: 'restrict' }),
-  description: text('description').notNull(),
-  image: bytea('image'),
-  imageMimeType: text('image_mime_type'),
-  authors: text('authors')
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  startDate: timestamp('start_date', { withTimezone: true }).notNull(),
-  endDate: timestamp('end_date', { withTimezone: true }),
-  gitUrl: text('git_url'),
-  publicationUrl: text('publication_url'),
-  advisorId: uuid('advisor_id').references(() => teamMembers.id, {
-    onDelete: 'set null',
-  }),
-  coAdvisorId: uuid('co_advisor_id').references(() => teamMembers.id, {
-    onDelete: 'set null',
-  }),
-  researchLeadId: uuid('research_lead_id').references(() => teamMembers.id, {
-    onDelete: 'set null',
-  }),
-  pdf: bytea('pdf'),
-  pdfMimeType: text('pdf_mime_type'),
-  pdfPath: text('pdf_path'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-})
+export const projects = pgTable(
+  'projects',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    slug: text('slug').notNull().unique(),
+    title: text('title').notNull(),
+    categoryId: uuid('category_id')
+      .notNull()
+      .references(() => projectCategories.id, { onDelete: 'restrict' }),
+    description: text('description').notNull(),
+    image: bytea('image'),
+    imageMimeType: text('image_mime_type'),
+    authors: text('authors')
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    startDate: timestamp('start_date', { withTimezone: true }).notNull(),
+    endDate: timestamp('end_date', { withTimezone: true }),
+    gitUrl: text('git_url'),
+    publicationUrl: text('publication_url'),
+    advisorId: uuid('advisor_id').references(() => teamMembers.id, {
+      onDelete: 'set null',
+    }),
+    coAdvisorId: uuid('co_advisor_id').references(() => teamMembers.id, {
+      onDelete: 'set null',
+    }),
+    researchLeadId: uuid('research_lead_id').references(() => teamMembers.id, {
+      onDelete: 'set null',
+    }),
+    pdf: bytea('pdf'),
+    pdfMimeType: text('pdf_mime_type'),
+    pdfPath: text('pdf_path'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [
+    index('idx_projects_category_id').on(t.categoryId),
+    index('idx_projects_start_date').on(t.startDate),
+  ]
+)
 
 export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
@@ -372,9 +408,11 @@ export const projectProjectThemes = pgTable(
       .notNull()
       .references(() => projectThemes.id, { onDelete: 'cascade' }),
   },
-  t => ({
-    pk: primaryKey({ columns: [t.projectId, t.themeId] }),
-  })
+  t => [
+    primaryKey({ columns: [t.projectId, t.themeId] }),
+    index('idx_ppt_project_id').on(t.projectId),
+    index('idx_ppt_theme_id').on(t.themeId),
+  ]
 )
 
 /** Tipos de evento gerenciados pelo gestor (ex: Palestra, Workshop) */
@@ -408,18 +446,22 @@ export const authUsers = pgTable('auth_user', {
   displayUsername: text('display_username'),
 })
 
-export const authSessions = pgTable('auth_session', {
-  id: text('id').primaryKey(),
-  expiresAt: timestamp('expires_at').notNull(),
-  token: text('token').notNull().unique(),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  userId: text('user_id')
-    .notNull()
-    .references(() => authUsers.id, { onDelete: 'cascade' }),
-})
+export const authSessions = pgTable(
+  'auth_session',
+  {
+    id: text('id').primaryKey(),
+    expiresAt: timestamp('expires_at').notNull(),
+    token: text('token').notNull().unique(),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    userId: text('user_id')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+  },
+  t => [index('idx_auth_session_user_id').on(t.userId)]
+)
 
 export const authAccounts = pgTable('auth_account', {
   id: text('id').primaryKey(),
