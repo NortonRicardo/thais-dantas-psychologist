@@ -1,10 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { ImageIcon, Linkedin, Trash2, FileText } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -35,10 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import {
-  teamMemberQualificationFormationLine,
-} from '@/lib/team-member-display'
-import { TeamDialog, type TeamMemberRow } from './team-dialog'
+import { TeamDegreeLevelDialog, type TeamDegreeLevelRow } from './team-degree-level-dialog'
 
 const PAGE_SIZE = 10
 
@@ -50,35 +46,54 @@ function buildPages(current: number, total: number): (number | 'ellipsis')[] {
   return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', total]
 }
 
-export function TeamTable() {
-  const [rows, setRows] = useState<TeamMemberRow[]>([])
+export function TeamDegreeLevelsTable() {
+  const [rows, setRows] = useState<TeamDegreeLevelRow[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
 
-  const fetchMembers = useCallback(async () => {
+  const fetchRows = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/team')
+      const res = await fetch('/api/team/degree-levels')
       const data = await res.json()
-      setRows(data)
+      setRows(
+        data.map(
+          (r: {
+            id: string
+            label: string
+            updatedAt: string | Date
+          }) => ({
+            id: r.id,
+            label: r.label,
+            updatedAt:
+              typeof r.updatedAt === 'string'
+                ? r.updatedAt
+                : new Date(r.updatedAt).toISOString(),
+          })
+        )
+      )
     } catch {
-      toast.error('Erro ao carregar equipe.')
+      toast.error('Erro ao carregar graus acadêmicos.')
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    fetchMembers()
-  }, [fetchMembers])
+    fetchRows()
+  }, [fetchRows])
 
   async function handleDelete(id: string) {
     try {
-      await fetch(`/api/team/${id}`, { method: 'DELETE' })
-      toast.success('Membro removido.')
-      fetchMembers()
-    } catch {
-      toast.error('Erro ao remover membro.')
+      const res = await fetch(`/api/team/degree-levels/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(typeof err.error === 'string' ? err.error : 'Erro ao remover')
+      }
+      toast.success('Grau removido.')
+      fetchRows()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao remover grau.')
     }
   }
 
@@ -90,45 +105,38 @@ export function TeamTable() {
     <div className="space-y-4">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold text-white/90">Membros</h1>
+          <h1 className="text-xl font-semibold text-white/90">Graus acadêmicos</h1>
           <p className="mt-0.5 text-sm text-white/40">
-            Cadastro de pessoas exibidas na página pública da equipe.
+            Graduação, mestrado, doutorado, pós-doutorado, etc. — usados na ficha do membro e na página
+            pública.
           </p>
         </div>
         <div className="flex shrink-0 self-end sm:self-start sm:pt-0.5">
-          <TeamDialog onSuccess={fetchMembers} />
+          <TeamDegreeLevelDialog onSuccess={fetchRows} />
         </div>
       </div>
 
       <div
         className="w-full overflow-x-auto rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(255,255,255,0.1)',
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[760px] [table-layout:fixed]">
+        <Table className="min-w-[480px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
               style={{ background: 'rgba(255,255,255,0.04)' }}
             >
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[28%]">
-                Nome
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[70%]">
+                Grau
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[16%]">
-                Categoria
-              </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[14%]">
-                Grau acadêmico
-              </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[26%]">
-                Área / atuação
-              </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[30%] text-right">
                 Ações
               </TableHead>
             </TableRow>
@@ -138,7 +146,7 @@ export function TeamTable() {
             {loading &&
               Array.from({ length: 4 }).map((_, i) => (
                 <TableRow key={i} className="border-white/[0.07]">
-                  {Array.from({ length: 5 }).map((_, j) => (
+                  {Array.from({ length: 2 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-4 w-full bg-white/10" />
                     </TableCell>
@@ -148,8 +156,11 @@ export function TeamTable() {
 
             {!loading && rows.length === 0 && (
               <TableRow className="border-white/[0.07] hover:bg-transparent">
-                <TableCell colSpan={5} className="py-12 text-center text-sm text-white/30">
-                  Nenhum membro cadastrado ainda.
+                <TableCell
+                  colSpan={2}
+                  className="py-12 text-center text-sm text-white/30"
+                >
+                  Nenhum grau cadastrado ainda.
                 </TableCell>
               </TableRow>
             )}
@@ -161,86 +172,11 @@ export function TeamTable() {
                   className="border-white/[0.07] transition-colors hover:bg-white/[0.04]"
                 >
                   <TableCell className="font-medium text-white/90">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
-                        {row.photoMimeType ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`/api/team/${row.id}/photo?t=${new Date(row.updatedAt).getTime()}`}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <ImageIcon size={14} className="text-white/20" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-                        <span className="truncate block">{row.displayName}</span>
-                        {row.linkedinUrl ? (
-                          <a
-                            href={row.linkedinUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-sky-400/90 transition hover:text-sky-300"
-                            title="LinkedIn"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <Linkedin className="h-4 w-4" />
-                          </a>
-                        ) : null}
-                        {row.lattesUrl ? (
-                          <a
-                            href={row.lattesUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-teal-400/90 transition hover:text-teal-300"
-                            title="Currículo Lattes"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <FileText className="h-4 w-4" />
-                          </a>
-                        ) : null}
-                      </div>
-                    </div>
+                    <span className="text-white/80">{row.label}</span>
                   </TableCell>
-
-                  <TableCell>
-                    <Badge className="border border-white/15 bg-white/[0.06] text-[0.65rem] font-medium text-white/90">
-                      <span className="flex items-center gap-1.5">
-                        <span
-                          className={`h-2 w-2 shrink-0 rounded-full ${row.categoryColor}`}
-                        />
-                        {row.categoryTitle}
-                      </span>
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell className="text-sm text-white/55">
-                    <span className="truncate block">
-                      {row.degreeLevelLabel?.trim() ? (
-                        row.degreeLevelLabel
-                      ) : (
-                        <span className="text-white/25">—</span>
-                      )}
-                    </span>
-                  </TableCell>
-
-                  <TableCell className="text-sm text-white/55 max-w-[220px]">
-                    <div className="overflow-hidden">
-                      <span className="truncate block">
-                        {teamMemberQualificationFormationLine({
-                          qualification: row.qualification,
-                          formationInstitution: row.formationInstitution,
-                        })}
-                      </span>
-                    </div>
-                  </TableCell>
-
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <TeamDialog member={row} onSuccess={fetchMembers} />
+                      <TeamDegreeLevelDialog degreeLevel={row} onSuccess={fetchRows} />
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -253,9 +189,9 @@ export function TeamTable() {
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remover membro?</AlertDialogTitle>
+                            <AlertDialogTitle>Remover grau?</AlertDialogTitle>
                             <AlertDialogDescription className="text-white/50">
-                              &ldquo;{row.displayName}&rdquo; será removido permanentemente.
+                              &ldquo;{row.label}&rdquo; será removido permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

@@ -32,17 +32,22 @@ export type TeamMemberRow = {
   categoryColor: string
   namePrefixId: string | null
   namePrefixLabel: string | null
+  degreeLevelId: string | null
+  degreeLevelLabel: string | null
+  formationInstitution: string | null
   name: string
   displayName: string
   qualification: string
   description: string | null
   photoMimeType: string | null
   linkedinUrl: string | null
+  lattesUrl: string | null
   updatedAt: string
 }
 
 type CategoryOption = { id: string; title: string; color: string }
 type PrefixOption = { id: string; label: string }
+type DegreeLevelOption = { id: string; label: string }
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
@@ -57,14 +62,21 @@ export function TeamDialog({ member, onSuccess }: Props) {
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<CategoryOption[]>([])
   const [prefixes, setPrefixes] = useState<PrefixOption[]>([])
+  const [degreeLevels, setDegreeLevels] = useState<DegreeLevelOption[]>([])
   const [categoryId, setCategoryId] = useState(member?.categoryId ?? '')
   const [namePrefixId, setNamePrefixId] = useState(
     () => member?.namePrefixId ?? '__none__'
+  )
+  const [degreeLevelId, setDegreeLevelId] = useState(
+    () => member?.degreeLevelId ?? '__none__'
   )
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [removeImage, setRemoveImage] = useState(false)
   const [linkedinSuffix, setLinkedinSuffix] = useState(() =>
     stripUrlScheme(member?.linkedinUrl ?? '')
+  )
+  const [lattesSuffix, setLattesSuffix] = useState(() =>
+    stripUrlScheme(member?.lattesUrl ?? '')
   )
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -81,16 +93,19 @@ export function TeamDialog({ member, onSuccess }: Props) {
     let cancelled = false
     ;(async () => {
       try {
-        const [catRes, pfxRes] = await Promise.all([
+        const [catRes, pfxRes, degRes] = await Promise.all([
           fetch('/api/team/categories'),
           fetch('/api/team/prefixes'),
+          fetch('/api/team/degree-levels'),
         ])
-        if (!catRes.ok || !pfxRes.ok) throw new Error('fetch')
+        if (!catRes.ok || !pfxRes.ok || !degRes.ok) throw new Error('fetch')
         const data: CategoryOption[] = await catRes.json()
         const pfxData: PrefixOption[] = await pfxRes.json()
+        const degData: DegreeLevelOption[] = await degRes.json()
         if (cancelled) return
         setCategories(data)
         setPrefixes(pfxData)
+        setDegreeLevels(degData)
         setCategoryId(prev => {
           if (member?.categoryId) return member.categoryId
           if (prev && data.some(c => c.id === prev)) return prev
@@ -101,6 +116,13 @@ export function TeamDialog({ member, onSuccess }: Props) {
             return member.namePrefixId
           }
           if (prev !== '__none__' && pfxData.some(p => p.id === prev)) return prev
+          return '__none__'
+        })
+        setDegreeLevelId(prev => {
+          if (member?.degreeLevelId && degData.some(d => d.id === member.degreeLevelId)) {
+            return member.degreeLevelId
+          }
+          if (prev !== '__none__' && degData.some(d => d.id === prev)) return prev
           return '__none__'
         })
       } catch {
@@ -116,7 +138,9 @@ export function TeamDialog({ member, onSuccess }: Props) {
     if (newOpen) {
       setCategoryId(member?.categoryId ?? '')
       setNamePrefixId(member?.namePrefixId ?? '__none__')
+      setDegreeLevelId(member?.degreeLevelId ?? '__none__')
       setLinkedinSuffix(stripUrlScheme(member?.linkedinUrl ?? ''))
+      setLattesSuffix(stripUrlScheme(member?.lattesUrl ?? ''))
       setImagePreview(null)
       setRemoveImage(false)
     }
@@ -148,7 +172,9 @@ export function TeamDialog({ member, onSuccess }: Props) {
     const fd = new FormData(form)
     fd.set('categoryId', categoryId)
     fd.set('namePrefixId', namePrefixId === '__none__' ? '' : namePrefixId)
+    fd.set('degreeLevelId', degreeLevelId === '__none__' ? '' : degreeLevelId)
     fd.set('linkedinUrl', toHttpsStored(linkedinSuffix))
+    fd.set('lattesUrl', toHttpsStored(lattesSuffix))
     if (removeImage) fd.set('removePhoto', 'true')
 
     const url = isEdit ? `/api/team/${member.id}` : '/api/team'
@@ -198,7 +224,11 @@ export function TeamDialog({ member, onSuccess }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-2 grid gap-4">
+        <form
+          key={member?.id ?? 'new'}
+          onSubmit={handleSubmit}
+          className="mt-2 grid gap-4"
+        >
           {/* Foto — primeiro campo, centralizado, redondo */}
           <div className="flex flex-col items-center gap-3">
             <input
@@ -327,17 +357,85 @@ export function TeamDialog({ member, onSuccess }: Props) {
             </p>
           </div>
 
-          {/* Qualificação */}
+          {/* Currículo Lattes (CNPq) */}
           <div className="grid gap-1.5">
-            <Label htmlFor="qualification" className="text-white/70">Qualificação *</Label>
+            <Label htmlFor="lattesSuffix" className="text-white/70">
+              Currículo Lattes{' '}
+              <span className="text-white/35 font-normal">(opcional)</span>
+            </Label>
+            <HttpsUrlSuffixField
+              id="lattesSuffix"
+              value={lattesSuffix}
+              onChange={setLattesSuffix}
+              placeholder="lattes.cnpq.br/0000000000000000"
+            />
+            <p className="text-[0.65rem] text-white/35">
+              Aceita <span className="text-white/50">lattes.cnpq.br/…</span> ou links do{' '}
+              <span className="text-white/50">buscatextual.cnpq.br</span> (visualização do CV). O
+              endereço é salvo com https://.
+            </p>
+          </div>
+
+          {/* Grau acadêmico (CRUD em Equipe → Graus) */}
+          <div className="grid gap-1.5">
+            <Label className="text-white/70">Grau acadêmico</Label>
+            <Select value={degreeLevelId} onValueChange={setDegreeLevelId}>
+              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
+                <SelectValue
+                  placeholder={!degreeLevels.length ? 'Carregando…' : 'Nenhum'}
+                />
+              </SelectTrigger>
+              <SelectContent className="bg-[#071525] border-white/10 text-white">
+                <SelectItem
+                  value="__none__"
+                  className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                >
+                  — Nenhum —
+                </SelectItem>
+                {degreeLevels.map(d => (
+                  <SelectItem
+                    key={d.id}
+                    value={d.id}
+                    className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                  >
+                    {d.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="formationInstitution" className="text-white/70">
+              Instituição de formação{' '}
+              <span className="text-white/35 font-normal">(opcional)</span>
+            </Label>
+            <Input
+              id="formationInstitution"
+              name="formationInstitution"
+              defaultValue={member?.formationInstitution ?? ''}
+              placeholder="Ex.: PUC Goiás, INPE…"
+              className={INPUT_CLS}
+            />
+          </div>
+
+          {/* qualification = área / linha de atuação (grau vem do select) */}
+          <div className="grid gap-1.5">
+            <Label htmlFor="qualification" className="text-white/70">
+              Área / atuação *
+            </Label>
             <Input
               id="qualification"
               name="qualification"
               required
               defaultValue={member?.qualification}
-              placeholder="Doutor em Ciência da Computação"
+              placeholder="Ex.: Ciência da Computação, IA e clima…"
               className={INPUT_CLS}
             />
+            <p className="text-[0.65rem] text-white/35">
+              Use o grau acadêmico acima para Mestrado/Doutorado etc.; aqui descreva a área, o cargo
+              ou a linha de pesquisa que aparece junto do nome no site.
+            </p>
           </div>
 
           {/* Descrição */}

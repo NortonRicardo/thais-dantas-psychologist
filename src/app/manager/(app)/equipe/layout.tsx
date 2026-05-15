@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/manager/equipe/membros', label: 'Equipe' },
   { href: '/manager/equipe/categorias', label: 'Categorias' },
   { href: '/manager/equipe/tratamentos', label: 'Tratamentos' },
+  { href: '/manager/equipe/graus', label: 'Graus' },
 ] as const
 
 export default function EquipeLayout({ children }: { children: ReactNode }) {

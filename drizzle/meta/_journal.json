@@ -134,6 +134,20 @@
       "when": 1747612800000,
       "tag": "0018_team_name_prefixes",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1747699200000,
+      "tag": "0019_team_degree_levels",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1747785600000,
+      "tag": "0020_team_members_lattes_url",
+      "breakpoints": true
     }
   ]
 }

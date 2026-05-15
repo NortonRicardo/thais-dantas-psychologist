@@ -202,6 +202,21 @@ export const teamNamePrefixes = pgTable('team_name_prefixes', {
 export type TeamNamePrefix = typeof teamNamePrefixes.$inferSelect
 export type NewTeamNamePrefix = typeof teamNamePrefixes.$inferInsert
 
+/** Grau acadêmico (Graduação, Mestrado, Doutorado, …) — CRUD em /manager/equipe/graus */
+export const teamDegreeLevels = pgTable('team_degree_levels', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  label: text('label').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type TeamDegreeLevel = typeof teamDegreeLevels.$inferSelect
+export type NewTeamDegreeLevel = typeof teamDegreeLevels.$inferInsert
+
 /** Membros da equipe exibidos na página pública /equipe */
 export const teamMembers = pgTable('team_members', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -211,11 +226,19 @@ export const teamMembers = pgTable('team_members', {
   namePrefixId: uuid('name_prefix_id').references(() => teamNamePrefixes.id, {
     onDelete: 'set null',
   }),
+  degreeLevelId: uuid('degree_level_id').references(() => teamDegreeLevels.id, {
+    onDelete: 'set null',
+  }),
+  /** Instituição de formação principal (faculdade, centro, INPE, …) */
+  formationInstitution: text('formation_institution'),
   name: text('name').notNull(),
+  /** Área, cargo ou resumo profissional (complementa grau + instituição) */
   qualification: text('qualification').notNull(),
   description: text('description'),
   /** URL completa do perfil (https://www.linkedin.com/in/…) */
   linkedinUrl: text('linkedin_url'),
+  /** Currículo Lattes (lattes.cnpq.br ou buscatextual.cnpq.br) */
+  lattesUrl: text('lattes_url'),
   photo: bytea('photo'),
   photoMimeType: text('photo_mime_type'),
   createdAt: timestamp('created_at', { withTimezone: true })

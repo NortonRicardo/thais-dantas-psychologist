@@ -9,11 +9,13 @@ import {
   hardware,
   hardwareModules,
   teamCategories,
+  teamDegreeLevels,
   teamMembers,
   teamNamePrefixes,
   projects,
 } from './schema'
 import { teamMemberDisplayName } from '@/lib/team-member-display'
+import { normalizeLattesUrl } from '@/lib/team-lattes'
 
 const seedEventTypes = [
   { name: 'Conferência', iconKey: 'Presentation', color: 'bg-sky-800' },
@@ -229,6 +231,13 @@ const seedTeamNamePrefixes = [
   { label: 'Miss' },
 ] as const
 
+const seedTeamDegreeLevels = [
+  { label: 'Graduação' },
+  { label: 'Mestrado' },
+  { label: 'Doutorado' },
+  { label: 'Pós-doutorado' },
+] as const
+
 const seedCollaborationPartners = [
   {
     name: 'INPE',
@@ -253,9 +262,13 @@ type SeedTeamMemberEntry = {
   category: 'professores' | 'colaboradores' | 'convidados'
   namePrefixLabel?: string
   name: string
+  /** Rótulo cadastrado em Graus (ex.: Doutorado). Opcional. */
+  degreeLevelLabel?: (typeof seedTeamDegreeLevels)[number]['label']
+  formationInstitution?: string | null
   qualification: string
   description: string
   linkedinUrl?: string | null
+  lattesUrl?: string | null
 }
 
 const seedTeamMembers: SeedTeamMemberEntry[] = [
@@ -264,7 +277,8 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
     category: 'professores',
     namePrefixLabel: 'Dra.',
     name: 'Maria José Pereira Dantas',
-    qualification: 'Doutora em Ciência da Computação',
+    degreeLevelLabel: 'Doutorado',
+    qualification: 'Ciência da Computação',
     description:
       'Coordenadora do LEMM. Pesquisa em IA, dados climáticos e otimização.',
   },
@@ -272,7 +286,8 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
     category: 'professores',
     namePrefixLabel: 'Dr.',
     name: 'José Elmo de Menezes',
-    qualification: 'Doutor em Estatística',
+    degreeLevelLabel: 'Doutorado',
+    qualification: 'Estatística',
     description:
       'Vice-coordenador do LEMM. Apoio metodológico em estatística, modelagem quantitativa e articulação de estudos internacionais.',
   },
@@ -280,7 +295,8 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
     category: 'professores',
     namePrefixLabel: 'Prof. Dr.',
     name: 'Wanderlei Malaquias Pereira Junior',
-    qualification: 'Doutor em Engenharia de Produção',
+    degreeLevelLabel: 'Doutorado',
+    qualification: 'Engenharia de Produção',
     description:
       'Pesquisa em metaheurísticas, otimização combinatória e logística. Coorientador de ICs e colaborador no desenvolvimento da plataforma META TOOL BOX.',
   },
@@ -288,7 +304,8 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
     category: 'professores',
     namePrefixLabel: 'Prof. Dr.',
     name: 'Roussian Di Amaro Alves Gaioso',
-    qualification: 'Doutor em Ciências Atmosféricas',
+    degreeLevelLabel: 'Doutorado',
+    qualification: 'Ciências Atmosféricas',
     description:
       'Pesquisa em modelagem climática urbana, ondas de calor e HPC. Estuda modelos WRF e experimentos de alto desempenho.',
   },
@@ -296,7 +313,8 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
     category: 'professores',
     namePrefixLabel: 'Prof. Dr.',
     name: 'Felipe Veloso',
-    qualification: 'Doutor em Computação Aplicada',
+    degreeLevelLabel: 'Doutorado',
+    qualification: 'Computação Aplicada',
     description:
       'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.',
   },
@@ -311,7 +329,9 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
   {
     category: 'colaboradores',
     name: 'Salatiel A. A. Jordão',
-    qualification: 'Pesquisador em IA e Clima — Mestrando INPE',
+    degreeLevelLabel: 'Mestrado',
+    formationInstitution: 'PUC Goiás',
+    qualification: 'Computação Aplicada — INPE · IA e clima',
     description:
       'Pesquisa em Transformers para predição de precipitação no Cerrado. Egresso da PUC Goiás, mestrando em Computação Aplicada no INPE.',
   },
@@ -441,7 +461,9 @@ const seedTeamMembers: SeedTeamMemberEntry[] = [
     category: 'convidados',
     namePrefixLabel: 'Prof. Dr.',
     name: 'Antônio Zamuner',
-    qualification: 'Doutor em Engenharia de Produção — UFCAT',
+    degreeLevelLabel: 'Doutorado',
+    formationInstitution: 'UFCAT',
+    qualification: 'Engenharia de Produção',
     description:
       'Pesquisa em cadeias agroindustriais, emissões de CO₂, microclima, ondas de calor urbano, blockchain e rastreabilidade logística.',
   },
@@ -757,6 +779,7 @@ async function main() {
 
   console.warn('🌱 Seeding equipe…')
   await db.delete(teamMembers)
+  await db.delete(teamDegreeLevels)
   await db.delete(teamCategories)
   await db.delete(teamNamePrefixes)
 
@@ -776,6 +799,14 @@ async function main() {
     insertedPrefixes.map(p => [p.label, p.id])
   )
 
+  const insertedDegreeLevels = await db
+    .insert(teamDegreeLevels)
+    .values([...seedTeamDegreeLevels])
+    .returning({ id: teamDegreeLevels.id, label: teamDegreeLevels.label })
+  const labelToDegreeLevelId = Object.fromEntries(
+    insertedDegreeLevels.map(d => [d.label, d.id])
+  )
+
   const memberValues = seedTeamMembers.map(m => {
     const title = LEGACY_TEAM_CATEGORY_TITLE[m.category]
     const categoryId = title ? titleToCategoryId[title] : undefined
@@ -783,16 +814,27 @@ async function main() {
       throw new Error(`Categoria de equipe desconhecida: ${m.category}`)
     }
     const namePrefixLabel = m.namePrefixLabel?.trim() || null
+    const degLabel = m.degreeLevelLabel?.trim()
+    let degreeLevelId: string | null = null
+    if (degLabel) {
+      degreeLevelId = labelToDegreeLevelId[degLabel] ?? null
+      if (!degreeLevelId) {
+        throw new Error(`Grau acadêmico desconhecido no seed: ${degLabel}`)
+      }
+    }
     return {
       categoryId,
       namePrefixId:
         namePrefixLabel && labelToPrefixId[namePrefixLabel]
           ? labelToPrefixId[namePrefixLabel]
           : null,
+      degreeLevelId,
+      formationInstitution: m.formationInstitution?.trim() || null,
       name: m.name,
       qualification: m.qualification,
       description: m.description ?? null,
       linkedinUrl: m.linkedinUrl?.trim() || null,
+      lattesUrl: normalizeLattesUrl(m.lattesUrl ?? null),
     }
   })
   const insertedMembers = await db

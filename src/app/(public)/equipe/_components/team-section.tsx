@@ -1,7 +1,12 @@
-import { Linkedin } from 'lucide-react'
+import { FileText, Linkedin } from 'lucide-react'
 import { db } from '@/lib/db'
-import { teamCategories, teamMembers, teamNamePrefixes } from '@/lib/db/schema'
-import { teamMemberDisplayName } from '@/lib/team-member-display'
+import {
+  teamCategories,
+  teamDegreeLevels,
+  teamMembers,
+  teamNamePrefixes,
+} from '@/lib/db/schema'
+import { teamMemberDisplayName, teamMemberProfessionalLine } from '@/lib/team-member-display'
 import { asc, eq } from 'drizzle-orm'
 
 type Member = {
@@ -9,11 +14,12 @@ type Member = {
   name: string
   namePrefixLabel: string | null
   displayName: string
-  qualification: string
+  professionalLine: string
   description: string | null
   photoMimeType: string | null
   photo: Buffer | null
   linkedinUrl: string | null
+  lattesUrl: string | null
 }
 
 type Section = {
@@ -64,18 +70,33 @@ function MemberCard({ member }: { member: Member }) {
       </div>
       <div>
         <p className="text-sm font-semibold text-white/90">{member.displayName}</p>
-        <p className="mt-0.5 text-xs text-[#00d4ff]/80">{member.qualification}</p>
-        {member.linkedinUrl ? (
-          <a
-            href={member.linkedinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-xs text-sky-400/90 transition hover:text-sky-300"
-          >
-            <Linkedin className="h-3.5 w-3.5" />
-            LinkedIn
-          </a>
-        ) : null}
+        <p className="mt-0.5 text-xs text-[#00d4ff]/80">{member.professionalLine}</p>
+        {(member.linkedinUrl || member.lattesUrl) && (
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            {member.linkedinUrl ? (
+              <a
+                href={member.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-sky-400/90 transition hover:text-sky-300"
+              >
+                <Linkedin className="h-3.5 w-3.5" />
+                LinkedIn
+              </a>
+            ) : null}
+            {member.lattesUrl ? (
+              <a
+                href={member.lattesUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-teal-400/90 transition hover:text-teal-300"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Lattes
+              </a>
+            ) : null}
+          </div>
+        )}
       </div>
       {member.description && (
         <p className="text-xs leading-relaxed text-white/50">{member.description}</p>
@@ -90,18 +111,22 @@ export async function TeamSection() {
       id: teamMembers.id,
       name: teamMembers.name,
       namePrefixLabel: teamNamePrefixes.label,
+      degreeLevelLabel: teamDegreeLevels.label,
       qualification: teamMembers.qualification,
+      formationInstitution: teamMembers.formationInstitution,
       description: teamMembers.description,
       photo: teamMembers.photo,
       photoMimeType: teamMembers.photoMimeType,
       linkedinUrl: teamMembers.linkedinUrl,
+      lattesUrl: teamMembers.lattesUrl,
       categoryId: teamCategories.id,
       categoryTitle: teamCategories.title,
     })
     .from(teamMembers)
     .innerJoin(teamCategories, eq(teamMembers.categoryId, teamCategories.id))
     .leftJoin(teamNamePrefixes, eq(teamMembers.namePrefixId, teamNamePrefixes.id))
-    .orderBy(asc(teamCategories.title), asc(teamMembers.createdAt))
+    .leftJoin(teamDegreeLevels, eq(teamMembers.degreeLevelId, teamDegreeLevels.id))
+    .orderBy(asc(teamCategories.title), asc(teamMembers.name))
 
   const hasAny = rows.length > 0
 
@@ -132,11 +157,16 @@ export async function TeamSection() {
       name: r.name,
       namePrefixLabel: r.namePrefixLabel,
       displayName: teamMemberDisplayName(r.name, r.namePrefixLabel),
-      qualification: r.qualification,
+      professionalLine: teamMemberProfessionalLine({
+        degreeLevelLabel: r.degreeLevelLabel,
+        qualification: r.qualification,
+        formationInstitution: r.formationInstitution,
+      }),
       description: r.description,
       photo: r.photo,
       photoMimeType: r.photoMimeType,
       linkedinUrl: r.linkedinUrl,
+      lattesUrl: r.lattesUrl,
     })
   }
 
