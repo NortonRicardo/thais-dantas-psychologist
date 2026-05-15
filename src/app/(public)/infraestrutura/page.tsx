@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Infraestrutura | LEMM',
   description:
-    'Infraestrutura computacional do LEMM — hardware, plataformas e rede de colaboração.',
+    'Infraestrutura computacional do LEMM — hardware, plataformas e Parcerias.',
 }
 
 export default async function InfraestruturaPage() {
@@ -51,7 +51,7 @@ export default async function InfraestruturaPage() {
     <PublicPageShell
       aria-label="Infraestrutura LEMM"
       title="Infraestrutura"
-      lead="Hardware de alto desempenho, plataformas proprietárias e rede de colaboração interinstitucional para pesquisa em modelagem climática, IA e otimização."
+      lead="Hardware de alto desempenho, plataformas proprietárias e Parcerias interinstitucional para pesquisa em modelagem climática, IA e otimização."
       fullWidthContent={
         <InfraestruturaSection
           hardwareBlocks={hardwareBlocks.map(({ id, title, modules }) => ({

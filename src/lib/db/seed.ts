@@ -13,15 +13,15 @@ import {
 } from './schema'
 
 const seedEventTypes = [
-  { name: 'Conferência',  iconKey: 'Presentation',  color: 'bg-sky-800' },
-  { name: 'Workshop',     iconKey: 'Wrench',         color: 'bg-purple-800' },
-  { name: 'Seminário',    iconKey: 'BookOpen',       color: 'bg-blue-800' },
-  { name: 'Desafio',      iconKey: 'Trophy',         color: 'bg-orange-800' },
-  { name: 'Minicurso',    iconKey: 'GraduationCap',  color: 'bg-green-800' },
-  { name: 'Defesa',       iconKey: 'Shield',         color: 'bg-rose-800' },
-  { name: 'Palestra',     iconKey: 'Mic',            color: 'bg-cyan-800' },
-  { name: 'Mesa-Redonda', iconKey: 'Users',          color: 'bg-yellow-800' },
-  { name: 'Encontro',     iconKey: 'Handshake',      color: 'bg-teal-800' },
+  { name: 'Conferência', iconKey: 'Presentation', color: 'bg-sky-800' },
+  { name: 'Workshop', iconKey: 'Wrench', color: 'bg-purple-800' },
+  { name: 'Seminário', iconKey: 'BookOpen', color: 'bg-blue-800' },
+  { name: 'Desafio', iconKey: 'Trophy', color: 'bg-orange-800' },
+  { name: 'Minicurso', iconKey: 'GraduationCap', color: 'bg-green-800' },
+  { name: 'Defesa', iconKey: 'Shield', color: 'bg-rose-800' },
+  { name: 'Palestra', iconKey: 'Mic', color: 'bg-cyan-800' },
+  { name: 'Mesa-Redonda', iconKey: 'Users', color: 'bg-yellow-800' },
+  { name: 'Encontro', iconKey: 'Handshake', color: 'bg-teal-800' },
 ]
 
 const seedEvents = [
@@ -223,34 +223,208 @@ const seedCollaborationPartners = [
 
 const seedTeamMembers = [
   // Professores
-  { category: 'professores', name: 'Dra. Maria José Pereira Dantas', qualification: 'Doutora em Ciência da Computação', description: 'Coordenadora do LEMM. Pesquisa em IA, dados climáticos e otimização.', sortOrder: 0 },
-  { category: 'professores', name: 'Dr. José Elmo de Menezes', qualification: 'Doutor em Estatística', description: 'Vice-coordenador do LEMM. Apoio metodológico em estatística, modelagem quantitativa e articulação de estudos internacionais.', sortOrder: 1 },
-  { category: 'professores', name: 'Prof. Dr. Wanderlei Malaquias Pereira Junior', qualification: 'Doutor em Engenharia de Produção', description: 'Pesquisa em metaheurísticas, otimização combinatória e logística. Coorientador de ICs e colaborador no desenvolvimento da plataforma META TOOL BOX.', sortOrder: 2 },
-  { category: 'professores', name: 'Prof. Dr. Roussian Di Amaro Alves Gaioso', qualification: 'Doutor em Ciências Atmosféricas', description: 'Pesquisa em modelagem climática urbana, ondas de calor e HPC. Estuda modelos WRF e experimentos de alto desempenho.', sortOrder: 3 },
-  { category: 'professores', name: 'Prof. Dr. Felipe Veloso', qualification: 'Doutor em Computação Aplicada', description: 'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.', sortOrder: 4 },
+  {
+    category: 'professores',
+    name: 'Dra. Maria José Pereira Dantas',
+    qualification: 'Doutora em Ciência da Computação',
+    description:
+      'Coordenadora do LEMM. Pesquisa em IA, dados climáticos e otimização.',
+    sortOrder: 0,
+  },
+  {
+    category: 'professores',
+    name: 'Dr. José Elmo de Menezes',
+    qualification: 'Doutor em Estatística',
+    description:
+      'Vice-coordenador do LEMM. Apoio metodológico em estatística, modelagem quantitativa e articulação de estudos internacionais.',
+    sortOrder: 1,
+  },
+  {
+    category: 'professores',
+    name: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
+    qualification: 'Doutor em Engenharia de Produção',
+    description:
+      'Pesquisa em metaheurísticas, otimização combinatória e logística. Coorientador de ICs e colaborador no desenvolvimento da plataforma META TOOL BOX.',
+    sortOrder: 2,
+  },
+  {
+    category: 'professores',
+    name: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    qualification: 'Doutor em Ciências Atmosféricas',
+    description:
+      'Pesquisa em modelagem climática urbana, ondas de calor e HPC. Estuda modelos WRF e experimentos de alto desempenho.',
+    sortOrder: 3,
+  },
+  {
+    category: 'professores',
+    name: 'Prof. Dr. Felipe Veloso',
+    qualification: 'Doutor em Computação Aplicada',
+    description:
+      'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.',
+    sortOrder: 4,
+  },
   // Colaboradores
-  { category: 'colaboradores', name: 'Norton Ricardo Pereira', qualification: 'Pesquisador e Desenvolvedor Full-Stack', description: 'Desenvolvedor da plataforma Weather Brasil. Premiado no Troféu Seriema 2025.', sortOrder: 0 },
-  { category: 'colaboradores', name: 'Salatiel A. A. Jordão', qualification: 'Pesquisador em IA e Clima — Mestrando INPE', description: 'Pesquisa em Transformers para predição de precipitação no Cerrado. Egresso da PUC Goiás, mestrando em Computação Aplicada no INPE.', sortOrder: 1 },
-  { category: 'colaboradores', name: 'Mirela Marques', qualification: 'Pesquisadora em Clima e Urbanismo', description: 'Estudo sobre ondas de calor urbanas em centros goianos.', sortOrder: 2 },
-  { category: 'colaboradores', name: 'Matheus Henrique Campos', qualification: 'Pesquisador em Otimização e Agronegócio', description: 'Metaheurísticas aplicadas à logística em cadeias agroindustriais.', sortOrder: 3 },
-  { category: 'colaboradores', name: 'Davi Aquila', qualification: 'Pesquisador em Ciência de Dados Climáticos', description: 'Curadoria e imputação de dados meteorológicos do Centro-Oeste.', sortOrder: 4 },
-  { category: 'colaboradores', name: 'Gabriela', qualification: 'Iniciação Científica — Transformers e Clima', description: 'Investigação de arquiteturas Transformer para predição de precipitação.', sortOrder: 5 },
-  { category: 'colaboradores', name: 'Sophia', qualification: 'Iniciação Científica — Agricultura de Precisão', description: 'Desenvolvimento de gêmeos digitais para agricultura de precisão.', sortOrder: 6 },
-  { category: 'colaboradores', name: 'Mateus Newmann', qualification: 'Iniciação Científica — Gêmeo Digital', description: 'Arquiteturas fog computing para tomada de decisão distribuída.', sortOrder: 7 },
+  {
+    category: 'colaboradores',
+    name: 'Norton Ricardo Pereira',
+    qualification: 'Pesquisador e Desenvolvedor Full-Stack',
+    description:
+      'Desenvolvedor da plataforma Weather Brasil. Premiado no Troféu Seriema 2025.',
+    sortOrder: 0,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Salatiel A. A. Jordão',
+    qualification: 'Pesquisador em IA e Clima — Mestrando INPE',
+    description:
+      'Pesquisa em Transformers para predição de precipitação no Cerrado. Egresso da PUC Goiás, mestrando em Computação Aplicada no INPE.',
+    sortOrder: 1,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Mirela Marques',
+    qualification: 'Pesquisadora em Clima e Urbanismo',
+    description: 'Estudo sobre ondas de calor urbanas em centros goianos.',
+    sortOrder: 2,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Matheus Henrique Campos',
+    qualification: 'Pesquisador em Otimização e Agronegócio',
+    description:
+      'Metaheurísticas aplicadas à logística em cadeias agroindustriais.',
+    sortOrder: 3,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Davi Aquila',
+    qualification: 'Pesquisador em Ciência de Dados Climáticos',
+    description:
+      'Curadoria e imputação de dados meteorológicos do Centro-Oeste.',
+    sortOrder: 4,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Gabriela',
+    qualification: 'Iniciação Científica — Transformers e Clima',
+    description:
+      'Investigação de arquiteturas Transformer para predição de precipitação.',
+    sortOrder: 5,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Sophia',
+    qualification: 'Iniciação Científica — Agricultura de Precisão',
+    description:
+      'Desenvolvimento de gêmeos digitais para agricultura de precisão.',
+    sortOrder: 6,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Mateus Newmann',
+    qualification: 'Iniciação Científica — Gêmeo Digital',
+    description:
+      'Arquiteturas fog computing para tomada de decisão distribuída.',
+    sortOrder: 7,
+  },
   // IC 2026/2027
-  { category: 'colaboradores', name: 'Carlos', qualification: 'Iniciação Científica — Eventos Extremos do Clima', description: 'Estudo de eventos extremos do clima articulado ao projeto Tecnologias Disruptivas e à plataforma Weather Brasil.', sortOrder: 8 },
-  { category: 'colaboradores', name: 'Alysson', qualification: 'Iniciação Científica — HPC e WRF', description: 'Modelagem climática com HPC e WRF em colaboração com o INPE e o mestrando Salatiel Jordão.', sortOrder: 9 },
-  { category: 'colaboradores', name: 'Arthur Felipe', qualification: 'Iniciação Científica — IA e Mercado Financeiro', description: 'Pesquisa em IA aplicada ao mercado financeiro, continuidade de linha com publicações em congressos, Springer e revista Production. Alto potencial de gerar produto em trading com IA.', sortOrder: 10 },
-  { category: 'colaboradores', name: 'Vitor Hugo', qualification: 'Iniciação Científica — LSTM e Metaheurísticas Financeiras', description: 'Pesquisa em LSTM e metaheurísticas com variáveis de rastreabilidade e sustentabilidade incorporadas na função objetivo.', sortOrder: 11 },
-  { category: 'colaboradores', name: 'Gabriel Fonseca', qualification: 'Iniciação Científica — Eventos Climáticos Extremos', description: 'Estudo de eventos climáticos extremos com potencial de aplicação no Cerrado. Grande potencial de publicação.', sortOrder: 12 },
-  { category: 'colaboradores', name: 'Matheus Mendanha', qualification: 'Iniciação Científica — Clima Urbano e Smart Cities', description: 'Determinação de localizações ideais para infraestruturas verdes e soluções de Smart Cities, maximizando a redução térmica urbana.', sortOrder: 13 },
-  { category: 'colaboradores', name: 'Mateus Teixeira', qualification: 'Iniciação Científica — Precipitação e Estações Virtuais', description: 'Ampliação da cobertura de dados meteorológicos de temperatura e precipitação no Cerrado Goiano, com estações meteorológicas virtuais.', sortOrder: 14 },
-  { category: 'colaboradores', name: 'Pedro Mota', qualification: 'Iniciação Científica — Queimadas e Monitoramento Ambiental', description: 'Incorporação de variáveis climáticas a modelos de predição de incêndios no Cerrado, em articulação com o projeto SEM FOGO da UnB.', sortOrder: 15 },
-  { category: 'colaboradores', name: 'Rogério Torres', qualification: 'Iniciação Científica — Risco Aeronáutico e Meteorologia', description: 'Estimativa de risco de ocorrência aeronáutica a partir de variáveis meteorológicas observadas, com inclusão de variáveis de clima como elemento inovador.', sortOrder: 16 },
+  {
+    category: 'colaboradores',
+    name: 'Carlos',
+    qualification: 'Iniciação Científica — Eventos Extremos do Clima',
+    description:
+      'Estudo de eventos extremos do clima articulado ao projeto Tecnologias Disruptivas e à plataforma Weather Brasil.',
+    sortOrder: 8,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Alysson',
+    qualification: 'Iniciação Científica — HPC e WRF',
+    description:
+      'Modelagem climática com HPC e WRF em colaboração com o INPE e o mestrando Salatiel Jordão.',
+    sortOrder: 9,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Arthur Felipe',
+    qualification: 'Iniciação Científica — IA e Mercado Financeiro',
+    description:
+      'Pesquisa em IA aplicada ao mercado financeiro, continuidade de linha com publicações em congressos, Springer e revista Production. Alto potencial de gerar produto em trading com IA.',
+    sortOrder: 10,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Vitor Hugo',
+    qualification: 'Iniciação Científica — LSTM e Metaheurísticas Financeiras',
+    description:
+      'Pesquisa em LSTM e metaheurísticas com variáveis de rastreabilidade e sustentabilidade incorporadas na função objetivo.',
+    sortOrder: 11,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Gabriel Fonseca',
+    qualification: 'Iniciação Científica — Eventos Climáticos Extremos',
+    description:
+      'Estudo de eventos climáticos extremos com potencial de aplicação no Cerrado. Grande potencial de publicação.',
+    sortOrder: 12,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Matheus Mendanha',
+    qualification: 'Iniciação Científica — Clima Urbano e Smart Cities',
+    description:
+      'Determinação de localizações ideais para infraestruturas verdes e soluções de Smart Cities, maximizando a redução térmica urbana.',
+    sortOrder: 13,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Mateus Teixeira',
+    qualification: 'Iniciação Científica — Precipitação e Estações Virtuais',
+    description:
+      'Ampliação da cobertura de dados meteorológicos de temperatura e precipitação no Cerrado Goiano, com estações meteorológicas virtuais.',
+    sortOrder: 14,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Pedro Mota',
+    qualification: 'Iniciação Científica — Queimadas e Monitoramento Ambiental',
+    description:
+      'Incorporação de variáveis climáticas a modelos de predição de incêndios no Cerrado, em articulação com o projeto SEM FOGO da UnB.',
+    sortOrder: 15,
+  },
+  {
+    category: 'colaboradores',
+    name: 'Rogério Torres',
+    qualification: 'Iniciação Científica — Risco Aeronáutico e Meteorologia',
+    description:
+      'Estimativa de risco de ocorrência aeronáutica a partir de variáveis meteorológicas observadas, com inclusão de variáveis de clima como elemento inovador.',
+    sortOrder: 16,
+  },
   // Convidados
-  { category: 'convidados', name: 'Dr. Reinaldo Rosa (INPE)', qualification: 'Pesquisador Sênior, INPE', description: 'Colaboração em modelos híbridos IA-física para predição de seca no Cerrado.', sortOrder: 0 },
-  { category: 'convidados', name: 'Profa. Dra. Marta Luz', qualification: 'Pesquisadora — Furnas', description: 'Integração entre variáveis climáticas, conservação do solo, cadeias agroindustriais e políticas/regulações públicas e privadas.', sortOrder: 1 },
-  { category: 'convidados', name: 'Prof. Dr. Antônio Zamuner', qualification: 'Doutor em Engenharia de Produção — UFCAT', description: 'Pesquisa em cadeias agroindustriais, emissões de CO₂, microclima, ondas de calor urbano, blockchain e rastreabilidade logística.', sortOrder: 2 },
+  {
+    category: 'convidados',
+    name: 'Dr. Reinaldo Rosa (INPE)',
+    qualification: 'Pesquisador Sênior, INPE',
+    description:
+      'Colaboração em modelos híbridos IA-física para predição de seca no Cerrado.',
+    sortOrder: 0,
+  },
+  {
+    category: 'convidados',
+    name: 'Profa. Dra. Marta Luz',
+    qualification: 'Pesquisadora — Furnas',
+    description:
+      'Integração entre variáveis climáticas, conservação do solo, cadeias agroindustriais e políticas/regulações públicas e privadas.',
+    sortOrder: 1,
+  },
+  {
+    category: 'convidados',
+    name: 'Prof. Dr. Antônio Zamuner',
+    qualification: 'Doutor em Engenharia de Produção — UFCAT',
+    description:
+      'Pesquisa em cadeias agroindustriais, emissões de CO₂, microclima, ondas de calor urbano, blockchain e rastreabilidade logística.',
+    sortOrder: 2,
+  },
 ]
 
 type ProjectSeed = {
@@ -436,7 +610,8 @@ const seedProjectsData: ProjectSeed[] = [
   },
   {
     slug: 'ic-mercado-financeiro-vitor',
-    title: 'LSTM e Metaheurísticas com Rastreabilidade e Sustentabilidade Financeira',
+    title:
+      'LSTM e Metaheurísticas com Rastreabilidade e Sustentabilidade Financeira',
     category: 'Iniciação Científica',
     themes: ['Otimização e Metaheurísticas'],
     description:
@@ -499,7 +674,8 @@ const seedProjectsData: ProjectSeed[] = [
   },
   {
     slug: 'ic-risco-aeronautico',
-    title: 'Estimativa de Risco Aeronáutico a partir de Variáveis Meteorológicas',
+    title:
+      'Estimativa de Risco Aeronáutico a partir de Variáveis Meteorológicas',
     category: 'Iniciação Científica',
     themes: ['Clima'],
     description:
@@ -554,7 +730,7 @@ async function main() {
     `✅ ${seedHardwareBlocks.length} equipamentos e ${modCount} módulos inseridos.`
   )
 
-  console.warn('🌱 Seeding rede de colaboração…')
+  console.warn('🌱 Seeding Parcerias…')
   await db.delete(collaborationPartners)
   await db.insert(collaborationPartners).values(seedCollaborationPartners)
   console.warn(`✅ ${seedCollaborationPartners.length} parceiros inseridos.`)
@@ -565,13 +741,16 @@ async function main() {
     .insert(teamMembers)
     .values(seedTeamMembers)
     .returning({ id: teamMembers.id, name: teamMembers.name })
-  const memberNameToId = Object.fromEntries(insertedMembers.map(m => [m.name, m.id]))
+  const memberNameToId = Object.fromEntries(
+    insertedMembers.map(m => [m.name, m.id])
+  )
   console.warn(`✅ ${insertedMembers.length} membros inseridos.`)
 
   console.warn('🌱 Seeding contato…')
   await db.delete(contactInfo)
   await db.insert(contactInfo).values({
-    mapUrl: 'https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed',
+    mapUrl:
+      'https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed',
   })
   console.warn('✅ Contato inserido.')
 
@@ -589,8 +768,12 @@ async function main() {
     gitUrl: p.gitUrl ?? null,
     publicationUrl: p.publicationUrl ?? null,
     advisorId: p.advisorName ? (memberNameToId[p.advisorName] ?? null) : null,
-    coAdvisorId: p.coAdvisorName ? (memberNameToId[p.coAdvisorName] ?? null) : null,
-    researchLeadId: p.researchLeadName ? (memberNameToId[p.researchLeadName] ?? null) : null,
+    coAdvisorId: p.coAdvisorName
+      ? (memberNameToId[p.coAdvisorName] ?? null)
+      : null,
+    researchLeadId: p.researchLeadName
+      ? (memberNameToId[p.researchLeadName] ?? null)
+      : null,
     pdfPath: p.pdfPath ?? null,
   }))
   await db.insert(projects).values(projectValues)

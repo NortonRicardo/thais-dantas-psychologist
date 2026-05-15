@@ -40,7 +40,7 @@ const cards = [
   },
   {
     id: 'rede-colaboracao',
-    title: 'Rede de colaboração',
+    title: 'Parcerias',
     description:
       'Parceiros institucionais mostrados na página Infraestrutura — nomes e descrições.',
     href: '/manager/rede-colaboracao',

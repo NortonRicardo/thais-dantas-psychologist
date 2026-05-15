@@ -57,7 +57,7 @@ export const aboutTimelineEntries = pgTable('about_timeline_entries', {
 export type AboutTimelineEntry = typeof aboutTimelineEntries.$inferSelect
 export type NewAboutTimelineEntry = typeof aboutTimelineEntries.$inferInsert
 
-/** Parceiros da rede de colaboração (página Infraestrutura) */
+/** Parceiros da Parcerias (página Infraestrutura) */
 export const collaborationPartners = pgTable('collaboration_partners', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
@@ -138,8 +138,12 @@ export const contactInfo = pgTable('contact_info', {
     { onDelete: 'set null' }
   ),
   mapUrl: text('map_url').notNull().default(''),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 })
 
 export type ContactInfo = typeof contactInfo.$inferSelect
@@ -177,8 +181,12 @@ export const teamMembers = pgTable('team_members', {
   photo: bytea('photo'),
   photoMimeType: text('photo_mime_type'),
   sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 })
 
 export type TeamMember = typeof teamMembers.$inferSelect
@@ -191,23 +199,39 @@ export const projects = pgTable('projects', {
   title: text('title').notNull(),
   /** 'TCC' | 'Iniciação Científica' | 'Mestrado' | 'Plataforma' | 'Pesquisa' */
   category: text('category').notNull(),
-  themes: text('themes').array().notNull().default(sql`ARRAY[]::text[]`),
+  themes: text('themes')
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
   description: text('description').notNull(),
   image: bytea('image'),
   imageMimeType: text('image_mime_type'),
-  authors: text('authors').array().notNull().default(sql`ARRAY[]::text[]`),
+  authors: text('authors')
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
   startDate: timestamp('start_date', { withTimezone: true }).notNull(),
   endDate: timestamp('end_date', { withTimezone: true }),
   gitUrl: text('git_url'),
   publicationUrl: text('publication_url'),
-  advisorId: uuid('advisor_id').references(() => teamMembers.id, { onDelete: 'set null' }),
-  coAdvisorId: uuid('co_advisor_id').references(() => teamMembers.id, { onDelete: 'set null' }),
-  researchLeadId: uuid('research_lead_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  advisorId: uuid('advisor_id').references(() => teamMembers.id, {
+    onDelete: 'set null',
+  }),
+  coAdvisorId: uuid('co_advisor_id').references(() => teamMembers.id, {
+    onDelete: 'set null',
+  }),
+  researchLeadId: uuid('research_lead_id').references(() => teamMembers.id, {
+    onDelete: 'set null',
+  }),
   pdf: bytea('pdf'),
   pdfMimeType: text('pdf_mime_type'),
   pdfPath: text('pdf_path'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 })
 
 export type Project = typeof projects.$inferSelect
@@ -219,8 +243,12 @@ export const eventTypes = pgTable('event_types', {
   name: text('name').notNull().unique(),
   iconKey: text('icon_key').notNull().default('calendar'),
   color: text('color').notNull().default('bg-blue-500'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 })
 
 export type EventType = typeof eventTypes.$inferSelect

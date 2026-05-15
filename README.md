@@ -42,9 +42,9 @@ DATABASE_URL=postgres://lemm:lemm@localhost:5432/lemm
 MANAGER_PASSWORD=lemm2025
 ```
 
-| Variável | Descrição |
-|---|---|
-| `DATABASE_URL` | String de conexão com o PostgreSQL |
+| Variável           | Descrição                            |
+| ------------------ | ------------------------------------ |
+| `DATABASE_URL`     | String de conexão com o PostgreSQL   |
 | `MANAGER_PASSWORD` | Senha de acesso ao painel `/manager` |
 
 > A `DATABASE_URL` dentro do Docker usa `db` como host (não `localhost`). O `docker-compose.yml` já sobrescreve isso automaticamente.
@@ -56,6 +56,7 @@ docker compose up
 ```
 
 Isso irá:
+
 - Construir a imagem da aplicação (`Dockerfile.dev`)
 - Subir o banco de dados PostgreSQL na porta `5432`
 - Aguardar o banco estar saudável
@@ -77,12 +78,13 @@ docker compose exec web bun db:seed
 Acesse [http://localhost:3000/manager/login](http://localhost:3000/manager/login) e use a senha definida em `MANAGER_PASSWORD`.
 
 O painel permite gerenciar:
+
 - Projetos e TCCs
 - Membros da equipe
 - Eventos
 - Hardware e módulos
 - Plataformas desenvolvidas
-- Rede de colaboração
+- Parcerias
 - Linha do tempo (Sobre Nós)
 - Informações de contato
 
@@ -137,16 +139,16 @@ docker compose down -v
 
 ### Público
 
-| Rota | Descrição |
-|---|---|
-| `/` | Página inicial |
-| `/projetos` | Listagem de projetos |
-| `/projetos/[id]` | Detalhes do projeto |
-| `/sobre-nos` | Linha do tempo institucional |
-| `/equipe` | Membros da equipe |
+| Rota              | Descrição                         |
+| ----------------- | --------------------------------- |
+| `/`               | Página inicial                    |
+| `/projetos`       | Listagem de projetos              |
+| `/projetos/[id]`  | Detalhes do projeto               |
+| `/sobre-nos`      | Linha do tempo institucional      |
+| `/equipe`         | Membros da equipe                 |
 | `/infraestrutura` | Hardware, plataformas e parceiros |
-| `/eventos` | Listagem de eventos |
-| `/contato` | Página de contato |
+| `/eventos`        | Listagem de eventos               |
+| `/contato`        | Página de contato                 |
 
 ### Painel (`/manager`)
 

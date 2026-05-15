@@ -247,11 +247,9 @@ export function InfraestruturaSection({
 
       {/* Rede de parceiros */}
       <div className="mt-auto border-t border-white/10 pt-8">
-        <SectionTitle>Rede de colaboração</SectionTitle>
+        <SectionTitle>Parcerias</SectionTitle>
         {partners.length === 0 ? (
-          <p className="text-sm text-white/35">
-            Rede de colaboração em atualização.
-          </p>
+          <p className="text-sm text-white/35">Parcerias em atualização.</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {partners.map(p => (

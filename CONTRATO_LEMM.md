@@ -1,4 +1,5 @@
 # CONTRATO DE PRESTAÇÃO DE SERVIÇOS
+
 # DESENVOLVIMENTO E MANUTENÇÃO DE SOFTWARE
 
 ---
@@ -106,15 +107,18 @@ O portal público é composto pelas seguintes páginas e funcionalidades:
 Seção dividida em três subáreas:
 
 **Hardware / Equipamentos HPC**
+
 - Listagem de equipamentos de alto desempenho computacional
 - Cada equipamento possui módulos detalhados com ícone representativo e especificações técnicas
 
 **Plataformas Desenvolvidas**
+
 - Catálogo de sistemas e softwares criados pelo laboratório
 - Exibe: nome, descrição, badge de status (ex.: "Beta", "Produção"), ícone visual
 - Links para projeto (GitHub) e acesso à plataforma
 
-**Rede de Colaboração**
+**Parcerias**
+
 - Lista de instituições e organizações parceiras
 - Exibe: nome e descrição do relacionamento institucional
 
@@ -179,7 +183,7 @@ Acessível via `/manager`, protegido por autenticação com senha exclusiva da C
 - Módulos possuem: título, ícone, descrição técnica e ordem de exibição
 - Limite de 24 equipamentos e 48 módulos por equipamento
 
-#### 3.3.7 Gerenciar Rede de Colaboração — `/manager/rede-colaboracao`
+#### 3.3.7 Gerenciar Parcerias — `/manager/rede-colaboracao`
 
 - CRUD completo de parceiros institucionais
 - Campos: nome da instituição e descrição do relacionamento
@@ -208,34 +212,34 @@ Acessível via `/manager`, protegido por autenticação com senha exclusiva da C
 
 ### 4.1 Stack Tecnológica
 
-| Camada | Tecnologia | Versão |
-|---|---|---|
-| Framework Web | Next.js | 16.2.4 |
-| Linguagem | TypeScript | 5 |
-| Runtime | Node.js + Bun | — |
-| Estilização | Tailwind CSS | 4 |
-| Componentes UI | Radix UI + Base UI | — |
-| Ícones | Lucide React | 0.574.0 |
-| ORM | Drizzle ORM | 0.45.2 |
-| Banco de Dados | PostgreSQL | 15+ |
-| Notificações | Sonner | 2.0.7 |
-| Containerização | Docker + Docker Compose | — |
+| Camada          | Tecnologia              | Versão  |
+| --------------- | ----------------------- | ------- |
+| Framework Web   | Next.js                 | 16.2.4  |
+| Linguagem       | TypeScript              | 5       |
+| Runtime         | Node.js + Bun           | —       |
+| Estilização     | Tailwind CSS            | 4       |
+| Componentes UI  | Radix UI + Base UI      | —       |
+| Ícones          | Lucide React            | 0.574.0 |
+| ORM             | Drizzle ORM             | 0.45.2  |
+| Banco de Dados  | PostgreSQL              | 15+     |
+| Notificações    | Sonner                  | 2.0.7   |
+| Containerização | Docker + Docker Compose | —       |
 
 ### 4.2 Banco de Dados — Estrutura das Tabelas
 
 O banco de dados PostgreSQL é composto pelas seguintes tabelas:
 
-| Tabela | Descrição |
-|---|---|
-| `projects` | Projetos, TCCs, dissertações e plataformas acadêmicas |
-| `events` | Eventos científicos (conferências, workshops, defesas, etc.) |
-| `team_members` | Membros da equipe (professores, colaboradores, convidados) |
-| `hardware` | Equipamentos de alta performance (HPC) |
-| `hardware_modules` | Módulos detalhados de cada equipamento |
-| `developed_platforms` | Plataformas e sistemas desenvolvidos pelo laboratório |
-| `collaboration_partners` | Instituições parceiras e rede de colaboração |
-| `about_timeline_entries` | Marcos históricos para a timeline de "Sobre Nós" |
-| `contact_info` | Informações de contato do diretor e do laboratório |
+| Tabela                   | Descrição                                                    |
+| ------------------------ | ------------------------------------------------------------ |
+| `projects`               | Projetos, TCCs, dissertações e plataformas acadêmicas        |
+| `events`                 | Eventos científicos (conferências, workshops, defesas, etc.) |
+| `team_members`           | Membros da equipe (professores, colaboradores, convidados)   |
+| `hardware`               | Equipamentos de alta performance (HPC)                       |
+| `hardware_modules`       | Módulos detalhados de cada equipamento                       |
+| `developed_platforms`    | Plataformas e sistemas desenvolvidos pelo laboratório        |
+| `collaboration_partners` | Instituições parceiras e Parcerias                           |
+| `about_timeline_entries` | Marcos históricos para a timeline de "Sobre Nós"             |
+| `contact_info`           | Informações de contato do diretor e do laboratório           |
 
 Todas as tabelas possuem identificadores únicos (UUID v4) gerados automaticamente e campos de auditoria (`createdAt` e `updatedAt` com timezone).
 
@@ -274,43 +278,43 @@ O sistema é entregue com configuração completa de containerização:
 
 ### 5.1 Composição e Valor Total
 
-| # | Item | Valor |
-|---|---|---|
-| 1 | Desenvolvimento do sistema LEMM | R$ 3.100,00 |
-| 2 | Registro de domínio — 2 anos (`lemm.com.br`, venc. 28/04/2028) | R$ 200,00 |
-| 3 | Hospedagem do servidor — 1 ano (venc. 15/05/2027) | R$ 500,00 |
-| 4 | Imposto sobre nota fiscal | R$ 380,00 |
-| | **TOTAL** | **R$ 4.180,00** |
+| #   | Item                                                           | Valor           |
+| --- | -------------------------------------------------------------- | --------------- |
+| 1   | Desenvolvimento do sistema LEMM                                | R$ 3.100,00     |
+| 2   | Registro de domínio — 2 anos (`lemm.com.br`, venc. 28/04/2028) | R$ 200,00       |
+| 3   | Hospedagem do servidor — 1 ano (venc. 15/05/2027)              | R$ 500,00       |
+| 4   | Imposto sobre nota fiscal                                      | R$ 380,00       |
+|     | **TOTAL**                                                      | **R$ 4.180,00** |
 
 > **Valor Total: R$ 4.180,00**
-> *(quatro mil, cento e oitenta reais)*
+> _(quatro mil, cento e oitenta reais)_
 > Pago **à vista**, contra entrega e ativação do sistema em ambiente de produção.
 
 ### 5.2 O Que Está Incluso no Valor
 
 O valor total compreende integralmente:
 
-| Item | Descrição |
-|---|---|
-| **Desenvolvimento do Sistema LEMM** | Entrega do sistema completo descrito neste contrato |
-| **Registro de Domínio** | Domínio `lemm.com.br` registrado e mantido por **2 (dois) anos** |
-| **Hospedagem do Servidor** | Servidor dedicado pelo período de **1 (um) ano** (venc. 15/05/2027) |
-| **Deploy e Ativação** | Configuração e implantação do sistema em ambiente de produção |
-| **Manutenção do Servidor** | Gerenciamento técnico do ambiente de execução pelo período de 1 ano |
-| **Backup Mensal** | Backup completo do banco de dados todo dia **25** de cada mês, durante 1 ano |
-| **Correção de Bugs** | Correção de falhas funcionais pelo período de **1 (um) ano** |
-| **Pequenos Ajustes** | Alterações de baixo impacto conforme definido na Cláusula Sétima |
+| Item                                | Descrição                                                                    |
+| ----------------------------------- | ---------------------------------------------------------------------------- |
+| **Desenvolvimento do Sistema LEMM** | Entrega do sistema completo descrito neste contrato                          |
+| **Registro de Domínio**             | Domínio `lemm.com.br` registrado e mantido por **2 (dois) anos**             |
+| **Hospedagem do Servidor**          | Servidor dedicado pelo período de **1 (um) ano** (venc. 15/05/2027)          |
+| **Deploy e Ativação**               | Configuração e implantação do sistema em ambiente de produção                |
+| **Manutenção do Servidor**          | Gerenciamento técnico do ambiente de execução pelo período de 1 ano          |
+| **Backup Mensal**                   | Backup completo do banco de dados todo dia **25** de cada mês, durante 1 ano |
+| **Correção de Bugs**                | Correção de falhas funcionais pelo período de **1 (um) ano**                 |
+| **Pequenos Ajustes**                | Alterações de baixo impacto conforme definido na Cláusula Sétima             |
 
 ### 5.3 O Que NÃO Está Incluso no Valor
 
 Os seguintes itens **não estão incluídos** no valor contratado e serão objeto de orçamento e cobrança separados:
 
-| Item | Observação |
-|---|---|
-| **Renovação de Hospedagem (após 1 ano)** | Após 15/05/2027, a renovação será orçada e formalizada em Aditivo Contratual |
-| **Novas Telas ou Funcionalidades** | Desenvolvimento de páginas ou módulos não presentes neste contrato |
-| **Mudanças Estruturais** | Alterações na arquitetura, banco de dados, infraestrutura ou stack tecnológica |
-| **Integrações com Terceiros** | Integrações com APIs externas, sistemas de pagamento, e-mail marketing, etc. |
+| Item                                     | Observação                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------ |
+| **Renovação de Hospedagem (após 1 ano)** | Após 15/05/2027, a renovação será orçada e formalizada em Aditivo Contratual   |
+| **Novas Telas ou Funcionalidades**       | Desenvolvimento de páginas ou módulos não presentes neste contrato             |
+| **Mudanças Estruturais**                 | Alterações na arquitetura, banco de dados, infraestrutura ou stack tecnológica |
+| **Integrações com Terceiros**            | Integrações com APIs externas, sistemas de pagamento, e-mail marketing, etc.   |
 
 ---
 
@@ -318,27 +322,27 @@ Os seguintes itens **não estão incluídos** no valor contratado e serão objet
 
 ### 6.1 Domínio
 
-| Campo | Informação |
-|---|---|
-| **Endereço** | `lemm.com.br` |
-| **Registrador** | GoDaddy |
-| **Titularidade** | IADA LTDA (em nome da CONTRATANTE) |
-| **Vencimento** | **28 de abril de 2028** |
+| Campo                      | Informação                                     |
+| -------------------------- | ---------------------------------------------- |
+| **Endereço**               | `lemm.com.br`                                  |
+| **Registrador**            | GoDaddy                                        |
+| **Titularidade**           | IADA LTDA (em nome da CONTRATANTE)             |
+| **Vencimento**             | **28 de abril de 2028**                        |
 | **Transferência de posse** | Disponível a partir de **27 de junho de 2026** |
 
 O domínio encontra-se registrado e gerenciado pela **IADA LTDA** em benefício da CONTRATANTE. A transferência da titularidade para conta própria da CONTRATANTE poderá ser solicitada a qualquer momento após **27 de junho de 2026** (data de liberação pela plataforma GoDaddy), mediante simples solicitação e indicação de conta GoDaddy de destino, sem custo adicional.
 
 ### 6.2 Servidor de Hospedagem
 
-| Especificação | Configuração |
-|---|---|
-| **Processamento** | 4 vCPU Cores |
-| **Memória RAM** | 8 GB |
-| **Armazenamento** | 300 GB SSD |
-| **Snapshots** | 1 Snapshot |
-| **Largura de banda** | 200 Mbit/s |
-| **Latência** | ~127 ms |
-| **Vencimento** | **15 de maio de 2027** |
+| Especificação        | Configuração           |
+| -------------------- | ---------------------- |
+| **Processamento**    | 4 vCPU Cores           |
+| **Memória RAM**      | 8 GB                   |
+| **Armazenamento**    | 300 GB SSD             |
+| **Snapshots**        | 1 Snapshot             |
+| **Largura de banda** | 200 Mbit/s             |
+| **Latência**         | ~127 ms                |
+| **Vencimento**       | **15 de maio de 2027** |
 
 O servidor está contratado e gerenciado pela **IADA LTDA** pelo período de 1 (um) ano incluso no valor deste contrato. Após o vencimento em **15/05/2027**, a renovação deverá ser acordada entre as partes mediante Aditivo Contratual.
 
@@ -375,7 +379,7 @@ A CONTRATADA prestará serviços de manutenção pelo período de **1 (um) ano**
 - Prazo de resposta: até **5 (cinco) dias úteis** para bugs de baixa criticidade
 - Prazo de resposta: até **48 (quarenta e oito) horas** para falhas críticas que impossibilitem o uso do sistema
 
-**c) Pequenos Ajustes** *(sem custo adicional)*
+**c) Pequenos Ajustes** _(sem custo adicional)_
 
 Entende-se por pequenos ajustes toda e qualquer alteração que **não modifique a estrutura do banco de dados, a arquitetura do sistema ou requeira novas telas**, incluindo:
 
@@ -505,34 +509,34 @@ Assim, por estarem justas e contratadas, as partes assinam o presente instrument
 
 **Representante Legal:**
 
-| | |
-|---|---|
+|       |                            |
+| ----- | -------------------------- |
 | Nome: | **Norton Pereira Ricardo** |
-| CPF: | 052.172.041-92 |
+| CPF:  | 052.172.041-92             |
 
-&emsp;&emsp;&emsp;&emsp;Assinatura: _______________________________________________
+&emsp;&emsp;&emsp;&emsp;Assinatura: **********************\_\_\_**********************
 
 ---
 
 **Desenvolvedora Responsável:**
 
-| | |
-|---|---|
+|       |                              |
+| ----- | ---------------------------- |
 | Nome: | **Luciana Lopes de Freitas** |
-| CPF: | 051.362.691-38 |
+| CPF:  | 051.362.691-38               |
 
-&emsp;&emsp;&emsp;&emsp;Assinatura: _______________________________________________
+&emsp;&emsp;&emsp;&emsp;Assinatura: **********************\_\_\_**********************
 
 ---
 
 ### CONTRATANTE
 
-| | |
-|---|---|
+|       |                               |
+| ----- | ----------------------------- |
 | Nome: | **Maria José Pereira Dantas** |
-| CPF: | 281.401.411-00 |
+| CPF:  | 281.401.411-00                |
 
-&emsp;&emsp;&emsp;&emsp;Assinatura: _______________________________________________
+&emsp;&emsp;&emsp;&emsp;Assinatura: **********************\_\_\_**********************
 
 ---
 
@@ -639,97 +643,97 @@ PAINEL ADMINISTRATIVO (acesso liberado)
 
 ### Tabela `projects`
 
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | UUID | Identificador único gerado automaticamente |
-| slug | TEXT UNIQUE | URL amigável do projeto |
-| title | TEXT | Título do projeto |
-| category | TEXT | TCC / IC / Mestrado / Plataforma / Pesquisa |
-| themes | TEXT[] | Array de temas e palavras-chave |
-| description | TEXT | Descrição completa |
-| image | BYTEA | Imagem de capa (binário) |
-| imageMimeType | TEXT | Tipo MIME da imagem |
-| authors | TEXT[] | Lista de autores |
-| startDate | TIMESTAMP | Data de início |
-| endDate | TIMESTAMP | Data de conclusão |
-| gitUrl | TEXT | Link repositório GitHub |
-| publicationUrl | TEXT | Link publicação acadêmica |
-| advisorId | UUID FK | Orientador (ref. team_members) |
-| coAdvisorId | UUID FK | Co-orientador (ref. team_members) |
-| researchLeadId | UUID FK | Pesquisador principal (ref. team_members) |
-| pdf | BYTEA | Documento PDF completo (binário) |
-| pdfMimeType | TEXT | Tipo MIME do PDF |
-| createdAt | TIMESTAMPTZ | Data de criação |
-| updatedAt | TIMESTAMPTZ | Data de atualização |
+| Campo          | Tipo        | Descrição                                   |
+| -------------- | ----------- | ------------------------------------------- |
+| id             | UUID        | Identificador único gerado automaticamente  |
+| slug           | TEXT UNIQUE | URL amigável do projeto                     |
+| title          | TEXT        | Título do projeto                           |
+| category       | TEXT        | TCC / IC / Mestrado / Plataforma / Pesquisa |
+| themes         | TEXT[]      | Array de temas e palavras-chave             |
+| description    | TEXT        | Descrição completa                          |
+| image          | BYTEA       | Imagem de capa (binário)                    |
+| imageMimeType  | TEXT        | Tipo MIME da imagem                         |
+| authors        | TEXT[]      | Lista de autores                            |
+| startDate      | TIMESTAMP   | Data de início                              |
+| endDate        | TIMESTAMP   | Data de conclusão                           |
+| gitUrl         | TEXT        | Link repositório GitHub                     |
+| publicationUrl | TEXT        | Link publicação acadêmica                   |
+| advisorId      | UUID FK     | Orientador (ref. team_members)              |
+| coAdvisorId    | UUID FK     | Co-orientador (ref. team_members)           |
+| researchLeadId | UUID FK     | Pesquisador principal (ref. team_members)   |
+| pdf            | BYTEA       | Documento PDF completo (binário)            |
+| pdfMimeType    | TEXT        | Tipo MIME do PDF                            |
+| createdAt      | TIMESTAMPTZ | Data de criação                             |
+| updatedAt      | TIMESTAMPTZ | Data de atualização                         |
 
 ### Tabela `events`
 
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | UUID | Identificador único |
-| title | TEXT | Título do evento |
-| description | TEXT | Descrição |
-| date | TIMESTAMP | Data e hora do evento |
-| type | TEXT | Tipo (conferência, workshop, etc.) |
-| speaker | TEXT | Palestrante |
-| organizer | TEXT | Organizador |
-| link | TEXT | Link do evento |
-| meetLink | TEXT | Link Google Meet |
-| featured | BOOLEAN | Destaque (sim/não) |
-| image | BYTEA | Imagem de capa (binário) |
-| imageMimeType | TEXT | Tipo MIME da imagem |
-| createdAt | TIMESTAMPTZ | Data de criação |
-| updatedAt | TIMESTAMPTZ | Data de atualização |
+| Campo         | Tipo        | Descrição                          |
+| ------------- | ----------- | ---------------------------------- |
+| id            | UUID        | Identificador único                |
+| title         | TEXT        | Título do evento                   |
+| description   | TEXT        | Descrição                          |
+| date          | TIMESTAMP   | Data e hora do evento              |
+| type          | TEXT        | Tipo (conferência, workshop, etc.) |
+| speaker       | TEXT        | Palestrante                        |
+| organizer     | TEXT        | Organizador                        |
+| link          | TEXT        | Link do evento                     |
+| meetLink      | TEXT        | Link Google Meet                   |
+| featured      | BOOLEAN     | Destaque (sim/não)                 |
+| image         | BYTEA       | Imagem de capa (binário)           |
+| imageMimeType | TEXT        | Tipo MIME da imagem                |
+| createdAt     | TIMESTAMPTZ | Data de criação                    |
+| updatedAt     | TIMESTAMPTZ | Data de atualização                |
 
 ### Tabela `team_members`
 
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | UUID | Identificador único |
-| category | TEXT | professores / colaboradores / convidados |
-| name | TEXT | Nome completo |
-| qualification | TEXT | Titulação e cargo |
-| description | TEXT | Biografia |
-| photo | BYTEA | Foto do membro (binário) |
-| photoMimeType | TEXT | Tipo MIME da foto |
-| sortOrder | INTEGER | Posição de exibição |
-| createdAt | TIMESTAMPTZ | Data de criação |
-| updatedAt | TIMESTAMPTZ | Data de atualização |
+| Campo         | Tipo        | Descrição                                |
+| ------------- | ----------- | ---------------------------------------- |
+| id            | UUID        | Identificador único                      |
+| category      | TEXT        | professores / colaboradores / convidados |
+| name          | TEXT        | Nome completo                            |
+| qualification | TEXT        | Titulação e cargo                        |
+| description   | TEXT        | Biografia                                |
+| photo         | BYTEA       | Foto do membro (binário)                 |
+| photoMimeType | TEXT        | Tipo MIME da foto                        |
+| sortOrder     | INTEGER     | Posição de exibição                      |
+| createdAt     | TIMESTAMPTZ | Data de criação                          |
+| updatedAt     | TIMESTAMPTZ | Data de atualização                      |
 
 ### Tabela `hardware`
 
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | UUID | Identificador único |
-| title | TEXT | Nome do equipamento |
-| createdAt | TIMESTAMPTZ | Data de criação |
+| Campo     | Tipo        | Descrição           |
+| --------- | ----------- | ------------------- |
+| id        | UUID        | Identificador único |
+| title     | TEXT        | Nome do equipamento |
+| createdAt | TIMESTAMPTZ | Data de criação     |
 | updatedAt | TIMESTAMPTZ | Data de atualização |
 
 ### Tabela `hardware_modules`
 
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | UUID | Identificador único |
-| hardwareId | UUID FK | Referência ao equipamento (cascade delete) |
-| title | TEXT | Nome do módulo |
-| iconKey | TEXT | Chave do ícone Lucide |
-| description | TEXT | Especificação técnica |
-| sortOrder | INTEGER | Ordem de exibição |
-| createdAt | TIMESTAMPTZ | Data de criação |
-| updatedAt | TIMESTAMPTZ | Data de atualização |
+| Campo       | Tipo        | Descrição                                  |
+| ----------- | ----------- | ------------------------------------------ |
+| id          | UUID        | Identificador único                        |
+| hardwareId  | UUID FK     | Referência ao equipamento (cascade delete) |
+| title       | TEXT        | Nome do módulo                             |
+| iconKey     | TEXT        | Chave do ícone Lucide                      |
+| description | TEXT        | Especificação técnica                      |
+| sortOrder   | INTEGER     | Ordem de exibição                          |
+| createdAt   | TIMESTAMPTZ | Data de criação                            |
+| updatedAt   | TIMESTAMPTZ | Data de atualização                        |
 
 ### Demais Tabelas
 
-| Tabela | Campos Principais |
-|---|---|
-| `developed_platforms` | título, descrição, links (projeto/acesso), badge, ícone |
-| `collaboration_partners` | nome, descrição |
-| `about_timeline_entries` | data (mês/ano), título, descrição |
-| `contact_info` | nome do diretor, cargo, email, telefone, LinkedIn, foto |
+| Tabela                   | Campos Principais                                       |
+| ------------------------ | ------------------------------------------------------- |
+| `developed_platforms`    | título, descrição, links (projeto/acesso), badge, ícone |
+| `collaboration_partners` | nome, descrição                                         |
+| `about_timeline_entries` | data (mês/ano), título, descrição                       |
+| `contact_info`           | nome do diretor, cargo, email, telefone, LinkedIn, foto |
 
 ---
 
-*Este Anexo I é parte integrante do contrato e complementa a descrição técnica do sistema entregue.*
+_Este Anexo I é parte integrante do contrato e complementa a descrição técnica do sistema entregue._
 
 ---
 
