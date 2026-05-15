@@ -23,12 +23,21 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [username()],
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+    storage: 'memory',
+    customRules: {
+      '/sign-in/username': { window: 60, max: 5 },
+    },
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 dias
-    updateAge: 60 * 60 * 24,     // renova o cookie se tiver > 1 dia velho
+    updateAge: 60 * 60 * 24, // renova o cookie se tiver > 1 dia velho
     cookieCache: {
       enabled: true,
-      maxAge: 5 * 60,            // cache local de 5 min — evita hit no DB a cada request
+      maxAge: 5 * 60, // cache local de 5 min — evita hit no DB a cada request
     },
   },
   advanced: {

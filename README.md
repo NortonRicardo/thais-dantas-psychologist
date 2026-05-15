@@ -6,6 +6,7 @@ Website institucional do laboratório LEMM com painel administrativo para gerenc
 
 - **Next.js 16** (App Router) + **TypeScript**
 - **PostgreSQL 16** + **Drizzle ORM**
+- **Better Auth** — autenticação com username + senha
 - **Tailwind CSS 4** + Radix UI
 - **Bun** como runtime e gerenciador de pacotes
 - **Docker** para orquestração
@@ -15,10 +16,11 @@ Website institucional do laboratório LEMM com painel administrativo para gerenc
 ## Pré-requisitos
 
 - [Docker](https://www.docker.com/) e Docker Compose instalados
+- `make` disponível no terminal
 
 ---
 
-## Passo a passo
+## Desenvolvimento local
 
 ### 1. Clone o repositório
 
@@ -29,53 +31,50 @@ cd lemm
 
 ### 2. Configure as variáveis de ambiente
 
-Crie o arquivo `.env` na raiz do projeto:
-
 ```sh
 cp .env.sample .env
 ```
 
-> Edite o `.env` conforme necessário. Valores padrão para desenvolvimento local:
+Os valores padrão do `.env.sample` já funcionam para desenvolvimento local sem nenhuma alteração.
 
-```env
-DATABASE_URL=postgres://lemm:lemm@localhost:5432/lemm
-MANAGER_PASSWORD=lemm2025
-```
+| Variável             | Descrição                                        |
+| -------------------- | ------------------------------------------------ |
+| `POSTGRES_USER`      | Usuário do banco (padrão: `lemm`)                |
+| `POSTGRES_PASSWORD`  | Senha do banco (padrão: `lemm`)                  |
+| `POSTGRES_DB`        | Nome do banco (padrão: `lemm`)                   |
+| `DATABASE_URL`       | String de conexão com o PostgreSQL               |
+| `BETTER_AUTH_SECRET` | Segredo da sessão — gere com `openssl rand -hex 32` |
+| `BETTER_AUTH_URL`    | URL pública da aplicação                         |
+| `ADMIN_USERNAME`     | Usuário admin criado no seed                     |
+| `ADMIN_PASSWORD`     | Senha admin criada no seed (mínimo 8 caracteres) |
 
-| Variável           | Descrição                            |
-| ------------------ | ------------------------------------ |
-| `DATABASE_URL`     | String de conexão com o PostgreSQL   |
-| `MANAGER_PASSWORD` | Senha de acesso ao painel `/manager` |
-
-> A `DATABASE_URL` dentro do Docker usa `db` como host (não `localhost`). O `docker-compose.yml` já sobrescreve isso automaticamente.
-
-### 3. Suba os containers
+### 3. Suba o ambiente
 
 ```sh
-docker compose up
+make dev
 ```
 
 Isso irá:
 
-- Construir a imagem da aplicação (`Dockerfile.dev`)
-- Subir o banco de dados PostgreSQL na porta `5432`
-- Aguardar o banco estar saudável
+- Subir o banco PostgreSQL na porta `5432`
 - Rodar as migrations automaticamente
-- Subir a aplicação Next.js na porta `3000`
+- Subir a aplicação Next.js em modo dev na porta `3000` com hot-reload
 
-A aplicação estará disponível em [http://localhost:3000](http://localhost:3000).
+Acesse em [http://localhost:3000](http://localhost:3000).
 
-### 4. Popule o banco com dados iniciais (opcional)
+### 4. Crie o usuário admin
 
 ```sh
-docker compose exec web bun db:seed
+make db-seed
 ```
+
+O seed lê `ADMIN_USERNAME` e `ADMIN_PASSWORD` do `.env` e cria o usuário uma única vez.
 
 ---
 
-## Acesso ao painel administrativo
+## Painel administrativo
 
-Acesse [http://localhost:3000/manager/login](http://localhost:3000/manager/login) e use a senha definida em `MANAGER_PASSWORD`.
+Acesse [http://localhost:3000/manager/login](http://localhost:3000/manager/login) com as credenciais definidas em `ADMIN_USERNAME` / `ADMIN_PASSWORD`.
 
 O painel permite gerenciar:
 
@@ -90,47 +89,73 @@ O painel permite gerenciar:
 
 ---
 
-## Comandos úteis
+## Comandos (Makefile)
+
+### Desenvolvimento
+
+| Comando       | Descrição                              |
+| ------------- | -------------------------------------- |
+| `make dev`    | Sobe os containers de dev              |
+| `make dev-build` | Sobe forçando rebuild da imagem     |
+| `make dev-down`  | Para e remove os containers         |
+| `make dev-logs`  | Acompanha os logs em tempo real     |
+| `make dev-shell` | Abre um shell no container web      |
 
 ### Banco de dados
 
-```sh
-# Rodar migrations
-docker compose exec web bun db:migrate
+| Comando          | Descrição                                     |
+| ---------------- | --------------------------------------------- |
+| `make db-migrate`  | Roda as migrations pendentes                |
+| `make db-seed`     | Popula o banco (cria admin + dados iniciais)|
+| `make db-reset`    | Apaga todos os dados do banco               |
+| `make db-fresh`    | Reset + migrate + seed (banco do zero)      |
+| `make db-studio`   | Abre o Drizzle Studio (UI visual do banco)  |
+| `make db-generate` | Gera nova migration a partir do schema      |
 
-# Popular com seed
-docker compose exec web bun db:seed
+### Produção
 
-# Resetar o banco
-docker compose exec web bun db:reset
+| Comando            | Descrição                                  |
+| ------------------ | ------------------------------------------ |
+| `make prod-up`     | Build e sobe os containers de produção     |
+| `make prod-down`   | Para e remove os containers de produção    |
+| `make prod-logs`   | Acompanha os logs de produção              |
+| `make prod-shell`  | Abre um shell no container web de produção |
+| `make prod-migrate`| Roda as migrations no container de prod    |
+| `make prod-seed`   | Roda o seed no container de prod           |
 
-# Resetar + migrar + seed (banco limpo)
-docker compose exec web bun db:fresh
+---
 
-# Push direto do schema (sem arquivo de migration)
-docker compose exec web bun db:push
+## Deploy em produção (Coolify)
 
-# Gerar nova migration a partir de mudanças no schema
-docker compose exec web bun db:generate
+### 1. Configure as variáveis de ambiente no servidor
 
-# Abrir o Drizzle Studio (interface visual do banco)
-docker compose exec web bun db:studio
+Crie o `.env` na raiz do projeto no servidor com valores de produção:
+
+```env
+POSTGRES_USER=seu_usuario_db
+POSTGRES_PASSWORD=senha_forte_db
+POSTGRES_DB=lemm
+DATABASE_URL=postgres://seu_usuario_db:senha_forte_db@db:5432/lemm
+BETTER_AUTH_SECRET=<saída de: openssl rand -hex 32>
+BETTER_AUTH_URL=https://seu-dominio.com
+ADMIN_USERNAME=seu_usuario
+ADMIN_PASSWORD=sua_senha_forte
 ```
 
-### Containers
+### 2. Suba os containers
 
 ```sh
-# Subir em background
-docker compose up -d
+make prod-up
+```
 
-# Ver logs
-docker compose logs -f
+O build de produção usa o `Dockerfile` multi-stage (standalone output) e sobe na porta `3020`.
 
-# Parar containers
-docker compose down
+> As migrations rodam automaticamente no startup do container via `CMD`.
 
-# Parar e remover volumes (apaga dados do banco)
-docker compose down -v
+### 3. Crie o usuário admin (primeira vez)
+
+```sh
+make prod-seed
 ```
 
 ---
@@ -152,4 +177,4 @@ docker compose down -v
 
 ### Painel (`/manager`)
 
-Protegido por senha. Acesso via `/manager/login`.
+Protegido por autenticação. Acesso via `/manager/login`.
