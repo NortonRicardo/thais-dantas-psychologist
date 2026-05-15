@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { ManagerLogout, ManagerNav } from '../_components/manager-nav'
 
 const headerShadow = [
@@ -24,9 +25,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           role="banner"
         >
           <div className="flex min-w-0 shrink-0 items-center justify-self-start">
-            <span className="text-[1.125rem] font-semibold leading-7 text-[#e4e4e7]">
+            <Link
+              href="/manager"
+              className="text-[1.125rem] font-semibold leading-7 text-[#e4e4e7] hover:text-white transition-colors"
+            >
               LEMM
-            </span>
+            </Link>
           </div>
           <ManagerNav />
           <div className="flex min-w-0 justify-end justify-self-end">
