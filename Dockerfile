@@ -37,9 +37,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Arquivos necessários para migrations e seed
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/src/lib/db ./src/lib/db
+COPY --from=builder --chown=nextjs:nodejs /app/src/lib ./src/lib
 
 USER nextjs
 
