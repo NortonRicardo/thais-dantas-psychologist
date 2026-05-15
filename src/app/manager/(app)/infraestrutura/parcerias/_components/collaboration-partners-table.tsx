@@ -104,8 +104,16 @@ export function CollaborationPartnersTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <CollaborationPartnerDialog onSuccess={fetchPartners} />
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold text-white/90">Parcerias</h1>
+          <p className="mt-0.5 text-sm text-white/40">
+            Parceiros exibidos na seção homônima da página pública Infraestrutura.
+          </p>
+        </div>
+        <div className="flex shrink-0 self-end sm:self-start sm:pt-0.5">
+          <CollaborationPartnerDialog onSuccess={fetchPartners} />
+        </div>
       </div>
 
       <div

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { createElement, useCallback, useEffect, useState } from 'react'
 import {
   Facebook,
   Github,
@@ -609,23 +609,33 @@ function AddChannelModal({
           </div>
 
           <div className="grid gap-1.5">
-            <Label className="text-sm text-white/70">Ícone</Label>
-            <Select value={iconKey} onValueChange={setIconKey}>
-              <SelectTrigger className={`${INPUT_CLS} h-10 w-full`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-white/10 bg-[#27272a] text-white">
-                {ICON_OPTIONS.map(opt => {
-                  const Icon = ICON_MAP[opt.key] ?? Link
-                  return (
-                    <SelectItem key={opt.key} value={opt.key} className="focus:bg-white/10 focus:text-white">
-                      <Icon size={14} className="mr-1.5 inline-block opacity-70" />
-                      {opt.label}
-                    </SelectItem>
-                  )
-                })}
-              </SelectContent>
-            </Select>
+            <Label className="text-sm text-white/70">
+              Ícone{' '}
+              <span className="font-normal text-white/40">(definido pelo tipo)</span>
+            </Label>
+            <div
+              className={`flex h-10 w-full items-center gap-2.5 rounded-md border px-3 ${INPUT_CLS} pointer-events-none select-none ${
+                label ? 'text-white/85' : 'text-white/35'
+              }`}
+              aria-readonly
+            >
+              {label ? (
+                <>
+                  {createElement(ICON_MAP[iconKey] ?? Link, {
+                    size: 16,
+                    strokeWidth: 1.6,
+                    className: 'shrink-0 text-white/70',
+                  })}
+                  <span className="truncate text-sm">
+                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ?? iconKey}
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-white/35">
+                  Escolha um tipo para ver o ícone correspondente
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="grid gap-1.5">
