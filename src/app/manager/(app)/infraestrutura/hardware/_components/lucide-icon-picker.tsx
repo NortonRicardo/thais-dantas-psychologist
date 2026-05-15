@@ -160,7 +160,7 @@ export function LucideIconPicker({
         />
         <ScrollArea
           className={cn(
-            compact ? 'max-h-44' : 'max-h-52',
+            compact ? 'h-44' : 'h-52',
             'overscroll-contain'
           )}
         >

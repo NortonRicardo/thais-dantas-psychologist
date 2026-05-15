@@ -17,13 +17,7 @@ import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { FilterCombobox } from '@/components/filter-combobox'
 import { TeamMemberThumb } from '@/components/team-member-thumb'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+
 import {
   Dialog,
   DialogContent,
@@ -42,7 +36,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { readApiError } from '@/lib/read-api-error'
-import { cn } from '@/lib/utils'
+
 import { parseEventForm } from '@/lib/validation/events-api'
 import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
@@ -160,7 +154,7 @@ function TypeCombobox({
 
         <ScrollArea
           type="always"
-          className="max-h-48 w-full shrink-0 overscroll-contain"
+          className="h-48 w-full shrink-0 overscroll-contain"
         >
           <div className="p-1">
             {filtered.length === 0 && (
@@ -535,46 +529,19 @@ export function EventDialog({ event, onSuccess }: Props) {
               </p>
             </div>
             <div className="grid min-w-0 gap-1.5">
-              <Label htmlFor="organizationId" className="text-white/70">
-                Organização
-              </Label>
-              <Select
-                value={organizationId || '__none__'}
-                onValueChange={v =>
-                  setOrganizationId(v === '__none__' ? '' : v)
+              <Label className="text-white/70">Organização</Label>
+              <FilterCombobox
+                value={organizationId}
+                onChange={setOrganizationId}
+                placeholder="Nenhuma"
+                clearLabel="Nenhuma"
+                showClear={!!organizationId}
+                options={organizationOptions.map(o => o.id)}
+                labelForValue={id =>
+                  organizationOptions.find(o => o.id === id)?.name ?? ''
                 }
-              >
-                <SelectTrigger
-                  id="organizationId"
-                  className={cn(
-                    INPUT_CLS,
-                    'h-9 w-full shadow-none focus-visible:ring-0 [&_svg]:text-white/40'
-                  )}
-                >
-                  <SelectValue placeholder="Nenhuma" />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="border-white/10 bg-[#071525] text-white"
-                >
-                  <SelectItem
-                    value="__none__"
-                    className="focus:bg-white/10 focus:text-white"
-                  >
-                    Nenhuma
-                  </SelectItem>
-                  {organizationOptions.map(o => (
-                    <SelectItem
-                      key={o.id}
-                      value={o.id}
-                      className="focus:bg-white/10 focus:text-white"
-                    >
-                      {o.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                width="w-full min-w-0"
+              />
               <p className="text-[0.65rem] text-white/35">
                 Cadastre opções em Eventos → Organizações.
               </p>

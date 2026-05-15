@@ -24,9 +24,10 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { FilterCombobox } from '@/components/filter-combobox'
+import { TeamMemberThumb } from '@/components/team-member-thumb'
 import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Dialog,
   DialogContent,
@@ -36,13 +37,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 import {
@@ -133,6 +127,7 @@ type TeamMember = {
   id: string
   name: string
   photoMimeType: string | null
+  updatedAt: string
   /** false = oculto na equipe pública; ainda pode ser diretor em contatos. */
   active: boolean
 }
@@ -143,83 +138,6 @@ type Channel = {
   iconKey: string
   value: string
   sortOrder: number
-}
-
-// ─── Team member searchable dropdown ─────────────────────────────────────────
-
-function TeamMemberSearch({
-  value,
-  onChange,
-  teamMembers,
-}: {
-  value: string
-  onChange: (id: string) => void
-  teamMembers: TeamMember[]
-}) {
-  const selected = teamMembers.find(m => m.id === value)
-  const [query, setQuery] = useState(selected?.name ?? '')
-  const [open, setOpen] = useState(false)
-
-  const filtered = query.trim()
-    ? teamMembers.filter(m =>
-        m.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : teamMembers
-
-  function select(m: TeamMember) {
-    onChange(m.id)
-    setQuery(m.name)
-    setOpen(false)
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setQuery(e.target.value)
-    setOpen(true)
-    if (!e.target.value) onChange('')
-  }
-
-  return (
-    <div className="relative">
-      <Input
-        value={query}
-        onChange={handleChange}
-        onClick={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder="Buscar membro…"
-        className={`${INPUT_CLS} h-10 text-sm`}
-        autoComplete="off"
-      />
-      {open && (
-        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-white/10 bg-[#27272a] shadow-lg">
-          <div onWheel={e => e.stopPropagation()}>
-            <ScrollArea className="max-h-52">
-              <ul className="p-1">
-                {filtered.length > 0 ? (
-                  filtered.map(m => (
-                    <li
-                      key={m.id}
-                      onMouseDown={() => select(m)}
-                      className={`cursor-pointer rounded-sm px-2.5 py-1.5 text-sm transition-colors ${
-                        m.id === value
-                          ? 'bg-white/15 text-white'
-                          : 'text-white/80 hover:bg-white/10 hover:text-white'
-                      }`}
-                    >
-                      {m.name}
-                    </li>
-                  ))
-                ) : (
-                  <li className="px-2.5 py-2 text-sm text-white/35">
-                    Nenhum membro encontrado.
-                  </li>
-                )}
-              </ul>
-            </ScrollArea>
-          </div>
-        </div>
-      )}
-    </div>
-  )
 }
 
 // ─── Director card ────────────────────────────────────────────────────────────
@@ -344,10 +262,35 @@ function DirectorCard({
           <form onSubmit={handleSave} className="space-y-4 pt-1">
             <div className="grid gap-1.5">
               <Label className="text-sm text-white/70">Membro da equipe</Label>
-              <TeamMemberSearch
+              <FilterCombobox
                 value={selectedId}
                 onChange={setSelectedId}
-                teamMembers={membersForPicker}
+                placeholder="Buscar membro…"
+                clearLabel="Remover diretor"
+                showClear={!!selectedId}
+                options={membersForPicker.map(m => m.id)}
+                labelForValue={id => membersForPicker.find(m => m.id === id)?.name ?? ''}
+                width="w-full min-w-0"
+                renderOption={id => {
+                  const m = membersForPicker.find(r => r.id === id)
+                  const label = m?.name ?? id
+                  return (
+                    <span className="flex min-w-0 items-center gap-2">
+                      <TeamMemberThumb memberId={id} displayName={label} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={22} frameClassName="border-white/10 bg-white/5" />
+                      <span className="truncate" title={label}>{label}</span>
+                    </span>
+                  )
+                }}
+                renderValue={id => {
+                  const m = membersForPicker.find(r => r.id === id)
+                  const label = m?.name ?? ''
+                  return (
+                    <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                      <TeamMemberThumb memberId={id} displayName={label || id} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={24} frameClassName="border-white/10 bg-white/5" />
+                      <span className="block min-w-0 flex-1 truncate" title={label || undefined}>{label}</span>
+                    </span>
+                  )
+                }}
               />
             </div>
 
@@ -686,29 +629,36 @@ function AddChannelModal({
         <form onSubmit={handleSave} className="space-y-4 pt-1">
           <div className="grid gap-1.5">
             <Label className="text-sm text-white/70">Tipo</Label>
-            <Select value={label} onValueChange={handleTypeChange}>
-              <SelectTrigger className={`${INPUT_CLS} h-10 w-full`}>
-                <SelectValue placeholder="Selecione o tipo…" />
-              </SelectTrigger>
-              <SelectContent className="border-white/10 bg-[#27272a] text-white">
-                {CONTACT_TYPES.map(t => {
-                  const Icon = ICON_MAP[t.icon] ?? Link
-                  return (
-                    <SelectItem
-                      key={t.label}
-                      value={t.label}
-                      className="focus:bg-white/10 focus:text-white"
-                    >
-                      <Icon
-                        size={14}
-                        className="mr-1.5 inline-block opacity-70"
-                      />
-                      {t.label}
-                    </SelectItem>
-                  )
-                })}
-              </SelectContent>
-            </Select>
+            <FilterCombobox
+              value={label}
+              onChange={handleTypeChange}
+              placeholder="Selecione o tipo…"
+              clearLabel="Limpar"
+              showClear={false}
+              options={CONTACT_TYPES.map(t => t.label)}
+              labelForValue={l => l}
+              width="w-full min-w-0"
+              renderOption={l => {
+                const t = CONTACT_TYPES.find(x => x.label === l)
+                const Icon = t ? (ICON_MAP[t.icon] ?? Link) : Link
+                return (
+                  <span className="flex items-center gap-2">
+                    {createElement(Icon, { size: 14, className: 'shrink-0 opacity-70' })}
+                    {l}
+                  </span>
+                )
+              }}
+              renderValue={l => {
+                const t = CONTACT_TYPES.find(x => x.label === l)
+                const Icon = t ? (ICON_MAP[t.icon] ?? Link) : Link
+                return (
+                  <span className="flex min-w-0 flex-1 items-center gap-2">
+                    {createElement(Icon, { size: 14, className: 'shrink-0 opacity-70' })}
+                    <span className="truncate">{l}</span>
+                  </span>
+                )
+              }}
+            />
           </div>
 
           <div className="grid gap-1.5">
@@ -817,11 +767,13 @@ export function ContatoWorkspace() {
                 name: string
                 displayName?: string
                 photoMimeType: string | null
+                updatedAt?: string
                 active?: boolean
               }) => ({
                 id: m.id,
                 name: m.displayName ?? m.name,
                 photoMimeType: m.photoMimeType,
+                updatedAt: m.updatedAt ?? '',
                 active: m.active !== false,
               })
             )
