@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -38,6 +38,7 @@ import {
   DevelopedPlatformDialog,
   type DevelopedPlatformRow,
 } from './developed-platform-dialog'
+import { readApiError } from '@/lib/read-api-error'
 
 const PAGE_SIZE = 10
 
@@ -53,9 +54,10 @@ export function DevelopedPlatformsTable() {
   const [rows, setRows] = useState<DevelopedPlatformRow[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const fetchPlatforms = useCallback(async () => {
-    setLoading(true)
+  const fetchPlatforms = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) setLoading(true)
     try {
       const res = await fetch('/api/developed-platforms')
       const data = await res.json()
@@ -88,7 +90,7 @@ export function DevelopedPlatformsTable() {
     } catch {
       toast.error('Erro ao carregar plataformas.')
     } finally {
-      setLoading(false)
+      if (!opts?.silent) setLoading(false)
     }
   }, [])
 
@@ -97,12 +99,22 @@ export function DevelopedPlatformsTable() {
   }, [fetchPlatforms])
 
   async function handleDelete(id: string) {
+    setDeletingId(id)
     try {
-      await fetch(`/api/developed-platforms/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/developed-platforms/${id}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok && res.status !== 204) {
+        throw new Error(await readApiError(res))
+      }
       toast.success('Plataforma removida.')
-      fetchPlatforms()
-    } catch {
-      toast.error('Erro ao remover plataforma.')
+      await fetchPlatforms({ silent: true })
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Erro ao remover plataforma.'
+      )
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -118,8 +130,8 @@ export function DevelopedPlatformsTable() {
             Plataformas desenvolvidas
           </h1>
           <p className="mt-0.5 text-sm text-white/40">
-            Cadastro exibido na página pública Infraestrutura — links do projeto e
-            da plataforma são opcionais.
+            Cadastro exibido na página pública Infraestrutura — links do projeto
+            e da plataforma são opcionais.
           </p>
         </div>
         <div className="flex shrink-0 self-end sm:self-auto">
@@ -243,8 +255,18 @@ export function DevelopedPlatformsTable() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
+                            disabled={deletingId !== null}
+                            aria-busy={deletingId === row.id ? true : undefined}
                           >
-                            <Trash2 size={14} />
+                            {deletingId === row.id ? (
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-rose-400/90"
+                                aria-hidden
+                              />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
@@ -263,9 +285,13 @@ export function DevelopedPlatformsTable() {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                              onClick={() => handleDelete(row.id)}
+                              disabled={deletingId !== null}
+                              onClick={e => {
+                                e.preventDefault()
+                                void handleDelete(row.id)
+                              }}
                             >
-                              Remover
+                              {deletingId === row.id ? 'A remover…' : 'Remover'}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

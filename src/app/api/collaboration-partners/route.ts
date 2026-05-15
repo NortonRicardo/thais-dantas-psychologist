@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { asc } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { collaborationPartners } from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
+import { parseCollaborationPartnerForm } from '@/lib/validation/infraestrutura-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
@@ -32,22 +34,15 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData()
-
-    const name = (fd.get('name') as string)?.trim()
-    const description = (fd.get('description') as string)?.trim()
-
-    if (!name || !description) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
+    const parsed = parseCollaborationPartnerForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const d = parsed.data
 
     const [created] = await db
       .insert(collaborationPartners)
       .values({
-        name,
-        description,
+        name: d.name,
+        description: d.description,
       })
       .returning({
         id: collaborationPartners.id,

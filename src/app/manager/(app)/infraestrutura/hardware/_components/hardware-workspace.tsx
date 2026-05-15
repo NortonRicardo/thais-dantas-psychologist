@@ -30,6 +30,7 @@ import { Textarea } from '@/components/ui/textarea'
 
 import { LucideIconPicker } from './lucide-icon-picker'
 import { getLucideIcon } from '@/lib/lucide-resolve'
+import { hardwareUpsertBodySchema } from '@/lib/validation/infraestrutura-api'
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
@@ -80,10 +81,14 @@ function HardwareSummaryCard({
   hardware,
   onEdit,
   onDelete,
+  deleteBusyGlobal,
+  deleteBusyThis,
 }: {
   hardware: HardwareDraft
   onEdit: () => void
   onDelete: () => void
+  deleteBusyGlobal: boolean
+  deleteBusyThis: boolean
 }) {
   const title = hardware.title.trim() || 'Sem título'
 
@@ -100,6 +105,7 @@ function HardwareSummaryCard({
             size="icon"
             className="h-8 w-8 text-white/45 hover:bg-white/10 hover:text-sky-400"
             title="Editar"
+            disabled={deleteBusyGlobal}
             onClick={onEdit}
           >
             <Pencil size={15} />
@@ -112,6 +118,7 @@ function HardwareSummaryCard({
                 size="icon"
                 className="h-8 w-8 text-white/45 hover:bg-rose-500/10 hover:text-rose-400"
                 title="Remover equipamento"
+                disabled={deleteBusyGlobal}
               >
                 <Trash2 size={15} />
               </Button>
@@ -130,9 +137,13 @@ function HardwareSummaryCard({
                 </AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                  onClick={onDelete}
+                  disabled={deleteBusyGlobal}
+                  onClick={e => {
+                    e.preventDefault()
+                    onDelete()
+                  }}
                 >
-                  Remover
+                  {deleteBusyThis ? 'A remover…' : 'Remover'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -182,6 +193,7 @@ export function HardwareWorkspace() {
 
   const [hardwareItems, setHardwareItems] = useState<HardwareDraft[]>([])
   const [moduleErrors, setModuleErrors] = useState<ModuleErrors>({})
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -296,34 +308,51 @@ export function HardwareWorkspace() {
   async function handleSubmitModal(e: React.FormEvent) {
     e.preventDefault()
 
-    const errors: ModuleErrors = {}
-    for (const m of draft.modules) {
-      const err: { title?: string; description?: string } = {}
-      if (!m.title.trim()) err.title = 'Obrigatório'
-      if (!m.description.trim()) err.description = 'Obrigatório'
-      if (err.title || err.description) errors[m.key] = err
+    const payload = {
+      title: draft.title.trim(),
+      modules: draft.modules.map(m => ({
+        title: m.title.trim(),
+        iconKey: m.iconKey.trim(),
+        description: m.description.trim(),
+      })),
     }
-    if (Object.keys(errors).length > 0) {
+
+    const parsed = hardwareUpsertBodySchema.safeParse(payload)
+    if (!parsed.success) {
+      const errors: ModuleErrors = {}
+      let titleMsg: string | undefined
+      let modulesMaxMsg: string | undefined
+      for (const issue of parsed.error.issues) {
+        const p = issue.path
+        if (p[0] === 'title') titleMsg = issue.message
+        else if (p[0] === 'modules' && p.length === 1)
+          modulesMaxMsg = issue.message
+        else if (p[0] === 'modules' && typeof p[1] === 'number') {
+          const idx = p[1] as number
+          const mod = draft.modules[idx]
+          if (!mod) continue
+          const field = p[2]
+          if (field === 'title' || field === 'description') {
+            const prev = errors[mod.key] ?? {}
+            errors[mod.key] = { ...prev, [field]: issue.message }
+          }
+        }
+      }
       setModuleErrors(errors)
+      if (titleMsg) toast.error(titleMsg)
+      else if (modulesMaxMsg) toast.error(modulesMaxMsg)
+      else if (Object.keys(errors).length === 0)
+        toast.error(parsed.error.issues[0]?.message ?? 'Dados inválidos.')
       return
     }
 
     setSaving(true)
     try {
-      const payload = {
-        title: draft.title.trim(),
-        modules: draft.modules.map(m => ({
-          title: m.title.trim(),
-          iconKey: m.iconKey.trim(),
-          description: m.description.trim(),
-        })),
-      }
-
       if (dialogMode === 'create') {
         const res = await fetch('/api/hardware', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(parsed.data),
         })
         if (!res.ok) {
           const err = await res.json().catch(() => ({}))
@@ -336,7 +365,7 @@ export function HardwareWorkspace() {
         const res = await fetch(`/api/hardware/${editingServerId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(parsed.data),
         })
         if (!res.ok) {
           const err = await res.json().catch(() => ({}))
@@ -360,6 +389,7 @@ export function HardwareWorkspace() {
   }
 
   async function handleDeleteHardware(id: string) {
+    setDeletingId(id)
     try {
       const res = await fetch(`/api/hardware/${id}`, { method: 'DELETE' })
       if (!res.ok && res.status !== 204) {
@@ -375,6 +405,8 @@ export function HardwareWorkspace() {
       toast.error(
         err instanceof Error ? err.message : 'Erro ao remover equipamento.'
       )
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -409,6 +441,8 @@ export function HardwareWorkspace() {
               hardware={hw}
               onEdit={() => openEdit(hw)}
               onDelete={() => void handleDeleteHardware(hw.key)}
+              deleteBusyGlobal={deletingId !== null}
+              deleteBusyThis={deletingId === hw.key}
             />
           ))}
         </div>
@@ -571,6 +605,7 @@ export function HardwareWorkspace() {
                 type="button"
                 variant="ghost"
                 className="text-white/50 hover:bg-white/5 hover:text-white"
+                disabled={saving}
                 onClick={() => setDialogOpen(false)}
               >
                 Cancelar
@@ -578,6 +613,9 @@ export function HardwareWorkspace() {
               <Button
                 type="submit"
                 loading={saving}
+                loadingLabel={
+                  dialogMode === 'create' ? 'A criar…' : 'A guardar…'
+                }
                 className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
               >
                 {dialogMode === 'create' ? 'Criar' : 'Salvar'}

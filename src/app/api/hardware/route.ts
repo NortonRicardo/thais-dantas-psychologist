@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { asc, inArray } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { hardware, hardwareModules } from '@/lib/db/schema'
+import { hardwareUpsertBodySchema } from '@/lib/validation/infraestrutura-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 const MAX_HARDWARE = 24
-const MAX_MODULES_PER_HW = 48
 
 export async function GET() {
   try {
@@ -76,26 +77,14 @@ export async function GET() {
   }
 }
 
-type ModulePayload = {
-  title: string
-  iconKey: string
-  description: string
-}
-
 /** Cria um único equipamento (usado pelo gestor ao adicionar). */
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as {
-      title?: string
-      modules?: ModulePayload[]
-    }
+    const raw = await req.json()
+    const parsed = hardwareUpsertBodySchema.safeParse(raw)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    const title = (body.title ?? '').trim()
-    const modules = Array.isArray(body.modules) ? body.modules : []
-
-    if (!title) {
-      return NextResponse.json({ error: 'Título obrigatório' }, { status: 400 })
-    }
+    const { title, modules } = parsed.data
 
     const rows = await db.select({ id: hardware.id }).from(hardware)
     if (rows.length >= MAX_HARDWARE) {
@@ -103,25 +92,6 @@ export async function POST(req: NextRequest) {
         { error: `No máximo ${MAX_HARDWARE} equipamentos` },
         { status: 400 }
       )
-    }
-
-    if (modules.length > MAX_MODULES_PER_HW) {
-      return NextResponse.json(
-        { error: `No máximo ${MAX_MODULES_PER_HW} módulos` },
-        { status: 400 }
-      )
-    }
-
-    for (let i = 0; i < modules.length; i++) {
-      const m = modules[i]
-      const title = (m.title ?? '').trim()
-      const description = (m.description ?? '').trim()
-      if (!title || !description) {
-        return NextResponse.json(
-          { error: `Módulo ${i + 1}: título e descrição obrigatórios` },
-          { status: 400 }
-        )
-      }
     }
 
     const [hw] = await db
@@ -133,9 +103,9 @@ export async function POST(req: NextRequest) {
       await db.insert(hardwareModules).values(
         modules.map((m, i) => ({
           hardwareId: hw.id,
-          title: m.title.trim(),
-          iconKey: (m.iconKey ?? '').trim(),
-          description: m.description.trim(),
+          title: m.title,
+          iconKey: m.iconKey,
+          description: m.description,
           sortOrder: i,
         }))
       )

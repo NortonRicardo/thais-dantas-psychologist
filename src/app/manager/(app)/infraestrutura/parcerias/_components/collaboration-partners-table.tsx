@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -38,6 +38,7 @@ import {
   CollaborationPartnerDialog,
   type CollaborationPartnerRow,
 } from './collaboration-partner-dialog'
+import { readApiError } from '@/lib/read-api-error'
 
 const PAGE_SIZE = 10
 
@@ -53,9 +54,10 @@ export function CollaborationPartnersTable() {
   const [rows, setRows] = useState<CollaborationPartnerRow[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const fetchPartners = useCallback(async () => {
-    setLoading(true)
+  const fetchPartners = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) setLoading(true)
     try {
       const res = await fetch('/api/collaboration-partners')
       const data = await res.json()
@@ -80,7 +82,7 @@ export function CollaborationPartnersTable() {
     } catch {
       toast.error('Erro ao carregar parceiros.')
     } finally {
-      setLoading(false)
+      if (!opts?.silent) setLoading(false)
     }
   }, [])
 
@@ -89,12 +91,22 @@ export function CollaborationPartnersTable() {
   }, [fetchPartners])
 
   async function handleDelete(id: string) {
+    setDeletingId(id)
     try {
-      await fetch(`/api/collaboration-partners/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/collaboration-partners/${id}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok && res.status !== 204) {
+        throw new Error(await readApiError(res))
+      }
       toast.success('Parceiro removido.')
-      fetchPartners()
-    } catch {
-      toast.error('Erro ao remover parceiro.')
+      await fetchPartners({ silent: true })
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Erro ao remover parceiro.'
+      )
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -108,7 +120,8 @@ export function CollaborationPartnersTable() {
         <div className="min-w-0">
           <h1 className="text-xl font-semibold text-white/90">Parcerias</h1>
           <p className="mt-0.5 text-sm text-white/40">
-            Parceiros exibidos na seção homônima da página pública Infraestrutura.
+            Parceiros exibidos na seção homônima da página pública
+            Infraestrutura.
           </p>
         </div>
         <div className="flex shrink-0 self-end sm:self-start sm:pt-0.5">
@@ -197,8 +210,18 @@ export function CollaborationPartnersTable() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
+                            disabled={deletingId !== null}
+                            aria-busy={deletingId === row.id ? true : undefined}
                           >
-                            <Trash2 size={14} />
+                            {deletingId === row.id ? (
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-rose-400/90"
+                                aria-hidden
+                              />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
@@ -217,9 +240,13 @@ export function CollaborationPartnersTable() {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                              onClick={() => handleDelete(row.id)}
+                              disabled={deletingId !== null}
+                              onClick={e => {
+                                e.preventDefault()
+                                void handleDelete(row.id)
+                              }}
                             >
-                              Remover
+                              {deletingId === row.id ? 'A remover…' : 'Remover'}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

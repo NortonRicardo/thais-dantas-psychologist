@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { readApiError } from '@/lib/read-api-error'
 
 export type CollaborationPartnerRow = {
   id: string
@@ -55,13 +56,15 @@ export function CollaborationPartnerDialog({ partner, onSuccess }: Props) {
 
     try {
       const res = await fetch(url, { method, body: fd })
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) throw new Error(await readApiError(res))
       toast.success(isEdit ? 'Parceiro atualizado!' : 'Parceiro criado!')
       setOpen(false)
       onSuccess()
     } catch (err) {
       console.error(err)
-      toast.error('Erro ao salvar parceiro.')
+      toast.error(
+        err instanceof Error ? err.message : 'Erro ao salvar parceiro.'
+      )
     } finally {
       setLoading(false)
     }
@@ -86,7 +89,7 @@ export function CollaborationPartnerDialog({ partner, onSuccess }: Props) {
       </DialogTrigger>
 
       <DialogContent
-        className="max-h-[90vh] max-w-lg overflow-y-auto bg-[#071525] text-white border-white/10 [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
+        className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto bg-[#071525] text-white border-white/10 sm:max-w-xl [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>
@@ -95,7 +98,11 @@ export function CollaborationPartnerDialog({ partner, onSuccess }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-2 grid gap-4">
+        <form
+          key={`${open}-${partner?.id ?? 'new'}`}
+          onSubmit={handleSubmit}
+          className="mt-2 grid gap-4"
+        >
           <div className="grid gap-1.5">
             <Label htmlFor="name" className="text-white/70">
               Nome *
@@ -130,6 +137,7 @@ export function CollaborationPartnerDialog({ partner, onSuccess }: Props) {
               type="button"
               variant="ghost"
               className="text-white/50 hover:text-white hover:bg-white/5"
+              disabled={loading}
               onClick={() => setOpen(false)}
             >
               Cancelar
@@ -137,6 +145,7 @@ export function CollaborationPartnerDialog({ partner, onSuccess }: Props) {
             <Button
               type="submit"
               loading={loading}
+              loadingLabel={isEdit ? 'A guardar…' : 'A criar…'}
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
               {isEdit ? 'Salvar alterações' : 'Criar'}

@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { asc } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { developedPlatforms } from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
-
-function optLink(v: unknown): string | null {
-  const t = typeof v === 'string' ? v.trim() : ''
-  return t.length > 0 ? t : null
-}
+import { parseDevelopedPlatformForm } from '@/lib/validation/infraestrutura-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
@@ -38,28 +35,19 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData()
-
-    const title = (fd.get('title') as string)?.trim()
-    const description = (fd.get('description') as string)?.trim()
-    const iconKey = ((fd.get('iconKey') as string) || 'cloud-sun').trim()
-    const badgeRaw = (fd.get('badge') as string)?.trim()
-
-    if (!title || !description) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
+    const parsed = parseDevelopedPlatformForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const d = parsed.data
 
     const [created] = await db
       .insert(developedPlatforms)
       .values({
-        title,
-        description,
-        projectLink: optLink(fd.get('projectLink')),
-        platformLink: optLink(fd.get('platformLink')),
-        badge: badgeRaw ? badgeRaw : null,
-        iconKey: iconKey || 'cloud-sun',
+        title: d.title,
+        description: d.description,
+        projectLink: d.projectLink,
+        platformLink: d.platformLink,
+        badge: d.badge,
+        iconKey: d.iconKey,
       })
       .returning({
         id: developedPlatforms.id,
