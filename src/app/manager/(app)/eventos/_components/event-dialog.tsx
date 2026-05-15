@@ -114,7 +114,7 @@ function TypeCombobox({
           </div>
         </div>
 
-        <div className="max-h-48 overflow-y-auto overscroll-contain p-1" onWheel={e => e.stopPropagation()}>
+        <div className="max-h-48 overflow-y-auto overscroll-contain p-1">
           {filtered.length === 0 && (
             <p className="py-2 text-center text-xs text-white/25">Nenhum resultado</p>
           )}

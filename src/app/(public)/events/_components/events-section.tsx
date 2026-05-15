@@ -354,7 +354,10 @@ function TypeFilterPopover({
                 />
               </div>
             </div>
-            <div className="max-h-52 overflow-y-auto p-1">
+            <div
+              className="max-h-52 overflow-y-auto p-1"
+              onWheel={e => e.stopPropagation()}
+            >
               <button
                 type="button"
                 onClick={() => select('')}

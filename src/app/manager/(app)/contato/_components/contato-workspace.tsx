@@ -196,7 +196,10 @@ function TeamMemberSearch({
       />
       {open && (
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-white/10 bg-[#27272a] shadow-lg">
-          <ul className="max-h-52 overflow-y-auto p-1">
+          <ul
+            className="max-h-52 overflow-y-auto p-1"
+            onWheel={e => e.stopPropagation()}
+          >
             {filtered.length > 0 ? filtered.map(m => (
               <li
                 key={m.id}

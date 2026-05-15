@@ -34,7 +34,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { LucideIconPicker } from '@/app/manager/(app)/hardware/_components/lucide-icon-picker'
+import { LucideIconPicker } from '@/app/manager/(app)/infraestrutura/hardware/_components/lucide-icon-picker'
 import { ColorSelector } from '@/components/color-selector'
 import { COLOR_OPTIONS } from '@/components/constants/colors'
 

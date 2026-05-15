@@ -11,9 +11,7 @@ const navItems = [
   { href: '/manager/equipe', label: 'Equipe' },
   { href: '/manager/sobre-nos', label: 'Sobre Nós' },
   { href: '/manager/contato', label: 'Contato' },
-  { href: '/manager/hardware', label: 'Hardware' },
-  { href: '/manager/plataformas', label: 'Plataformas' },
-  { href: '/manager/rede-colaboracao', label: 'Parcerias' },
+  { href: '/manager/infraestrutura', label: 'Infraestrutura' },
 ]
 
 export function ManagerNav() {
@@ -25,7 +23,10 @@ export function ManagerNav() {
       aria-label="Principal"
     >
       {navItems.map(({ href, label }) => {
-        const isCurrent = pathname === href
+        const isCurrent =
+          href === '/manager/infraestrutura'
+            ? pathname.startsWith('/manager/infraestrutura')
+            : pathname === href
         return (
           <Link
             key={label}

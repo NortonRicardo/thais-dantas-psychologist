@@ -25,25 +25,11 @@ const cards = [
     href: '/manager/sobre-nos',
   },
   {
-    id: 'plataformas',
-    title: 'Plataformas desenvolvidas',
+    id: 'infraestrutura',
+    title: 'Infraestrutura',
     description:
-      'Weather Brasil, META TOOL BOX e demais — textos, selos e links na Infraestrutura.',
-    href: '/manager/plataformas',
-  },
-  {
-    id: 'hardware',
-    title: 'Hardware atual',
-    description:
-      'Um ou mais equipamentos; cada um com módulos (ícone + texto) na Infraestrutura.',
-    href: '/manager/hardware',
-  },
-  {
-    id: 'rede-colaboracao',
-    title: 'Parcerias',
-    description:
-      'Parceiros institucionais mostrados na página Infraestrutura — nomes e descrições.',
-    href: '/manager/rede-colaboracao',
+      'Hardware, plataformas desenvolvidas e parcerias exibidos na página pública Infraestrutura.',
+    href: '/manager/infraestrutura',
   },
   {
     id: 'equipe',
