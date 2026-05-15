@@ -1,7 +1,14 @@
 import 'server-only'
-import { asc, desc } from 'drizzle-orm'
+import { asc, desc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { eventTypes, events } from '@/lib/db/schema'
+import {
+  eventOrganizations,
+  eventTypes,
+  events,
+  teamMembers,
+  teamNamePrefixes,
+} from '@/lib/db/schema'
+import { eventSpeakerDisplayName } from '@/lib/events-speaker-display'
 
 export type PublicEventTypeData = {
   name: string
@@ -23,6 +30,11 @@ export type PublicEventData = {
   date: string
   type: string
   speaker: string | null
+  speakerMemberId: string | null
+  speakerPhotoMimeType: string | null
+  /** Para cache-bust da foto `/api/team/:id/photo` */
+  speakerMemberUpdatedAt: string | null
+  /** Nome da organização (via FK) */
   organizer: string | null
   link: string | null
   meetLink: string | null
@@ -33,15 +45,19 @@ export type PublicEventData = {
 }
 
 export async function getPublicEvents(): Promise<PublicEventData[]> {
-  const rows = await db
+  const raw = await db
     .select({
       id: events.id,
       title: events.title,
       description: events.description,
       date: events.date,
       type: events.type,
-      speaker: events.speaker,
-      organizer: events.organizer,
+      speakerMemberId: events.speakerMemberId,
+      speakerMemberName: teamMembers.name,
+      speakerPrefixLabel: teamNamePrefixes.label,
+      speakerPhotoMimeType: teamMembers.photoMimeType,
+      speakerMemberUpdatedAt: teamMembers.updatedAt,
+      organizer: eventOrganizations.name,
       link: events.link,
       meetLink: events.meetLink,
       recordingLink: events.recordingLink,
@@ -50,11 +66,39 @@ export async function getPublicEvents(): Promise<PublicEventData[]> {
       updatedAt: events.updatedAt,
     })
     .from(events)
-    .orderBy(desc(events.date))
+    .leftJoin(
+      eventOrganizations,
+      eq(events.organizationId, eventOrganizations.id)
+    )
+    .leftJoin(teamMembers, eq(events.speakerMemberId, teamMembers.id))
+    .leftJoin(
+      teamNamePrefixes,
+      eq(teamMembers.namePrefixId, teamNamePrefixes.id)
+    )
+    .orderBy(desc(events.date), desc(events.createdAt))
 
-  return rows.map(r => ({
-    ...r,
-    date: r.date.toISOString(),
-    updatedAt: r.updatedAt.toISOString(),
-  }))
+  return raw.map(r => {
+    const {
+      speakerMemberName,
+      speakerPrefixLabel,
+      speakerMemberId,
+      speakerPhotoMimeType,
+      speakerMemberUpdatedAt,
+      ...rest
+    } = r
+    return {
+      ...rest,
+      speakerMemberId,
+      speakerPhotoMimeType,
+      speakerMemberUpdatedAt: speakerMemberUpdatedAt
+        ? speakerMemberUpdatedAt.toISOString()
+        : null,
+      speaker: eventSpeakerDisplayName({
+        speakerMemberName,
+        speakerPrefixLabel,
+      }),
+      date: r.date.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+    }
+  })
 }

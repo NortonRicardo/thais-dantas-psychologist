@@ -1,19 +1,19 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { TeamMemberThumb } from '@/components/team-member-thumb'
+import { COLOR_HEX_MAP } from '@/components/constants/colors'
+import type { PublicEventData, PublicEventTypeData } from '@/lib/http/events'
 import {
   CalendarDays,
   ChevronDown,
   ExternalLink,
   MapPin,
-  Mic,
   Search,
   Users,
   Video,
   X,
 } from 'lucide-react'
-import { COLOR_HEX_MAP } from '@/components/constants/colors'
-import type { PublicEventTypeData } from '@/lib/http/events'
 
 const glass = {
   background:
@@ -57,22 +57,6 @@ function buildTypeColorMap(types: PublicEventTypeData[]) {
   return Object.fromEntries(types.map(t => [t.name, buildBadgeColor(t.color)]))
 }
 
-export type PublicEvent = {
-  id: string
-  title: string
-  description: string
-  date: string
-  type: string
-  speaker: string | null
-  organizer: string | null
-  link: string | null
-  meetLink: string | null
-  recordingLink: string | null
-  featured: boolean
-  imageMimeType: string | null
-  updatedAt: string
-}
-
 const MONTHS = [
   'jan',
   'fev',
@@ -104,7 +88,7 @@ function formatTime(iso: string) {
 function isPast(iso: string) {
   return new Date(iso) < new Date()
 }
-function imageUrl(event: PublicEvent) {
+function imageUrl(event: PublicEventData) {
   return `/api/events/${event.id}/image?t=${new Date(event.updatedAt).getTime()}`
 }
 
@@ -126,7 +110,13 @@ function TypeBadge({ type, colorMap }: { type: string; colorMap: ColorMap }) {
   )
 }
 
-function FeaturedCard({ event, colorMap }: { event: PublicEvent; colorMap: ColorMap }) {
+function FeaturedCard({
+  event,
+  colorMap,
+}: {
+  event: PublicEventData
+  colorMap: ColorMap
+}) {
   const past = isPast(event.date)
   return (
     <div className="relative overflow-hidden rounded-3xl" style={glass}>
@@ -176,9 +166,15 @@ function FeaturedCard({ event, colorMap }: { event: PublicEvent; colorMap: Color
             </span>
           )}
           {event.speaker && (
-            <span className="flex items-center gap-1.5">
-              <Mic size={13} strokeWidth={1.5} />
-              {event.speaker}
+            <span className="flex items-center gap-2">
+              <TeamMemberThumb
+                memberId={event.speakerMemberId ?? ''}
+                displayName={event.speaker}
+                photoMimeType={event.speakerPhotoMimeType}
+                updatedAtIso={event.speakerMemberUpdatedAt}
+                sizePx={28}
+              />
+              <span>{event.speaker}</span>
             </span>
           )}
         </div>
@@ -220,7 +216,13 @@ function FeaturedCard({ event, colorMap }: { event: PublicEvent; colorMap: Color
   )
 }
 
-function EventCard({ event, colorMap }: { event: PublicEvent; colorMap: ColorMap }) {
+function EventCard({
+  event,
+  colorMap,
+}: {
+  event: PublicEventData
+  colorMap: ColorMap
+}) {
   const past = isPast(event.date)
   return (
     <div
@@ -252,8 +254,15 @@ function EventCard({ event, colorMap }: { event: PublicEvent; colorMap: ColorMap
             {formatDate(event.date)} · {formatTime(event.date)}
           </span>
           {event.speaker && (
-            <span className="flex items-center gap-1.5">
-              <Mic size={11} strokeWidth={1.5} /> {event.speaker}
+            <span className="flex items-center gap-2">
+              <TeamMemberThumb
+                memberId={event.speakerMemberId ?? ''}
+                displayName={event.speaker}
+                photoMimeType={event.speakerPhotoMimeType}
+                updatedAtIso={event.speakerMemberUpdatedAt}
+                sizePx={22}
+              />
+              <span className="min-w-0 truncate">{event.speaker}</span>
             </span>
           )}
           {event.organizer && (
@@ -316,20 +325,32 @@ function TypeFilterPopover({
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const filtered = types.filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
+  const filtered = types.filter(t =>
+    t.name.toLowerCase().includes(search.toLowerCase())
+  )
 
-  function select(v: string) { onChange(v); setOpen(false); setSearch('') }
+  function select(v: string) {
+    onChange(v)
+    setOpen(false)
+    setSearch('')
+  }
 
   return (
     <div className="relative">
       <button
         type="button"
-        onClick={() => { setOpen(o => !o); setTimeout(() => inputRef.current?.focus(), 0) }}
+        onClick={() => {
+          setOpen(o => !o)
+          setTimeout(() => inputRef.current?.focus(), 0)
+        }}
         className="flex w-48 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10"
       >
         {value ? (
           <span className="flex items-center gap-2 text-white/80">
-            <span className="h-2 w-2 rounded-full" style={{ background: colorMap[value]?.text ?? '#fff' }} />
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ background: colorMap[value]?.text ?? '#fff' }}
+            />
             {value}
           </span>
         ) : (
@@ -344,7 +365,10 @@ function TypeFilterPopover({
           <div className="absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl">
             <div className="border-b border-white/10 p-2">
               <div className="relative">
-                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+                <Search
+                  size={12}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+                />
                 <input
                   ref={inputRef}
                   value={search}
@@ -372,11 +396,18 @@ function TypeFilterPopover({
                   onClick={() => select(t.name)}
                   className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === t.name ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
                 >
-                  <span className="h-2 w-2 rounded-full shrink-0" style={{ background: colorMap[t.name]?.text ?? '#fff' }} />
+                  <span
+                    className="h-2 w-2 rounded-full shrink-0"
+                    style={{ background: colorMap[t.name]?.text ?? '#fff' }}
+                  />
                   {t.name}
                 </button>
               ))}
-              {filtered.length === 0 && <p className="py-2 text-center text-xs text-white/25">Sem resultados</p>}
+              {filtered.length === 0 && (
+                <p className="py-2 text-center text-xs text-white/25">
+                  Sem resultados
+                </p>
+              )}
             </div>
           </div>
         </>
@@ -385,7 +416,7 @@ function TypeFilterPopover({
   )
 }
 
-type Props = { events: PublicEvent[]; eventTypes: PublicEventTypeData[] }
+type Props = { events: PublicEventData[]; eventTypes: PublicEventTypeData[] }
 
 export function EventsSection({ events, eventTypes }: Props) {
   const colorMap = buildTypeColorMap(eventTypes)
@@ -394,22 +425,30 @@ export function EventsSection({ events, eventTypes }: Props) {
 
   const hasFilters = filterTitle || filterType
 
-  function applyFilters(list: PublicEvent[]) {
+  function applyFilters(list: PublicEventData[]) {
     return list.filter(e => {
-      if (filterTitle && !e.title.toLowerCase().includes(filterTitle.toLowerCase())) return false
+      if (
+        filterTitle &&
+        !e.title.toLowerCase().includes(filterTitle.toLowerCase())
+      )
+        return false
       if (filterType && e.type !== filterType) return false
       return true
     })
   }
 
-  const featuredList = events
-    .filter(e => e.featured)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  const rest = events
-    .filter(e => !e.featured)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  const upcoming = applyFilters(rest.filter(e => !isPast(e.date)))
-  const past = applyFilters(rest.filter(e => isPast(e.date)))
+  function sortByDateDesc(list: PublicEventData[]) {
+    return [...list].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+  }
+
+  const featuredList = sortByDateDesc(events.filter(e => e.featured))
+  const rest = sortByDateDesc(events.filter(e => !e.featured))
+  const upcoming = sortByDateDesc(
+    applyFilters(rest.filter(e => !isPast(e.date)))
+  )
+  const past = sortByDateDesc(applyFilters(rest.filter(e => isPast(e.date))))
 
   return (
     <div className="flex w-full flex-col gap-10 pb-16">
@@ -420,13 +459,17 @@ export function EventsSection({ events, eventTypes }: Props) {
             Eventos
           </h1>
           <p className="max-w-prose text-base leading-relaxed text-slate-300">
-            Conferências, workshops, seminários e desafios científicos do ecossistema LEMM.
+            Conferências, workshops, seminários e desafios científicos do
+            ecossistema LEMM.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <Search
+              size={13}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+            />
             <input
               type="text"
               value={filterTitle}
@@ -435,7 +478,10 @@ export function EventsSection({ events, eventTypes }: Props) {
               className="w-[26rem] rounded-xl border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/35 outline-none backdrop-blur-sm focus:border-white/20"
             />
             {filterTitle && (
-              <button onClick={() => setFilterTitle('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60">
+              <button
+                onClick={() => setFilterTitle('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+              >
                 <X size={12} />
               </button>
             )}

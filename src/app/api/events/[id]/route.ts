@@ -1,21 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { events } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import {
+  eventOrganizations,
+  events,
+  teamMembers,
+  teamNamePrefixes,
+} from '@/lib/db/schema'
+import { eventSpeakerDisplayName } from '@/lib/events-speaker-display'
+import { parseEventForm } from '@/lib/validation/events-api'
+import {
+  uuidParamSafeParse,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, { params }: Ctx) {
   const { id } = await params
-  const [row] = await db
+  const idParsed = uuidParamSafeParse(id)
+  if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
+  const eventId = idParsed.data
+  const [raw] = await db
     .select({
       id: events.id,
       title: events.title,
       description: events.description,
       date: events.date,
       type: events.type,
-      speaker: events.speaker,
-      organizer: events.organizer,
+      speakerMemberId: events.speakerMemberId,
+      speakerMemberName: teamMembers.name,
+      speakerPrefixLabel: teamNamePrefixes.label,
+      speakerPhotoMimeType: teamMembers.photoMimeType,
+      speakerMemberUpdatedAt: teamMembers.updatedAt,
+      organizationId: events.organizationId,
+      organizer: eventOrganizations.name,
       link: events.link,
       meetLink: events.meetLink,
       recordingLink: events.recordingLink,
@@ -25,49 +45,69 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
       updatedAt: events.updatedAt,
     })
     .from(events)
-    .where(eq(events.id, id))
+    .leftJoin(
+      eventOrganizations,
+      eq(events.organizationId, eventOrganizations.id)
+    )
+    .leftJoin(teamMembers, eq(events.speakerMemberId, teamMembers.id))
+    .leftJoin(
+      teamNamePrefixes,
+      eq(teamMembers.namePrefixId, teamNamePrefixes.id)
+    )
+    .where(eq(events.id, eventId))
 
-  if (!row)
+  if (!raw)
     return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+
+  const {
+    speakerMemberName,
+    speakerPrefixLabel,
+    speakerMemberId,
+    speakerPhotoMimeType,
+    speakerMemberUpdatedAt,
+    ...rest
+  } = raw
+
+  const row = {
+    ...rest,
+    speakerMemberId,
+    speakerPhotoMimeType,
+    speakerMemberUpdatedAt: speakerMemberUpdatedAt
+      ? speakerMemberUpdatedAt.toISOString()
+      : null,
+    speaker: eventSpeakerDisplayName({
+      speakerMemberName,
+      speakerPrefixLabel,
+    }),
+  }
+
   return NextResponse.json({ ...row, hasImage: !!row.imageMimeType })
 }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
   try {
     const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
     const fd = await req.formData()
+    const parsed = parseEventForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    const title = (fd.get('title') as string)?.trim()
-    const description = (fd.get('description') as string)?.trim()
-    const dateRaw = fd.get('date') as string
-    const type = (fd.get('type') as string)?.trim()
-
-    if (!title || !description || !dateRaw || !type) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
-
-    const speaker = (fd.get('speaker') as string) || null
-    const organizer = (fd.get('organizer') as string) || null
-    const link = (fd.get('link') as string) || null
-    const meetLink = (fd.get('meetLink') as string) || null
-    const recordingLink = (fd.get('recordingLink') as string) || null
-    const featured = fd.get('featured') === 'true'
+    const d = parsed.data
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const patch: Record<string, any> = {
-      title,
-      description,
-      date: new Date(dateRaw),
-      type,
-      speaker,
-      organizer,
-      link,
-      meetLink,
-      recordingLink,
-      featured,
+      title: d.title,
+      description: d.description,
+      date: new Date(d.dateRaw),
+      type: d.type,
+      speakerMemberId: d.speakerMemberId,
+      organizationId: d.organizationId,
+      link: d.link,
+      meetLink: d.meetLink,
+      recordingLink: d.recordingLink,
+      featured: d.featured,
       updatedAt: new Date(),
     }
 
@@ -85,7 +125,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     const [updated] = await db
       .update(events)
       .set(patch)
-      .where(eq(events.id, id))
+      .where(eq(events.id, idParsed.data))
       .returning({ id: events.id, title: events.title, date: events.date })
 
     if (!updated)
@@ -101,7 +141,26 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
-  const { id } = await params
-  await db.delete(events).where(eq(events.id, id))
-  return new NextResponse(null, { status: 204 })
+  try {
+    const { id } = await params
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
+    const [deleted] = await db
+      .delete(events)
+      .where(eq(events.id, idParsed.data))
+      .returning({ id: events.id })
+
+    if (!deleted) {
+      return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+    }
+
+    return new NextResponse(null, { status: 204 })
+  } catch (err) {
+    console.error('[DELETE /api/events/:id]', err)
+    return NextResponse.json(
+      { error: 'Erro ao remover evento' },
+      { status: 500 }
+    )
+  }
 }

@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { EventsTable } from './events-table'
+import { EventOrganizationsTable } from './event-organizations-table'
 import { EventTypesTable } from './event-types-table'
 
-type View = 'eventos' | 'tipo-evento'
+type View = 'eventos' | 'tipo-evento' | 'organizacoes'
 
 const NAV_ITEMS: { id: View; label: string }[] = [
   { id: 'eventos', label: 'Eventos' },
   { id: 'tipo-evento', label: 'Tipo de Evento' },
+  { id: 'organizacoes', label: 'Organizações' },
 ]
 
 export function EventosLayout() {
@@ -44,6 +46,8 @@ export function EventosLayout() {
         {view === 'eventos' && <EventsTable />}
 
         {view === 'tipo-evento' && <EventTypesTable />}
+
+        {view === 'organizacoes' && <EventOrganizationsTable />}
       </div>
     </div>
   )

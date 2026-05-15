@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { eventTypes } from '@/lib/db/schema'
+import { events, eventTypes } from '@/lib/db/schema'
+import { eventTypeUpsertSchema } from '@/lib/validation/events-api'
+import {
+  validationErrorResponse,
+  uuidParamSafeParse,
+} from '@/lib/validation/team-api'
 
 export async function PUT(
   req: NextRequest,
@@ -9,22 +14,26 @@ export async function PUT(
 ) {
   try {
     const { id } = await params
-    const body = await req.json()
-    const { name, iconKey, color } = body as { name: string; iconKey: string; color: string }
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
 
-    if (!name?.trim()) {
-      return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
-    }
+    const raw = await req.json()
+    const parsed = eventTypeUpsertSchema.safeParse(raw)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+
+    const { name, iconKey, color } = parsed.data
+
+    const eventTypeId = idParsed.data
 
     const [updated] = await db
       .update(eventTypes)
       .set({
-        name: name.trim(),
-        iconKey: iconKey?.trim() || 'calendar',
-        color: color?.trim() || 'bg-blue-500',
+        name,
+        iconKey,
+        color,
         updatedAt: new Date(),
       })
-      .where(eq(eventTypes.id, id))
+      .where(eq(eventTypes.id, eventTypeId))
       .returning()
 
     if (!updated) {
@@ -48,7 +57,37 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    await db.delete(eventTypes).where(eq(eventTypes.id, id))
+    const idParsed = uuidParamSafeParse(id)
+    if (!idParsed.success) return validationErrorResponse(idParsed.error)
+
+    const eventTypeId = idParsed.data
+
+    const [row] = await db
+      .select({ id: eventTypes.id, name: eventTypes.name })
+      .from(eventTypes)
+      .where(eq(eventTypes.id, eventTypeId))
+      .limit(1)
+
+    if (!row) {
+      return NextResponse.json({ error: 'Tipo não encontrado' }, { status: 404 })
+    }
+
+    const [{ c }] = await db
+      .select({ c: sql<number>`count(*)::int` })
+      .from(events)
+      .where(eq(events.type, row.name))
+
+    if (Number(c) > 0) {
+      return NextResponse.json(
+        {
+          error:
+            'Não é possível excluir: existem eventos cadastrados com este tipo. Edite ou remova esses eventos antes.',
+        },
+        { status: 409 }
+      )
+    }
+
+    await db.delete(eventTypes).where(eq(eventTypes.id, eventTypeId))
     return new NextResponse(null, { status: 204 })
   } catch (err) {
     console.error('[DELETE /api/event-types/:id]', err)

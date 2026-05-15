@@ -169,6 +169,20 @@
       "when": 1747987200000,
       "tag": "0023_better_auth_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1748073600000,
+      "tag": "0024_event_organizations",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1748160000000,
+      "tag": "0025_events_speaker_member",
+      "breakpoints": true
     }
   ]
 }

@@ -16,6 +16,7 @@ export function FilterCombobox({
   clearLabel,
   options,
   width = 'w-44',
+  showClear = true,
   renderOption,
   labelForValue,
   renderValue,
@@ -26,6 +27,8 @@ export function FilterCombobox({
   clearLabel: string
   options: string[]
   width?: string
+  /** Se false, oculta o rodapé «limpar» (ex.: campo obrigatório). */
+  showClear?: boolean
   renderOption?: (opt: string) => React.ReactNode
   /** Quando `value` não é legível (ex.: id), exibir rótulo no botão. */
   labelForValue?: (value: string) => string
@@ -64,17 +67,23 @@ export function FilterCombobox({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className={`flex ${width} items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none hover:bg-white/[0.08] focus:border-white/20`}
+          className={`flex h-9 min-w-0 ${width} items-center justify-between gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-0 text-sm outline-none hover:bg-white/[0.08] focus:border-white/20`}
         >
           <span
-            className={`flex min-w-0 items-center gap-2 ${value ? 'text-white/80' : 'text-white/25'}`}
+            className={`flex min-w-0 flex-1 items-center gap-2 overflow-hidden text-left ${value ? 'text-white/80' : 'text-white/25'}`}
           >
             {value && renderValue ? (
-              renderValue(value)
+              <span className="flex min-w-0 flex-1 overflow-hidden">
+                {renderValue(value)}
+              </span>
             ) : value ? (
-              <span className="truncate">{triggerLabel}</span>
+              <span className="block min-w-0 flex-1 truncate">
+                {triggerLabel}
+              </span>
             ) : (
-              <span className="truncate">{placeholder}</span>
+              <span className="block min-w-0 flex-1 truncate">
+                {placeholder}
+              </span>
             )}
           </span>
           <ChevronDown size={13} className="shrink-0 text-white/30" />
@@ -82,7 +91,7 @@ export function FilterCombobox({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className={`${width} border-white/10 bg-[#071525] p-0 shadow-xl`}
+        className="w-[var(--radix-popover-trigger-width)] min-w-0 border-white/10 bg-[#071525] p-0 shadow-xl"
       >
         <div className="border-b border-white/10 px-2 py-2">
           <div className="relative">
@@ -127,7 +136,7 @@ export function FilterCombobox({
           ))}
         </div>
 
-        {value && (
+        {showClear && value && (
           <div className="border-t border-white/10 p-1">
             <button
               type="button"

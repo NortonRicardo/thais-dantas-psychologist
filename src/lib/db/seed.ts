@@ -6,6 +6,7 @@ import {
   collaborationPartners,
   contactInfo,
   developedPlatforms,
+  eventOrganizations,
   eventTypes,
   events,
   hardware,
@@ -35,7 +36,20 @@ const seedEventTypes = [
   { name: 'Encontro', iconKey: 'Handshake', color: 'bg-teal-800' },
 ]
 
-const seedEvents = [
+type SeedEventEntry = {
+  title: string
+  description: string
+  date: Date
+  type: string
+  organization?: string
+  speaker: string
+  featured?: boolean
+  link?: string
+  meetLink?: string
+  recordingLink?: string
+}
+
+const seedEvents: SeedEventEntry[] = [
   {
     title: 'Weather Brasil no WCERE 2026',
     description:
@@ -43,7 +57,7 @@ const seedEvents = [
     date: new Date('2026-06-15T09:00:00'),
     type: 'Conferência',
     link: 'https://wcere2026.org',
-    organizer: 'WCERE 2026 — Lisboa, Portugal',
+    organization: 'WCERE 2026 — Lisboa, Portugal',
     speaker: 'Norton Ricardo Pereira',
     featured: true,
   },
@@ -54,7 +68,7 @@ const seedEvents = [
     date: new Date('2026-05-20T14:00:00'),
     type: 'Workshop',
     meetLink: 'https://meet.google.com/abc-defg-hij',
-    organizer: 'DataSheLeads · LEMM',
+    organization: 'DataSheLeads · LEMM',
     speaker: 'Dra. Maria José Pereira Dantas',
   },
   {
@@ -64,7 +78,8 @@ const seedEvents = [
     date: new Date('2026-05-28T08:00:00'),
     type: 'Desafio',
     link: 'https://lemm.pucgoias.edu.br/desafio',
-    organizer: 'LEMM · PPGEIIA / PUC Goiás',
+    organization: 'LEMM · PPGEIIA / PUC Goiás',
+    speaker: 'Dra. Maria José Pereira Dantas',
   },
   {
     title: 'Seminário: Transformers para Modelagem Climática',
@@ -73,7 +88,7 @@ const seedEvents = [
     date: new Date('2026-06-05T16:00:00'),
     type: 'Seminário',
     meetLink: 'https://teams.microsoft.com/l/meetup-join/mock-link',
-    organizer: 'LEMM · INPE',
+    organization: 'LEMM · INPE',
     speaker: 'Salatiel A. A. Jordão',
   },
   {
@@ -82,7 +97,7 @@ const seedEvents = [
       'Introdução a algoritmos metaheurísticos (PSO, GA, SA) com aplicações em problemas de otimização combinatória, logística e portfólios financeiros. Material prático com Python e plataforma META TOOL BOX.',
     date: new Date('2026-07-10T09:00:00'),
     type: 'Minicurso',
-    organizer: 'LEMM · UFCAT',
+    organization: 'LEMM · UFCAT',
     speaker: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
   },
   {
@@ -91,7 +106,8 @@ const seedEvents = [
       'Defesa pública de dissertação de mestrado sobre modelos híbridos IA-física para predição de eventos de seca no Cerrado, com dados ERA5-Land e INMET integrados via pipeline de data healing.',
     date: new Date('2026-04-10T10:00:00'),
     type: 'Defesa',
-    organizer: 'PPGEIIA / PUC Goiás',
+    organization: 'PPGEIIA / PUC Goiás',
+    speaker: 'Dra. Maria José Pereira Dantas',
   },
   {
     title: 'Seminário: Risco Climático em Cadeias Agroindustriais',
@@ -99,7 +115,7 @@ const seedEvents = [
       'Seminário sobre modelagem de risco climático aplicada às cadeias de soja e carne bovina no Centro-Oeste brasileiro. Inclui discussão de blockchain para rastreabilidade e decisão sob incerteza.',
     date: new Date('2026-03-22T14:30:00'),
     type: 'Seminário',
-    organizer: 'LEMM · UFCAT',
+    organization: 'LEMM · UFCAT',
     speaker: 'Prof. Dr. Antônio Zamuner',
   },
 ]
@@ -822,11 +838,6 @@ async function main() {
   await db.insert(eventTypes).values(seedEventTypes)
   console.warn(`✅ ${seedEventTypes.length} tipos inseridos.`)
 
-  console.warn('🌱 Seeding events…')
-  await db.delete(events)
-  await db.insert(events).values(seedEvents)
-  console.warn(`✅ ${seedEvents.length} eventos inseridos.`)
-
   console.warn('🌱 Seeding sobre nós (linha do tempo)…')
   await db.delete(aboutTimelineEntries)
   await db.insert(aboutTimelineEntries).values(seedAboutTimeline)
@@ -935,8 +946,62 @@ async function main() {
     if (!row) return
     const display = teamMemberDisplayName(m.name, m.namePrefixLabel ?? null)
     memberNameToId[display] = row.id
+    memberNameToId[m.name.trim()] = row.id
   })
   console.warn(`✅ ${insertedMembers.length} membros inseridos.`)
+
+  console.warn('🌱 Seeding organizações e eventos…')
+  await db.delete(events)
+  await db.delete(eventOrganizations)
+
+  const orgNames = [
+    ...new Set(
+      seedEvents
+        .map(e => e.organization)
+        .filter((x): x is string => typeof x === 'string' && x.trim() !== '')
+    ),
+  ]
+  const insertedOrgs =
+    orgNames.length > 0
+      ? await db
+          .insert(eventOrganizations)
+          .values(orgNames.map(name => ({ name })))
+          .returning({
+            id: eventOrganizations.id,
+            name: eventOrganizations.name,
+          })
+      : []
+  const nameToOrgId = Object.fromEntries(insertedOrgs.map(o => [o.name, o.id]))
+
+  await db.insert(events).values(
+    seedEvents.map(e => {
+      const speakerKey = e.speaker.trim()
+      const speakerMemberId = memberNameToId[speakerKey]
+      if (!speakerMemberId) {
+        throw new Error(
+          `Palestrante não encontrado na equipe (seed): "${e.speaker}" — ${e.title}`
+        )
+      }
+      return {
+        title: e.title,
+        description: e.description,
+        date: e.date,
+        type: e.type,
+        speakerMemberId,
+        organizationId:
+          e.organization && nameToOrgId[e.organization]
+            ? nameToOrgId[e.organization]
+            : null,
+        link: e.link ?? null,
+        meetLink: e.meetLink ?? null,
+        recordingLink: e.recordingLink ?? null,
+        featured: e.featured ?? false,
+      }
+    })
+  )
+  console.warn(
+    `✅ ${insertedOrgs.length} organizações, ${seedEvents.length} eventos inseridos.`
+  )
 
   console.warn('🌱 Seeding contato…')
   await db.delete(contactInfo)
@@ -1025,7 +1090,9 @@ async function main() {
   const adminPassword = process.env.ADMIN_PASSWORD
 
   if (!adminUsername || !adminPassword) {
-    console.warn('⚠️  ADMIN_USERNAME ou ADMIN_PASSWORD não definidos no .env — admin ignorado.')
+    console.warn(
+      '⚠️  ADMIN_USERNAME ou ADMIN_PASSWORD não definidos no .env — admin ignorado.'
+    )
   } else {
     const [existing] = await db
       .select({ id: authUsers.id })

@@ -1,19 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { desc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { events } from '@/lib/db/schema'
-import { desc } from 'drizzle-orm'
+import {
+  eventOrganizations,
+  events,
+  teamMembers,
+  teamNamePrefixes,
+} from '@/lib/db/schema'
+import { eventSpeakerDisplayName } from '@/lib/events-speaker-display'
+import { parseEventForm } from '@/lib/validation/events-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
-    const rows = await db
+    const raw = await db
       .select({
         id: events.id,
         title: events.title,
         description: events.description,
         date: events.date,
         type: events.type,
-        speaker: events.speaker,
-        organizer: events.organizer,
+        speakerMemberId: events.speakerMemberId,
+        speakerMemberName: teamMembers.name,
+        speakerPrefixLabel: teamNamePrefixes.label,
+        speakerPhotoMimeType: teamMembers.photoMimeType,
+        speakerMemberUpdatedAt: teamMembers.updatedAt,
+        organizationId: events.organizationId,
+        organizer: eventOrganizations.name,
         link: events.link,
         meetLink: events.meetLink,
         recordingLink: events.recordingLink,
@@ -23,7 +36,39 @@ export async function GET() {
         updatedAt: events.updatedAt,
       })
       .from(events)
-      .orderBy(desc(events.date))
+      .leftJoin(
+        eventOrganizations,
+        eq(events.organizationId, eventOrganizations.id)
+      )
+      .leftJoin(teamMembers, eq(events.speakerMemberId, teamMembers.id))
+      .leftJoin(
+        teamNamePrefixes,
+        eq(teamMembers.namePrefixId, teamNamePrefixes.id)
+      )
+      .orderBy(desc(events.date), desc(events.createdAt))
+
+    const rows = raw.map(r => {
+      const {
+        speakerMemberName,
+        speakerPrefixLabel,
+        speakerMemberId,
+        speakerPhotoMimeType,
+        speakerMemberUpdatedAt,
+        ...rest
+      } = r
+      return {
+        ...rest,
+        speakerMemberId,
+        speakerPhotoMimeType,
+        speakerMemberUpdatedAt: speakerMemberUpdatedAt
+          ? speakerMemberUpdatedAt.toISOString()
+          : null,
+        speaker: eventSpeakerDisplayName({
+          speakerMemberName,
+          speakerPrefixLabel,
+        }),
+      }
+    })
 
     return NextResponse.json(rows)
   } catch (err) {
@@ -38,25 +83,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData()
+    const parsed = parseEventForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    const title = (fd.get('title') as string)?.trim()
-    const description = (fd.get('description') as string)?.trim()
-    const dateRaw = fd.get('date') as string
-    const type = (fd.get('type') as string)?.trim()
-
-    if (!title || !description || !dateRaw || !type) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
-
-    const speaker = (fd.get('speaker') as string) || null
-    const organizer = (fd.get('organizer') as string) || null
-    const link = (fd.get('link') as string) || null
-    const meetLink = (fd.get('meetLink') as string) || null
-    const recordingLink = (fd.get('recordingLink') as string) || null
-    const featured = fd.get('featured') === 'true'
+    const d = parsed.data
+    const date = new Date(d.dateRaw)
 
     const imageFile = fd.get('image') as File | null
     let image: Buffer | undefined
@@ -70,16 +101,16 @@ export async function POST(req: NextRequest) {
     const [created] = await db
       .insert(events)
       .values({
-        title,
-        description,
-        date: new Date(dateRaw),
-        type,
-        speaker,
-        organizer,
-        link,
-        meetLink,
-        recordingLink,
-        featured,
+        title: d.title,
+        description: d.description,
+        date,
+        type: d.type,
+        speakerMemberId: d.speakerMemberId,
+        organizationId: d.organizationId,
+        link: d.link,
+        meetLink: d.meetLink,
+        recordingLink: d.recordingLink,
+        featured: d.featured,
         image,
         imageMimeType,
       })

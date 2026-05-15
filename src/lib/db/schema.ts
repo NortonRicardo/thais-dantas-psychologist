@@ -16,14 +16,34 @@ const bytea = customType<{ data: Buffer }>({
   },
 })
 
+/** Organizações promotoras dos eventos (CRUD no gestor; evento referencia por FK) */
+export const eventOrganizations = pgTable('event_organizations', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type EventOrganization = typeof eventOrganizations.$inferSelect
+export type NewEventOrganization = typeof eventOrganizations.$inferInsert
+
 export const events = pgTable('events', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: text('title').notNull(),
   description: text('description').notNull(),
   date: timestamp('date', { withTimezone: true }).notNull(),
   type: text('type').notNull(), // 'Palestra' | 'Minicurso' | 'Mesa-Redonda' | 'Workshop' | 'Defesa' | 'Encontro'
-  speaker: text('speaker'),
-  organizer: text('organizer'),
+  speakerMemberId: uuid('speaker_member_id').references(() => teamMembers.id, {
+    onDelete: 'set null',
+  }),
+  organizationId: uuid('organization_id').references(
+    () => eventOrganizations.id,
+    { onDelete: 'set null' }
+  ),
   link: text('link'),
   meetLink: text('meet_link'),
   recordingLink: text('recording_link'),

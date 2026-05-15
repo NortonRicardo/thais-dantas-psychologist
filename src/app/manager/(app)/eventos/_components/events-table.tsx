@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { ImageIcon, Search, Trash2, X } from 'lucide-react'
+import { ImageIcon, Loader2, Search, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { TeamMemberThumb } from '@/components/team-member-thumb'
 import { FilterCombobox } from '@/components/filter-combobox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { EventDialog, type EventRow } from './event-dialog'
+import { readApiError } from '@/lib/read-api-error'
 
 const PAGE_SIZE = 10
 
@@ -81,17 +83,23 @@ export function EventsTable() {
   const [filterTitle, setFilterTitle] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterSpeaker, setFilterSpeaker] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const fetchEvents = useCallback(async () => {
-    setLoading(true)
+  const fetchEvents = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) setLoading(true)
     try {
       const res = await fetch('/api/events')
       const data = await res.json()
-      setRows(data)
+      const list = Array.isArray(data) ? data : []
+      list.sort(
+        (a: EventRow, b: EventRow) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+      )
+      setRows(list)
     } catch {
       toast.error('Erro ao carregar eventos.')
     } finally {
-      setLoading(false)
+      if (!opts?.silent) setLoading(false)
     }
   }, [])
 
@@ -100,12 +108,20 @@ export function EventsTable() {
   }, [fetchEvents])
 
   async function handleDelete(id: string) {
+    setDeletingId(id)
     try {
-      await fetch(`/api/events/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/events/${id}`, { method: 'DELETE' })
+      if (!res.ok && res.status !== 204) {
+        throw new Error(await readApiError(res))
+      }
       toast.success('Evento removido.')
-      fetchEvents()
-    } catch {
-      toast.error('Erro ao remover evento.')
+      await fetchEvents({ silent: true })
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Erro ao remover evento.'
+      )
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -316,11 +332,25 @@ export function EventsTable() {
                     })()}
                   </TableCell>
 
-                  <TableCell className="text-sm text-white/55 max-w-[160px]">
-                    <div className="overflow-hidden">
-                      <span className="truncate block">
-                        {row.speaker ?? '—'}
-                      </span>
+                  <TableCell className="text-sm text-white/55 max-w-[220px]">
+                    <div className="flex min-w-0 items-center gap-2">
+                      {row.speaker ? (
+                        <>
+                          <TeamMemberThumb
+                            memberId={row.speakerMemberId ?? ''}
+                            displayName={row.speaker}
+                            photoMimeType={row.speakerPhotoMimeType}
+                            updatedAtIso={row.speakerMemberUpdatedAt}
+                            sizePx={28}
+                            frameClassName="border-white/10 bg-white/5"
+                          />
+                          <span className="min-w-0 truncate">
+                            {row.speaker}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-white/35">—</span>
+                      )}
                     </div>
                   </TableCell>
 
@@ -344,8 +374,18 @@ export function EventsTable() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
+                            disabled={deletingId !== null}
+                            aria-busy={deletingId === row.id ? true : undefined}
                           >
-                            <Trash2 size={14} />
+                            {deletingId === row.id ? (
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-rose-400/90"
+                                aria-hidden
+                              />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
@@ -362,9 +402,13 @@ export function EventsTable() {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                              onClick={() => handleDelete(row.id)}
+                              disabled={deletingId !== null}
+                              onClick={e => {
+                                e.preventDefault()
+                                void handleDelete(row.id)
+                              }}
                             >
-                              Remover
+                              {deletingId === row.id ? 'A remover…' : 'Remover'}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

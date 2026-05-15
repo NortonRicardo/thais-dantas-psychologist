@@ -3,7 +3,7 @@
 import { createElement, useCallback, useEffect, useState } from 'react'
 import * as Lucide from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -37,6 +37,8 @@ import {
 import { LucideIconPicker } from '@/app/manager/(app)/infraestrutura/hardware/_components/lucide-icon-picker'
 import { ColorSelector } from '@/components/color-selector'
 import { COLOR_OPTIONS } from '@/components/constants/colors'
+import { eventTypeUpsertSchema } from '@/lib/validation/events-api'
+import { readApiError } from '@/lib/read-api-error'
 
 type EventTypeRow = {
   id: string
@@ -106,10 +108,18 @@ function EventTypeDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.name.trim()) {
-      toast.error('Nome é obrigatório')
+    const parsed = eventTypeUpsertSchema.safeParse({
+      name: form.name.trim(),
+      iconKey: form.iconKey.trim(),
+      color: form.color.trim(),
+    })
+    if (!parsed.success) {
+      toast.error(
+        parsed.error.issues[0]?.message ?? 'Dados inválidos.'
+      )
       return
     }
+
     setSaving(true)
     try {
       const url = initial
@@ -119,11 +129,10 @@ function EventTypeDialog({
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(parsed.data),
       })
       if (!res.ok) {
-        const data = await res.json()
-        toast.error(data.error ?? 'Erro ao salvar')
+        toast.error(await readApiError(res))
         return
       }
       toast.success(initial ? 'Tipo atualizado.' : 'Tipo criado.')
@@ -186,6 +195,7 @@ function EventTypeDialog({
               type="button"
               variant="ghost"
               className="text-white/50 hover:text-white/80"
+              disabled={saving}
               onClick={() => onOpenChange(false)}
             >
               Cancelar
@@ -193,6 +203,7 @@ function EventTypeDialog({
             <Button
               type="submit"
               loading={saving}
+              loadingLabel={initial ? 'A guardar…' : 'A criar…'}
               className="bg-orange-700 text-white hover:bg-orange-600"
             >
               {initial ? 'Salvar' : 'Criar'}
@@ -209,9 +220,10 @@ export function EventTypesTable() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<EventTypeRow | undefined>()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const fetchTypes = useCallback(async () => {
-    setLoading(true)
+  const fetchTypes = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) setLoading(true)
     try {
       const res = await fetch('/api/event-types')
       const data = await res.json()
@@ -219,7 +231,7 @@ export function EventTypesTable() {
     } catch {
       toast.error('Erro ao carregar tipos.')
     } finally {
-      setLoading(false)
+      if (!opts?.silent) setLoading(false)
     }
   }, [])
 
@@ -228,12 +240,19 @@ export function EventTypesTable() {
   }, [fetchTypes])
 
   async function handleDelete(id: string) {
+    setDeletingId(id)
     try {
-      await fetch(`/api/event-types/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/event-types/${id}`, { method: 'DELETE' })
+      if (!res.ok && res.status !== 204) {
+        toast.error(await readApiError(res), { duration: 12_000 })
+        return
+      }
       toast.success('Tipo removido.')
-      fetchTypes()
+      await fetchTypes({ silent: true })
     } catch {
       toast.error('Erro ao remover tipo.')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -365,16 +384,26 @@ export function EventTypesTable() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
+                            disabled={deletingId !== null}
+                            aria-busy={deletingId === row.id ? true : undefined}
                           >
-                            <Trash2 size={14} />
+                            {deletingId === row.id ? (
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-rose-400/90"
+                                aria-hidden
+                              />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
                           <AlertDialogHeader>
                             <AlertDialogTitle>Remover tipo?</AlertDialogTitle>
                             <AlertDialogDescription className="text-white/50">
-                              &ldquo;{row.name}&rdquo; será removido
-                              permanentemente.
+                              &ldquo;{row.name}&rdquo; será removido se não
+                              houver eventos cadastrados com este tipo.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -383,9 +412,13 @@ export function EventTypesTable() {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                              onClick={() => handleDelete(row.id)}
+                              disabled={deletingId !== null}
+                              onClick={e => {
+                                e.preventDefault()
+                                void handleDelete(row.id)
+                              }}
                             >
-                              Remover
+                              {deletingId === row.id ? 'A remover…' : 'Remover'}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

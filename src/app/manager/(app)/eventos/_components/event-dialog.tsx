@@ -14,7 +14,16 @@ import {
 import { toast } from 'sonner'
 
 import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
+import { FilterCombobox } from '@/components/filter-combobox'
+import { TeamMemberThumb } from '@/components/team-member-thumb'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Dialog,
   DialogContent,
@@ -31,6 +40,9 @@ import {
 } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { readApiError } from '@/lib/read-api-error'
+import { cn } from '@/lib/utils'
+import { parseEventForm } from '@/lib/validation/events-api'
 import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 export type EventRow = {
@@ -39,7 +51,13 @@ export type EventRow = {
   description: string
   date: string
   type: string
+  speakerMemberId: string | null
+  /** Nome para exibição (tratamento + nome do membro) */
   speaker: string | null
+  speakerPhotoMimeType: string | null
+  speakerMemberUpdatedAt: string | null
+  organizationId: string | null
+  /** Nome da organização (join) para exibição */
   organizer: string | null
   link: string | null
   meetLink: string | null
@@ -50,6 +68,15 @@ export type EventRow = {
 }
 
 type EventTypeOption = { id: string; name: string; color: string }
+
+type OrganizationOption = { id: string; name: string }
+
+type TeamPickerRow = {
+  id: string
+  displayName: string
+  photoMimeType: string | null
+  updatedAt: string
+}
 
 function TypeCombobox({
   value,
@@ -181,6 +208,12 @@ export function EventDialog({ event, onSuccess }: Props) {
   const [eventTypeOptions, setEventTypeOptions] = useState<EventTypeOption[]>(
     []
   )
+  const [organizationOptions, setOrganizationOptions] = useState<
+    OrganizationOption[]
+  >([])
+  const [organizationId, setOrganizationId] = useState('')
+  const [teamPickerRows, setTeamPickerRows] = useState<TeamPickerRow[]>([])
+  const [speakerMemberId, setSpeakerMemberId] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [linkSuffix, setLinkSuffix] = useState(() =>
@@ -202,6 +235,47 @@ export function EventDialog({ event, onSuccess }: Props) {
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (!open) return
+    fetch('/api/event-organizations')
+      .then(r => r.json())
+      .then(d => setOrganizationOptions(Array.isArray(d) ? d : []))
+      .catch(() => {})
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    fetch('/api/team')
+      .then(r => r.json())
+      .then(
+        (
+          data: {
+            id: string
+            displayName: string
+            photoMimeType: string | null
+            updatedAt: string
+          }[]
+        ) => {
+          const rows = Array.isArray(data)
+            ? [...data].sort((a, b) =>
+                a.displayName.localeCompare(b.displayName, 'pt-BR', {
+                  sensitivity: 'base',
+                })
+              )
+            : []
+          setTeamPickerRows(
+            rows.map(r => ({
+              id: r.id,
+              displayName: r.displayName,
+              photoMimeType: r.photoMimeType ?? null,
+              updatedAt: r.updatedAt,
+            }))
+          )
+        }
+      )
+      .catch(() => {})
+  }, [open])
+
   const existingImageUrl =
     isEdit && event.imageMimeType && !removeImage
       ? `/api/events/${event.id}/image?t=${new Date(event.updatedAt).getTime()}`
@@ -212,6 +286,8 @@ export function EventDialog({ event, onSuccess }: Props) {
     if (newOpen) {
       setFeatured(event?.featured ?? false)
       setType(event?.type ?? '')
+      setOrganizationId(event?.organizationId ?? '')
+      setSpeakerMemberId(event?.speakerMemberId ?? '')
       setImagePreview(null)
       setRemoveImage(false)
       setLinkSuffix(stripUrlScheme(event?.link ?? ''))
@@ -236,29 +312,46 @@ export function EventDialog({ event, onSuccess }: Props) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
+    if (!type.trim()) {
+      toast.error('Selecione um tipo.')
+      return
+    }
+    if (!speakerMemberId.trim()) {
+      toast.error('Selecione um palestrante.')
+      return
+    }
 
     const form = e.currentTarget
     const fd = new FormData(form)
     fd.set('featured', String(featured))
     fd.set('type', type)
+    fd.set('speakerMemberId', speakerMemberId)
+    fd.set('organizationId', organizationId)
     fd.set('link', toHttpsStored(linkSuffix))
     fd.set('meetLink', toHttpsStored(meetLinkSuffix))
     fd.set('recordingLink', toHttpsStored(recordingLinkSuffix))
     if (removeImage) fd.set('removeImage', 'true')
+
+    const parsed = parseEventForm(fd)
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? 'Dados inválidos.')
+      return
+    }
+
+    setLoading(true)
 
     const url = isEdit ? `/api/events/${event.id}` : '/api/events'
     const method = isEdit ? 'PUT' : 'POST'
 
     try {
       const res = await fetch(url, { method, body: fd })
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) throw new Error(await readApiError(res))
       toast.success(isEdit ? 'Evento atualizado!' : 'Evento criado!')
       setOpen(false)
       onSuccess()
     } catch (err) {
       console.error(err)
-      toast.error('Erro ao salvar evento.')
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar evento.')
     } finally {
       setLoading(false)
     }
@@ -292,7 +385,11 @@ export function EventDialog({ event, onSuccess }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-2 grid gap-4">
+        <form
+          key={`${open}-${event?.id ?? 'new'}`}
+          onSubmit={handleSubmit}
+          className="mt-2 grid gap-4"
+        >
           {/* Title */}
           <div className="grid gap-1.5">
             <Label htmlFor="title" className="text-white/70">
@@ -349,27 +446,130 @@ export function EventDialog({ event, onSuccess }: Props) {
 
           {/* Speaker + Organizer */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-1.5">
-              <Label htmlFor="speaker" className="text-white/70">
-                Palestrante
-              </Label>
-              <Input
-                id="speaker"
-                name="speaker"
-                defaultValue={event?.speaker ?? ''}
-                className={INPUT_CLS}
+            <div className="grid min-w-0 gap-1.5">
+              <Label className="text-white/70">Palestrante *</Label>
+              <FilterCombobox
+                value={speakerMemberId}
+                onChange={setSpeakerMemberId}
+                placeholder="Selecionar membro…"
+                clearLabel="Limpar palestrante"
+                showClear={false}
+                options={teamPickerRows.map(r => r.id)}
+                width="w-full min-w-0"
+                labelForValue={id =>
+                  teamPickerRows.find(r => r.id === id)?.displayName ??
+                  (isEdit && event?.speakerMemberId === id
+                    ? (event.speaker ?? '')
+                    : '')
+                }
+                renderOption={id => {
+                  const row = teamPickerRows.find(r => r.id === id)
+                  const label =
+                    row?.displayName ??
+                    (isEdit && event?.speakerMemberId === id
+                      ? (event.speaker ?? id)
+                      : id)
+                  return (
+                    <span className="flex min-w-0 items-center gap-2">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label}
+                        photoMimeType={row?.photoMimeType ?? null}
+                        updatedAtIso={row?.updatedAt ?? null}
+                        sizePx={22}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span className="truncate" title={label}>
+                        {label}
+                      </span>
+                    </span>
+                  )
+                }}
+                renderValue={id => {
+                  const row = teamPickerRows.find(r => r.id === id)
+                  const label =
+                    row?.displayName ??
+                    (isEdit && event?.speakerMemberId === id
+                      ? (event.speaker ?? '')
+                      : '')
+                  const photoMime =
+                    row?.photoMimeType ??
+                    (isEdit && event?.speakerMemberId === id
+                      ? event.speakerPhotoMimeType
+                      : null)
+                  const updatedAt =
+                    row?.updatedAt ??
+                    (isEdit && event?.speakerMemberId === id
+                      ? event.speakerMemberUpdatedAt
+                      : null)
+                  return (
+                    <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label || id}
+                        photoMimeType={photoMime}
+                        updatedAtIso={updatedAt}
+                        sizePx={24}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span
+                        className="block min-w-0 flex-1 truncate"
+                        title={label || undefined}
+                      >
+                        {label}
+                      </span>
+                    </span>
+                  )
+                }}
               />
+              <p className="text-[0.65rem] text-white/35">
+                Lista da equipe cadastrada em Equipe → Membros.
+              </p>
             </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="organizer" className="text-white/70">
+            <div className="grid min-w-0 gap-1.5">
+              <Label htmlFor="organizationId" className="text-white/70">
                 Organização
               </Label>
-              <Input
-                id="organizer"
-                name="organizer"
-                defaultValue={event?.organizer ?? ''}
-                className={INPUT_CLS}
-              />
+              <Select
+                value={organizationId || '__none__'}
+                onValueChange={v =>
+                  setOrganizationId(v === '__none__' ? '' : v)
+                }
+              >
+                <SelectTrigger
+                  id="organizationId"
+                  className={cn(
+                    INPUT_CLS,
+                    'h-9 w-full shadow-none focus-visible:ring-0 [&_svg]:text-white/40'
+                  )}
+                >
+                  <SelectValue placeholder="Nenhuma" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  sideOffset={4}
+                  className="border-white/10 bg-[#071525] text-white"
+                >
+                  <SelectItem
+                    value="__none__"
+                    className="focus:bg-white/10 focus:text-white"
+                  >
+                    Nenhuma
+                  </SelectItem>
+                  {organizationOptions.map(o => (
+                    <SelectItem
+                      key={o.id}
+                      value={o.id}
+                      className="focus:bg-white/10 focus:text-white"
+                    >
+                      {o.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[0.65rem] text-white/35">
+                Cadastre opções em Eventos → Organizações.
+              </p>
             </div>
           </div>
 
@@ -495,6 +695,7 @@ export function EventDialog({ event, onSuccess }: Props) {
               type="button"
               variant="ghost"
               className="text-white/50 hover:text-white hover:bg-white/5"
+              disabled={loading}
               onClick={() => setOpen(false)}
             >
               Cancelar
@@ -502,7 +703,8 @@ export function EventDialog({ event, onSuccess }: Props) {
             <Button
               type="submit"
               loading={loading}
-              disabled={!type}
+              loadingLabel={isEdit ? 'A guardar…' : 'A criar…'}
+              disabled={!type || !speakerMemberId}
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
               {isEdit ? 'Salvar alterações' : 'Criar evento'}

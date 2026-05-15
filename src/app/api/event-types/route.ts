@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { asc } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { eventTypes } from '@/lib/db/schema'
+import { eventTypeUpsertSchema } from '@/lib/validation/events-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
@@ -18,19 +20,18 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { name, iconKey, color } = body as { name: string; iconKey: string; color: string }
+    const raw = await req.json()
+    const parsed = eventTypeUpsertSchema.safeParse(raw)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    if (!name?.trim()) {
-      return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
-    }
+    const { name, iconKey, color } = parsed.data
 
     const [created] = await db
       .insert(eventTypes)
       .values({
-        name: name.trim(),
-        iconKey: iconKey?.trim() || 'calendar',
-        color: color?.trim() || 'bg-blue-500',
+        name,
+        iconKey,
+        color,
       })
       .returning()
 
