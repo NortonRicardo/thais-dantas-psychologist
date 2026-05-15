@@ -1,16 +1,7 @@
 import { createElement } from 'react'
-import {
-  CloudSun,
-  Cpu,
-  ExternalLink,
-  Globe,
-  LayoutGrid,
-  Layers,
-  Wrench,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { ExternalLink, Layers } from 'lucide-react'
 
-import { getLucideIcon } from '@/lib/lucide-resolve'
+import { getLucideIcon, getLucideIconNamed } from '@/lib/lucide-resolve'
 
 const glass = {
   background:
@@ -21,15 +12,6 @@ const glass = {
   border: '1px solid rgba(255,255,255,0.18)',
   boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
 } as const
-
-const PLATFORM_ICONS: Record<string, LucideIcon> = {
-  'cloud-sun': CloudSun,
-  wrench: Wrench,
-  globe: Globe,
-  'layout-grid': LayoutGrid,
-  layers: Layers,
-  cpu: Cpu,
-}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -99,7 +81,7 @@ function DevelopedPlatformCard({
   projectLink,
   platformLink,
 }: Omit<DevelopedPlatformPublic, 'id'>) {
-  const Icon = PLATFORM_ICONS[iconKey] ?? Layers
+  const Icon = getLucideIconNamed(iconKey, Layers)
   const linkBtn =
     'inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/8 px-3 py-1.5 text-[0.65rem] font-medium text-white/75 transition-colors hover:bg-white/12 hover:text-white'
 

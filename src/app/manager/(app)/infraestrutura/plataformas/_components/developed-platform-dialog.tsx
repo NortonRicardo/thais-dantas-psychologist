@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { Pencil, Plus } from 'lucide-react'
+import { createElement, useMemo, useState } from 'react'
+import { Layers, Pencil, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { DEVELOPED_PLATFORM_ICON_OPTIONS } from '@/lib/developed-platform-icon-options'
+import { getLucideIconNamed } from '@/lib/lucide-resolve'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -34,15 +36,6 @@ export type DevelopedPlatformRow = {
   updatedAt: string
 }
 
-const ICON_OPTIONS = [
-  { value: 'cloud-sun', label: 'Clima / dados' },
-  { value: 'wrench', label: 'Ferramentas (META)' },
-  { value: 'globe', label: 'Web / global' },
-  { value: 'layout-grid', label: 'Grade / apps' },
-  { value: 'layers', label: 'Camadas' },
-  { value: 'cpu', label: 'Computação' },
-] as const
-
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
 
@@ -57,6 +50,20 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
   const [iconKey, setIconKey] = useState(platform?.iconKey ?? 'cloud-sun')
 
   const isEdit = !!platform
+
+  const iconSelectOptions = useMemo(() => {
+    const known = new Set<string>(
+      DEVELOPED_PLATFORM_ICON_OPTIONS.map(o => o.value)
+    )
+    const raw = platform?.iconKey?.trim()
+    if (raw && !known.has(raw)) {
+      return [
+        { value: raw, label: `Ícone salvo (${raw})` },
+        ...DEVELOPED_PLATFORM_ICON_OPTIONS,
+      ]
+    }
+    return [...DEVELOPED_PLATFORM_ICON_OPTIONS]
+  }, [platform?.iconKey])
 
   function handleOpenChange(newOpen: boolean) {
     if (newOpen) {
@@ -150,19 +157,33 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
           <div className="grid gap-1.5">
             <Label className="text-white/70">Ícone no card</Label>
             <Select value={iconKey} onValueChange={setIconKey}>
-              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                <SelectValue />
+              <SelectTrigger className="h-auto min-h-10 w-full gap-2 bg-white/5 border-white/10 py-2 text-white focus:ring-0 [&_[data-slot=select-value]]:flex [&_[data-slot=select-value]]:items-center [&_[data-slot=select-value]]:gap-2">
+                <SelectValue placeholder="Escolha um ícone" />
               </SelectTrigger>
-              <SelectContent className="bg-[#071525] border-white/10 text-white">
-                {ICON_OPTIONS.map(o => (
-                  <SelectItem
-                    key={o.value}
-                    value={o.value}
-                    className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                  >
-                    {o.label}
-                  </SelectItem>
-                ))}
+              <SelectContent
+                position="popper"
+                sideOffset={6}
+                className="max-h-72 w-[var(--radix-select-trigger-width)] bg-[#071525] border-white/10 text-white"
+              >
+                {iconSelectOptions.map(o => {
+                  const Icon = getLucideIconNamed(o.value, Layers)
+                  return (
+                    <SelectItem
+                      key={o.value}
+                      value={o.value}
+                      className="cursor-pointer py-2 text-white/85 data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/15"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        {createElement(Icon, {
+                          size: 16,
+                          strokeWidth: 1.6,
+                          className: 'shrink-0 text-white/80',
+                        })}
+                        <span>{o.label}</span>
+                      </span>
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
           </div>
