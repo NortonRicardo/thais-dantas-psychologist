@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { Toaster } from 'sonner'
+
+import { Toaster } from '@/components/ui/sonner'
 
 export default function ManagerLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +14,13 @@ export default function ManagerLayout({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      <Toaster theme="dark" position="bottom-right" />
+      <Toaster
+        theme="dark"
+        position="top-center"
+        richColors
+        closeButton
+        offset={16}
+      />
     </div>
   )
 }

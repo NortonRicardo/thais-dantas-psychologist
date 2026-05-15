@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { asc } from 'drizzle-orm'
+
 import { db } from '@/lib/db'
 import { teamCategories } from '@/lib/db/schema'
+import {
+  parseTeamCategoryForm,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 
 export async function GET() {
   try {
@@ -29,15 +34,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData()
-    const title = (fd.get('title') as string)?.trim()
-    const color = (fd.get('color') as string)?.trim()
+    const parsed = parseTeamCategoryForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    if (!title || !color) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      )
-    }
+    const { title, color } = parsed.data
 
     const [created] = await db
       .insert(teamCategories)

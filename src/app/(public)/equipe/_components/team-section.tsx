@@ -42,6 +42,7 @@ export async function TeamSection() {
     })
     .from(teamMembers)
     .innerJoin(teamCategories, eq(teamMembers.categoryId, teamCategories.id))
+    .where(eq(teamMembers.active, true))
     .leftJoin(
       teamNamePrefixes,
       eq(teamMembers.namePrefixId, teamNamePrefixes.id)

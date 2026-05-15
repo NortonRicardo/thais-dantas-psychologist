@@ -255,10 +255,10 @@ export function DevelopedPlatformDialog({ platform, onSuccess }: Props) {
             </Button>
             <Button
               type="submit"
-              disabled={loading}
-              className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
+              loading={loading}
+              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
-              {loading ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar'}
+              {isEdit ? 'Salvar alterações' : 'Criar'}
             </Button>
           </div>
         </form>

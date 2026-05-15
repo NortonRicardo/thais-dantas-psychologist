@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Loader2 } from 'lucide-react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
@@ -45,21 +46,40 @@ function Button({
   variant = 'default',
   size = 'default',
   asChild = false,
+  loading = false,
+  loadingLabel = 'Salvando…',
+  disabled,
+  children,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    /** Mostra spinner, texto `loadingLabel` e desabilita o botão (ex.: submit ao salvar). */
+    loading?: boolean
+    /** Texto exibido enquanto `loading` é true (ex.: «Entrando…» no login). */
+    loadingLabel?: string
   }) {
-  const Comp = asChild ? Slot : 'button'
+  const Comp = asChild && !loading ? Slot : 'button'
 
   return (
     <Comp
       data-slot="button"
       data-variant={variant}
       data-size={size}
+      data-loading={loading ? '' : undefined}
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={disabled || loading}
       {...props}
-    />
+    >
+      {loading ? (
+        <>
+          <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden />
+          <span>{loadingLabel}</span>
+        </>
+      ) : (
+        children
+      )}
+    </Comp>
   )
 }
 

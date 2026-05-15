@@ -1,70 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { betterFetch } from '@better-fetch/fetch'
+import type { Session } from 'better-auth/types'
 
-const SESSION_COOKIE = 'lemm_session'
+const PROTECTED_API_PREFIXES = [
+  '/api/team',
+  '/api/projects',
+  '/api/project-categories',
+  '/api/project-themes',
+  '/api/event-types',
+  '/api/contato',
+  '/api/hardware',
+  '/api/hardware-modules',
+  '/api/events',
+  '/api/about-timeline',
+  '/api/collaboration-partners',
+  '/api/developed-platforms',
+]
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
+  // Passa direto: endpoints internos do Better Auth
+  if (pathname.startsWith('/api/auth')) return NextResponse.next()
+
+  // Passa direto: página de login
   if (pathname === '/manager/login') return NextResponse.next()
 
-  const session = req.cookies.get(SESSION_COOKIE)?.value
+  const needsAuth =
+    pathname.startsWith('/manager') ||
+    (req.method !== 'GET' &&
+      PROTECTED_API_PREFIXES.some(p => pathname.startsWith(p)))
 
-  if (pathname.startsWith('/manager')) {
-    if (session !== 'authenticated') {
-      const url = req.nextUrl.clone()
-      url.pathname = '/manager/login'
-      return NextResponse.redirect(url)
-    }
-  }
+  if (!needsAuth) return NextResponse.next()
 
-  if (pathname.startsWith('/api/events') && req.method !== 'GET') {
-    if (session !== 'authenticated') {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-  }
+  const { data: session } = await betterFetch<Session>('/api/auth/get-session', {
+    baseURL: req.nextUrl.origin,
+    headers: { cookie: req.headers.get('cookie') ?? '' },
+  })
 
-  if (pathname.startsWith('/api/about-timeline') && req.method !== 'GET') {
-    if (session !== 'authenticated') {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  if (!session) {
+    if (pathname.startsWith('/manager')) {
+      const loginUrl = req.nextUrl.clone()
+      loginUrl.pathname = '/manager/login'
+      return NextResponse.redirect(loginUrl)
     }
-  }
-
-  if (
-    pathname.startsWith('/api/collaboration-partners') &&
-    req.method !== 'GET'
-  ) {
-    if (session !== 'authenticated') {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-  }
-
-  if (pathname.startsWith('/api/developed-platforms') && req.method !== 'GET') {
-    if (session !== 'authenticated') {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-  }
-
-  if (pathname.startsWith('/api/hardware') && req.method !== 'GET') {
-    if (session !== 'authenticated') {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: [
-    '/manager/:path*',
-    '/api/events/:path*',
-    '/api/events',
-    '/api/about-timeline/:path*',
-    '/api/about-timeline',
-    '/api/collaboration-partners/:path*',
-    '/api/collaboration-partners',
-    '/api/developed-platforms/:path*',
-    '/api/developed-platforms',
-    '/api/hardware/:path*',
-    '/api/hardware',
-  ],
+  matcher: ['/manager/:path*', '/api/:path*'],
 }

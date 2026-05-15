@@ -1,37 +1,37 @@
-import 'server-only'
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { betterAuth } from 'better-auth'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { username } from 'better-auth/plugins'
+import { db } from '@/lib/db'
+import {
+  authUsers,
+  authSessions,
+  authAccounts,
+  authVerifications,
+} from '@/lib/db/schema'
 
-const SESSION_COOKIE = 'lemm_session'
-const PASSWORD = process.env.MANAGER_PASSWORD ?? ''
-
-export function verifyPassword(password: string): boolean {
-  if (!PASSWORD) return false
-  return password === PASSWORD
-}
-
-export async function createSession(): Promise<void> {
-  const jar = await cookies()
-  jar.set(SESSION_COOKIE, 'authenticated', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  })
-}
-
-export async function destroySession(): Promise<void> {
-  const jar = await cookies()
-  jar.delete(SESSION_COOKIE)
-}
-
-export async function isAuthenticated(): Promise<boolean> {
-  const jar = await cookies()
-  return jar.get(SESSION_COOKIE)?.value === 'authenticated'
-}
-
-export async function requireAuth(): Promise<void> {
-  const ok = await isAuthenticated()
-  if (!ok) redirect('/manager/login')
-}
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+    schema: {
+      user: authUsers,
+      session: authSessions,
+      account: authAccounts,
+      verification: authVerifications,
+    },
+  }),
+  emailAndPassword: {
+    enabled: true,
+  },
+  plugins: [username()],
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 dias
+    updateAge: 60 * 60 * 24,     // renova o cookie se tiver > 1 dia velho
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,            // cache local de 5 min — evita hit no DB a cada request
+    },
+  },
+  advanced: {
+    cookiePrefix: '__Host',
+  },
+})

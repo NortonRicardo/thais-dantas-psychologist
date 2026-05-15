@@ -183,3 +183,24 @@
     transform: translateY(0);
   }
 }
+
+/* Sonner — alertas de erro em vermelho (gestor + login; tema dark) */
+[data-sonner-toast][data-type='error'] {
+  background-color: rgba(127, 29, 29, 0.94) !important;
+  border: 1px solid rgba(248, 113, 113, 0.55) !important;
+  color: rgb(254 242 242) !important;
+}
+
+[data-sonner-toast][data-type='error'] [data-title] {
+  color: rgb(254 242 242) !important;
+}
+
+[data-sonner-toast][data-type='error'] [data-description] {
+  color: rgb(254 205 211) !important;
+}
+
+[data-sonner-toast][data-type='error'] [data-close-button] {
+  color: rgb(254 242 242) !important;
+  border-color: rgba(248, 113, 113, 0.45) !important;
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}

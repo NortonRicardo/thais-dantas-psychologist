@@ -39,13 +39,17 @@ export function TeamPrefixDialog({ prefix, onSuccess }: Props) {
     setLoading(true)
     const form = e.currentTarget
     const fd = new FormData(form)
-    const url = isEdit ? `/api/team/prefixes/${prefix.id}` : '/api/team/prefixes'
+    const url = isEdit
+      ? `/api/team/prefixes/${prefix.id}`
+      : '/api/team/prefixes'
     const method = isEdit ? 'PUT' : 'POST'
     try {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(typeof err.error === 'string' ? err.error : 'Erro ao salvar')
+        throw new Error(
+          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
+        )
       }
       toast.success(isEdit ? 'Tratamento atualizado!' : 'Tratamento criado!')
       setOpen(false)
@@ -99,7 +103,8 @@ export function TeamPrefixDialog({ prefix, onSuccess }: Props) {
               className={INPUT_CLS}
             />
             <p className="text-xs text-white/35">
-              Ex.: &ldquo;Dr.&rdquo;, &ldquo;Dra.&rdquo;, &ldquo;Prof. Dr.&rdquo; — o nome do membro fica só em &ldquo;Nome&rdquo;.
+              Ex.: &ldquo;Dr.&rdquo;, &ldquo;Dra.&rdquo;, &ldquo;Prof.
+              Dr.&rdquo; — o nome do membro fica só em &ldquo;Nome&rdquo;.
             </p>
           </div>
 
@@ -114,10 +119,10 @@ export function TeamPrefixDialog({ prefix, onSuccess }: Props) {
             </Button>
             <Button
               type="submit"
-              disabled={loading}
-              className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
+              loading={loading}
+              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
-              {loading ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar'}
+              {isEdit ? 'Salvar alterações' : 'Criar'}
             </Button>
           </div>
         </form>

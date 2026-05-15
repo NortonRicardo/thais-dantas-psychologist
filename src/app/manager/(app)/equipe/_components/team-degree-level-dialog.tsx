@@ -47,7 +47,9 @@ export function TeamDegreeLevelDialog({ degreeLevel, onSuccess }: Props) {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(typeof err.error === 'string' ? err.error : 'Erro ao salvar')
+        throw new Error(
+          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
+        )
       }
       toast.success(isEdit ? 'Grau atualizado!' : 'Grau criado!')
       setOpen(false)
@@ -101,8 +103,9 @@ export function TeamDegreeLevelDialog({ degreeLevel, onSuccess }: Props) {
               className={INPUT_CLS}
             />
             <p className="text-xs text-white/35">
-              Use o termo que a equipe reconhece (ex.: &ldquo;Doutorado&rdquo;, &ldquo;MBA&rdquo;). O
-              membro escolhe um grau na ficha; área e instituição ficam em outros campos.
+              Use o termo que a equipe reconhece (ex.: &ldquo;Doutorado&rdquo;,
+              &ldquo;MBA&rdquo;). O membro escolhe um grau na ficha; área e
+              instituição ficam em outros campos.
             </p>
           </div>
 
@@ -117,10 +120,10 @@ export function TeamDegreeLevelDialog({ degreeLevel, onSuccess }: Props) {
             </Button>
             <Button
               type="submit"
-              disabled={loading}
-              className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
+              loading={loading}
+              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
-              {loading ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar'}
+              {isEdit ? 'Salvar alterações' : 'Criar'}
             </Button>
           </div>
         </form>

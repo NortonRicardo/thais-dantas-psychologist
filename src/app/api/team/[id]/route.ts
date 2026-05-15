@@ -1,51 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { eq } from 'drizzle-orm'
+import { count, eq, or } from 'drizzle-orm'
+
 import { db } from '@/lib/db'
 import {
+  projects,
   teamCategories,
   teamDegreeLevels,
   teamMembers,
   teamNamePrefixes,
 } from '@/lib/db/schema'
-import { normalizeLinkedinUrl } from '@/lib/team-linkedin'
-import { normalizeLattesUrl } from '@/lib/team-lattes'
+import {
+  parseTeamMemberForm,
+  uuidParamSafeParse,
+} from '@/lib/validation/team-api'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
   try {
     const { id } = await params
-    const fd = await req.formData()
-
-    const categoryId = (fd.get('categoryId') as string)?.trim()
-    const namePrefixIdRaw = (fd.get('namePrefixId') as string)?.trim()
-    const namePrefixId =
-      namePrefixIdRaw && namePrefixIdRaw !== '__none__' ? namePrefixIdRaw : null
-    const degreeLevelIdRaw = (fd.get('degreeLevelId') as string)?.trim()
-    const degreeLevelId =
-      degreeLevelIdRaw && degreeLevelIdRaw !== '__none__' ? degreeLevelIdRaw : null
-    const formationInstitution =
-      (fd.get('formationInstitution') as string)?.trim() || null
-    const name = (fd.get('name') as string)?.trim()
-    const qualification = (fd.get('qualification') as string)?.trim()
-    const description = (fd.get('description') as string)?.trim() || null
-    const linkedinUrl = normalizeLinkedinUrl(fd.get('linkedinUrl') as string | null)
-    const lattesUrl = normalizeLattesUrl(fd.get('lattesUrl') as string | null)
-
-    if (fd.get('linkedinUrl') && String(fd.get('linkedinUrl')).trim() && !linkedinUrl) {
-      return NextResponse.json({ error: 'URL do LinkedIn inválida (use linkedin.com/…)' }, { status: 400 })
-    }
-
-    if (fd.get('lattesUrl') && String(fd.get('lattesUrl')).trim() && !lattesUrl) {
+    const idCheck = uuidParamSafeParse(id)
+    if (!idCheck.success) {
       return NextResponse.json(
-        { error: 'URL do Lattes inválida (use lattes.cnpq.br ou buscatextual.cnpq.br/…)' },
+        {
+          error: idCheck.error.issues[0]?.message ?? 'Identificador inválido.',
+        },
         { status: 400 }
       )
     }
 
-    if (!categoryId || !name || !qualification) {
-      return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 })
-    }
+    const fd = await req.formData()
+    const validated = parseTeamMemberForm(fd)
+    if (!validated.ok) return validated.response
+
+    const {
+      categoryId,
+      namePrefixId,
+      degreeLevelId,
+      formationInstitution,
+      name,
+      qualification,
+      description,
+      linkedinUrl,
+      lattesUrl,
+      removePhoto,
+      active,
+    } = validated.data
 
     const [cat] = await db
       .select({ id: teamCategories.id })
@@ -64,7 +64,10 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
         .where(eq(teamNamePrefixes.id, namePrefixId))
         .limit(1)
       if (!pfx) {
-        return NextResponse.json({ error: 'Tratamento inválido' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'Tratamento inválido' },
+          { status: 400 }
+        )
       }
     }
 
@@ -75,7 +78,10 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
         .where(eq(teamDegreeLevels.id, degreeLevelId))
         .limit(1)
       if (!deg) {
-        return NextResponse.json({ error: 'Grau acadêmico inválido' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'Grau acadêmico inválido' },
+          { status: 400 }
+        )
       }
     }
 
@@ -93,7 +99,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       updatedAt: new Date(),
     }
 
-    if (fd.get('removePhoto') === 'true') {
+    if (removePhoto) {
       patch.photo = null
       patch.photoMimeType = null
     }
@@ -104,22 +110,78 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       patch.photoMimeType = photoFile.type
     }
 
+    if (active !== undefined) {
+      patch.active = active === 'true'
+    }
+
     const [updated] = await db
       .update(teamMembers)
       .set(patch)
       .where(eq(teamMembers.id, id))
       .returning({ id: teamMembers.id, name: teamMembers.name })
 
-    if (!updated) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+    if (!updated)
+      return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
     return NextResponse.json(updated)
   } catch (err) {
     console.error('[PUT /api/team/:id]', err)
-    return NextResponse.json({ error: 'Erro ao atualizar membro' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao atualizar membro' },
+      { status: 500 }
+    )
   }
 }
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
-  const { id } = await params
-  await db.delete(teamMembers).where(eq(teamMembers.id, id))
-  return new NextResponse(null, { status: 204 })
+  try {
+    const { id } = await params
+    const idCheck = uuidParamSafeParse(id)
+    if (!idCheck.success) {
+      return NextResponse.json(
+        {
+          error: idCheck.error.issues[0]?.message ?? 'Identificador inválido.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const [linkRow] = await db
+      .select({ c: count() })
+      .from(projects)
+      .where(
+        or(
+          eq(projects.advisorId, id),
+          eq(projects.coAdvisorId, id),
+          eq(projects.researchLeadId, id)
+        )
+      )
+
+    const linkedCount = Number(linkRow?.c ?? 0)
+    if (linkedCount > 0) {
+      return NextResponse.json(
+        {
+          error:
+            'Este membro está vinculado a um ou mais projetos (orientador, coorientador ou liderança). Inative-o em “Editar membro” para ocultá-lo da equipe pública sem perder os vínculos.',
+        },
+        { status: 409 }
+      )
+    }
+
+    const [deleted] = await db
+      .delete(teamMembers)
+      .where(eq(teamMembers.id, id))
+      .returning({ id: teamMembers.id })
+
+    if (!deleted) {
+      return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+    }
+
+    return new NextResponse(null, { status: 204 })
+  } catch (err) {
+    console.error('[DELETE /api/team/:id]', err)
+    return NextResponse.json(
+      { error: 'Erro ao remover membro' },
+      { status: 500 }
+    )
+  }
 }

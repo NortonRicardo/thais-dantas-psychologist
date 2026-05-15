@@ -285,7 +285,8 @@ export function HardwareWorkspace() {
       if (!errs) return prev
       const next = { ...errs }
       if ('title' in patch && patch.title?.trim()) delete next.title
-      if ('description' in patch && patch.description?.trim()) delete next.description
+      if ('description' in patch && patch.description?.trim())
+        delete next.description
       const cleaned = { ...prev, [modKey]: next }
       if (!next.title && !next.description) delete cleaned[modKey]
       return cleaned
@@ -576,14 +577,10 @@ export function HardwareWorkspace() {
               </Button>
               <Button
                 type="submit"
-                disabled={saving}
-                className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
+                loading={saving}
+                className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
               >
-                {saving
-                  ? 'Salvando…'
-                  : dialogMode === 'create'
-                    ? 'Criar'
-                    : 'Salvar'}
+                {dialogMode === 'create' ? 'Criar' : 'Salvar'}
               </Button>
             </div>
           </form>

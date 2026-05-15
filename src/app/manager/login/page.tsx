@@ -4,9 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
+import { authClient } from '@/lib/auth-client'
+import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
   const router = useRouter()
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -14,13 +17,12 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+      const { error } = await authClient.signIn.username({
+        username,
+        password,
       })
-      if (!res.ok) {
-        toast.error('Senha incorreta.')
+      if (error) {
+        toast.error('Usuário ou senha incorretos.')
         return
       }
       router.replace('/manager')
@@ -52,28 +54,40 @@ export default function LoginPage() {
           <div className="text-center">
             <h1 className="text-lg font-semibold text-white/90">Gestor LEMM</h1>
             <p className="mt-0.5 text-sm text-white/40">
-              Digite a senha para continuar
+              Entre com suas credenciais
             </p>
           </div>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-3">
+          <input
+            type="text"
+            placeholder="Usuário"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            required
+            autoFocus
+            autoComplete="username"
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/30"
+          />
           <input
             type="password"
             placeholder="Senha"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
-            autoFocus
+            autoComplete="current-password"
             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/30"
           />
-          <button
+          <Button
             type="submit"
-            disabled={loading || !password}
-            className="rounded-lg bg-orange-800 px-4 py-2.5 text-sm font-medium text-orange-50 transition hover:bg-orange-700 disabled:opacity-50"
+            loading={loading}
+            loadingLabel="Entrando…"
+            disabled={!username || !password}
+            className="mt-1 w-full rounded-lg border-0 bg-orange-800 px-4 py-2.5 text-sm font-medium text-orange-50 hover:bg-orange-700 disabled:opacity-50"
           >
-            {loading ? 'Entrando…' : 'Entrar'}
-          </button>
+            Entrar
+          </Button>
         </div>
       </form>
     </div>

@@ -1,7 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, ImageIcon, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react'
+import {
+  ChevronDown,
+  ImageIcon,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
@@ -81,7 +90,9 @@ function TypeCombobox({
         >
           {selected ? (
             <span className="flex items-center gap-2 text-white/90">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${selected.color}`} />
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ${selected.color}`}
+              />
               {selected.name}
             </span>
           ) : (
@@ -96,7 +107,10 @@ function TypeCombobox({
       >
         <div className="border-b border-white/10 px-2 py-2">
           <div className="relative">
-            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <Search
+              size={12}
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+            />
             <input
               ref={inputRef}
               value={search}
@@ -118,7 +132,9 @@ function TypeCombobox({
 
         <div className="max-h-48 overflow-y-auto overscroll-contain p-1">
           {filtered.length === 0 && (
-            <p className="py-2 text-center text-xs text-white/25">Nenhum resultado</p>
+            <p className="py-2 text-center text-xs text-white/25">
+              Nenhum resultado
+            </p>
           )}
           {filtered.map(opt => (
             <button
@@ -162,7 +178,9 @@ export function EventDialog({ event, onSuccess }: Props) {
   const [type, setType] = useState(event?.type ?? '')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [removeImage, setRemoveImage] = useState(false)
-  const [eventTypeOptions, setEventTypeOptions] = useState<EventTypeOption[]>([])
+  const [eventTypeOptions, setEventTypeOptions] = useState<EventTypeOption[]>(
+    []
+  )
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [linkSuffix, setLinkSuffix] = useState(() =>
@@ -483,14 +501,11 @@ export function EventDialog({ event, onSuccess }: Props) {
             </Button>
             <Button
               type="submit"
-              disabled={loading || !type}
-              className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
+              loading={loading}
+              disabled={!type}
+              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
-              {loading
-                ? 'Salvando…'
-                : isEdit
-                  ? 'Salvar alterações'
-                  : 'Criar evento'}
+              {isEdit ? 'Salvar alterações' : 'Criar evento'}
             </Button>
           </div>
         </form>

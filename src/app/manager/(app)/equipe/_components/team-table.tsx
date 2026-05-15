@@ -7,6 +7,13 @@ import { toast } from 'sonner'
 import { FilterCombobox } from '@/components/filter-combobox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -41,6 +48,8 @@ import { TeamDialog, type TeamMemberRow } from './team-dialog'
 
 const PAGE_SIZE = 10
 
+type ActiveFilterValue = 'all' | 'active' | 'inactive'
+
 function buildPages(current: number, total: number): (number | 'ellipsis')[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
   if (current <= 4) return [1, 2, 3, 4, 5, 'ellipsis', total]
@@ -56,13 +65,17 @@ export function TeamTable() {
   const [filterName, setFilterName] = useState('')
   const [filterCategoryId, setFilterCategoryId] = useState('')
   const [filterDegree, setFilterDegree] = useState('')
+  const [filterActive, setFilterActive] = useState<ActiveFilterValue>('all')
 
   const fetchMembers = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/team')
-      const data = await res.json()
-      setRows(data)
+      const data = (await res.json()) as TeamMemberRow[]
+      const normalized = Array.isArray(data)
+        ? data.map(r => ({ ...r, active: Boolean(r.active) }))
+        : []
+      setRows(normalized)
     } catch {
       toast.error('Erro ao carregar equipe.')
     } finally {
@@ -102,9 +115,16 @@ export function TeamTable() {
 
   async function handleDelete(id: string) {
     try {
-      await fetch(`/api/team/${id}`, { method: 'DELETE' })
-      toast.success('Membro removido.')
-      fetchMembers()
+      const res = await fetch(`/api/team/${id}`, { method: 'DELETE' })
+      if (res.status === 204) {
+        toast.success('Membro removido.')
+        fetchMembers()
+        return
+      }
+      const body = await res.json().catch(() => ({}))
+      const msg =
+        typeof body.error === 'string' ? body.error : 'Erro ao remover membro.'
+      toast.error(msg, { duration: 10000 })
     } catch {
       toast.error('Erro ao remover membro.')
     }
@@ -119,6 +139,8 @@ export function TeamTable() {
     if (filterCategoryId && row.categoryId !== filterCategoryId) return false
     if (filterDegree && (row.degreeLevelLabel ?? '') !== filterDegree)
       return false
+    if (filterActive === 'active' && !row.active) return false
+    if (filterActive === 'inactive' && row.active) return false
     return true
   })
 
@@ -212,6 +234,38 @@ export function TeamTable() {
           options={degreeOptions}
           width="w-48"
         />
+
+        <Select
+          value={filterActive}
+          onValueChange={v => {
+            setFilterActive(v as ActiveFilterValue)
+            setPage(1)
+          }}
+        >
+          <SelectTrigger className="h-auto w-[11.5rem] shrink-0 rounded-lg border-white/10 bg-white/5 py-2 text-sm text-white/80 [&_svg]:text-white/30">
+            <SelectValue placeholder="Situação" />
+          </SelectTrigger>
+          <SelectContent className="border-white/10 bg-[#071525] text-white">
+            <SelectItem
+              value="all"
+              className="text-white/80 focus:bg-white/10 focus:text-white"
+            >
+              Todos (situação)
+            </SelectItem>
+            <SelectItem
+              value="active"
+              className="text-white/80 focus:bg-white/10 focus:text-white"
+            >
+              Somente ativos
+            </SelectItem>
+            <SelectItem
+              value="inactive"
+              className="text-white/80 focus:bg-white/10 focus:text-white"
+            >
+              Somente inativos
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div
@@ -225,23 +279,26 @@ export function TeamTable() {
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[760px] [table-layout:fixed]">
+        <Table className="min-w-[840px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
               style={{ background: 'rgba(255,255,255,0.04)' }}
             >
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[28%]">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[26%]">
                 Nome
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[16%]">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[14%]">
                 Categoria
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[14%]">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[12%]">
                 Grau acadêmico
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[26%]">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[24%]">
                 Área / atuação
+              </TableHead>
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[14%]">
+                Situação
               </TableHead>
               <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-right">
                 Ações
@@ -253,7 +310,7 @@ export function TeamTable() {
             {loading &&
               Array.from({ length: 4 }).map((_, i) => (
                 <TableRow key={i} className="border-white/[0.07]">
-                  {Array.from({ length: 5 }).map((_, j) => (
+                  {Array.from({ length: 6 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-4 w-full bg-white/10" />
                     </TableCell>
@@ -264,7 +321,7 @@ export function TeamTable() {
             {!loading && filtered.length === 0 && (
               <TableRow className="border-white/[0.07] hover:bg-transparent">
                 <TableCell
-                  colSpan={5}
+                  colSpan={6}
                   className="py-12 text-center text-sm text-white/30"
                 >
                   {rows.length === 0
@@ -360,6 +417,19 @@ export function TeamTable() {
                     </div>
                   </TableCell>
 
+                  <TableCell className="text-sm">
+                    <Badge
+                      variant="outline"
+                      className={
+                        row.active
+                          ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200/95 text-[0.65rem] font-medium'
+                          : 'border-white/10 bg-white/5 text-white/45 text-[0.65rem] font-medium'
+                      }
+                    >
+                      {row.active ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </TableCell>
+
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <TeamDialog member={row} onSuccess={fetchMembers} />
@@ -378,7 +448,11 @@ export function TeamTable() {
                             <AlertDialogTitle>Remover membro?</AlertDialogTitle>
                             <AlertDialogDescription className="text-white/50">
                               &ldquo;{row.displayName}&rdquo; será removido
-                              permanentemente.
+                              permanentemente. Se este membro estiver em algum
+                              projeto como orientador ou liderança, a exclusão
+                              será bloqueada: use &ldquo;Editar membro&rdquo; e
+                              marque como inativo para ocultá-lo da página
+                              Equipe sem perder os vínculos.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

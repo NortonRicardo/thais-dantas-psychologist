@@ -48,7 +48,8 @@ const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
 
 const GLASS = {
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
   border: '1px solid rgba(255,255,255,0.1)',
@@ -114,8 +115,14 @@ function applyPhoneMask(raw: string): string {
 const PHONE_LABELS = new Set(['Telefone', 'WhatsApp'])
 
 const URL_LABELS = new Set([
-  'LinkedIn', 'Instagram', 'GitHub', 'YouTube', 'Twitter / X',
-  'Facebook', 'Site', 'Telegram',
+  'LinkedIn',
+  'Instagram',
+  'GitHub',
+  'YouTube',
+  'Twitter / X',
+  'Facebook',
+  'Site',
+  'Telegram',
 ])
 
 function validateValue(label: string, value: string): string | null {
@@ -123,13 +130,19 @@ function validateValue(label: string, value: string): string | null {
   if (!v) return 'Campo obrigatório.'
 
   if (label === 'E-mail') {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : 'Informe um e-mail válido.'
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+      ? null
+      : 'Informe um e-mail válido.'
   }
   if (label === 'Telefone' || label === 'WhatsApp') {
-    return v.replace(/\D/g, '').length >= 8 ? null : 'Informe um número válido (ex: (62) 9 0000-0000).'
+    return v.replace(/\D/g, '').length >= 8
+      ? null
+      : 'Informe um número válido (ex: (62) 9 0000-0000).'
   }
   if (URL_LABELS.has(label)) {
-    return /^https?:\/\/.+/.test(v) ? null : 'Informe uma URL válida (ex: https://...).'
+    return /^https?:\/\/.+/.test(v)
+      ? null
+      : 'Informe uma URL válida (ex: https://...).'
   }
   return null
 }
@@ -144,6 +157,8 @@ type TeamMember = {
   id: string
   name: string
   photoMimeType: string | null
+  /** false = oculto na equipe pública; ainda pode ser diretor em contatos. */
+  active: boolean
 }
 
 type Channel = {
@@ -170,7 +185,9 @@ function TeamMemberSearch({
   const [open, setOpen] = useState(false)
 
   const filtered = query.trim()
-    ? teamMembers.filter(m => m.name.toLowerCase().includes(query.toLowerCase()))
+    ? teamMembers.filter(m =>
+        m.name.toLowerCase().includes(query.toLowerCase())
+      )
     : teamMembers
 
   function select(m: TeamMember) {
@@ -202,20 +219,24 @@ function TeamMemberSearch({
             className="max-h-52 overflow-y-auto p-1"
             onWheel={e => e.stopPropagation()}
           >
-            {filtered.length > 0 ? filtered.map(m => (
-              <li
-                key={m.id}
-                onMouseDown={() => select(m)}
-                className={`cursor-pointer rounded-sm px-2.5 py-1.5 text-sm transition-colors ${
-                  m.id === value
-                    ? 'bg-white/15 text-white'
-                    : 'text-white/80 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {m.name}
+            {filtered.length > 0 ? (
+              filtered.map(m => (
+                <li
+                  key={m.id}
+                  onMouseDown={() => select(m)}
+                  className={`cursor-pointer rounded-sm px-2.5 py-1.5 text-sm transition-colors ${
+                    m.id === value
+                      ? 'bg-white/15 text-white'
+                      : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {m.name}
+                </li>
+              ))
+            ) : (
+              <li className="px-2.5 py-2 text-sm text-white/35">
+                Nenhum membro encontrado.
               </li>
-            )) : (
-              <li className="px-2.5 py-2 text-sm text-white/35">Nenhum membro encontrado.</li>
             )}
           </ul>
         </div>
@@ -229,15 +250,20 @@ function TeamMemberSearch({
 function DirectorCard({
   data,
   teamMembers,
+  membersForPicker,
   onSaved,
 }: {
   data: ContactData
   teamMembers: TeamMember[]
+  /** Opções da busca (ex.: apenas ativos + diretor atual se inativo). */
+  membersForPicker: TeamMember[]
   onSaved: (updated: ContactData) => void
 }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [selectedId, setSelectedId] = useState<string>(data.directorTeamMemberId ?? '')
+  const [selectedId, setSelectedId] = useState<string>(
+    data.directorTeamMemberId ?? ''
+  )
 
   function openModal() {
     setSelectedId(data.directorTeamMemberId ?? '')
@@ -274,7 +300,12 @@ function DirectorCard({
     : null
 
   const initials = director
-    ? director.name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('')
+    ? director.name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(w => w[0].toUpperCase())
+        .join('')
     : 'D'
 
   return (
@@ -295,16 +326,24 @@ function DirectorCard({
         <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-sm font-bold text-white/50">
           {photoSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photoSrc} alt={director?.name} className="h-full w-full object-cover" />
+            <img
+              src={photoSrc}
+              alt={director?.name}
+              className="h-full w-full object-cover"
+            />
           ) : (
             initials
           )}
         </span>
 
         <div className="space-y-0.5">
-          <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">Diretor</p>
+          <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">
+            Diretor
+          </p>
           <p className="text-sm font-medium text-white/80">
-            {director?.name ?? <span className="italic text-white/30">Não selecionado</span>}
+            {director?.name ?? (
+              <span className="italic text-white/30">Não selecionado</span>
+            )}
           </p>
         </div>
       </div>
@@ -315,7 +354,9 @@ function DirectorCard({
           onOpenAutoFocus={e => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle className="text-white/90">Selecionar diretor</DialogTitle>
+            <DialogTitle className="text-white/90">
+              Selecionar diretor
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSave} className="space-y-4 pt-1">
@@ -324,16 +365,28 @@ function DirectorCard({
               <TeamMemberSearch
                 value={selectedId}
                 onChange={setSelectedId}
-                teamMembers={teamMembers}
+                teamMembers={membersForPicker}
               />
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="ghost" size="sm" className="text-white/50 hover:bg-white/5 hover:text-white" onClick={() => setModalOpen(false)} disabled={saving}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-white/50 hover:bg-white/5 hover:text-white"
+                onClick={() => setModalOpen(false)}
+                disabled={saving}
+              >
                 <X size={13} className="mr-1" /> Cancelar
               </Button>
-              <Button type="submit" size="sm" disabled={saving} className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50">
-                {saving ? 'Salvando…' : 'Salvar'}
+              <Button
+                type="submit"
+                size="sm"
+                loading={saving}
+                className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
+              >
+                Salvar
               </Button>
             </DialogFooter>
           </form>
@@ -407,12 +460,15 @@ function MapCard({
         </span>
 
         <div className="space-y-0.5">
-          <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">Localização</p>
+          <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">
+            Localização
+          </p>
           <p className="max-w-[160px] truncate text-sm text-white/75">
-            {data.mapUrl
-              ? data.mapUrl
-              : <span className="italic text-white/30">Não configurado</span>
-            }
+            {data.mapUrl ? (
+              data.mapUrl
+            ) : (
+              <span className="italic text-white/30">Não configurado</span>
+            )}
           </p>
         </div>
       </div>
@@ -420,7 +476,9 @@ function MapCard({
       <Dialog open={modalOpen} onOpenChange={v => !v && setModalOpen(false)}>
         <DialogContent className="border-white/10 bg-[#18181b] text-white sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white/90">Localização no mapa</DialogTitle>
+            <DialogTitle className="text-white/90">
+              Localização no mapa
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSave} className="space-y-4 pt-1">
@@ -441,11 +499,23 @@ function MapCard({
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="ghost" size="sm" className="text-white/50 hover:bg-white/5 hover:text-white" onClick={() => setModalOpen(false)} disabled={saving}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-white/50 hover:bg-white/5 hover:text-white"
+                onClick={() => setModalOpen(false)}
+                disabled={saving}
+              >
                 Cancelar
               </Button>
-              <Button type="submit" size="sm" disabled={saving} className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50">
-                {saving ? 'Salvando…' : 'Salvar'}
+              <Button
+                type="submit"
+                size="sm"
+                loading={saving}
+                className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
+              >
+                Salvar
               </Button>
             </DialogFooter>
           </form>
@@ -470,7 +540,9 @@ function ChannelCard({
   async function handleDelete() {
     setDeleting(true)
     try {
-      const res = await fetch(`/api/contato/channels/${channel.id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/contato/channels/${channel.id}`, {
+        method: 'DELETE',
+      })
       if (!res.ok) throw new Error()
       onDeleted(channel.id)
       toast.success('Canal removido.')
@@ -500,8 +572,12 @@ function ChannelCard({
       </span>
 
       <div className="space-y-0.5">
-        <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">{channel.label}</p>
-        <p className="max-w-[160px] break-all text-sm text-white/75">{channel.value}</p>
+        <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">
+          {channel.label}
+        </p>
+        <p className="max-w-[160px] break-all text-sm text-white/75">
+          {channel.value}
+        </p>
       </div>
     </div>
   )
@@ -548,7 +624,10 @@ function AddChannelModal({
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     const err = validateValue(label, value)
-    if (err) { setValueError(err); return }
+    if (err) {
+      setValueError(err)
+      return
+    }
     setSaving(true)
     try {
       const res = await fetch('/api/contato/channels', {
@@ -558,7 +637,9 @@ function AddChannelModal({
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(typeof body.error === 'string' ? body.error : 'Erro ao criar canal')
+        throw new Error(
+          typeof body.error === 'string' ? body.error : 'Erro ao criar canal'
+        )
       }
       const created: Channel = await res.json()
       onAdded(created)
@@ -573,25 +654,27 @@ function AddChannelModal({
 
   const placeholder: Record<string, string> = {
     'E-mail': 'lemm@pucgoias.edu.br',
-    'Telefone': '+55 62 3946-1000',
-    'WhatsApp': '+55 62 9 0000-0000',
-    'LinkedIn': 'https://linkedin.com/company/lemm',
-    'Instagram': 'https://instagram.com/lemm',
-    'GitHub': 'https://github.com/lemm',
-    'YouTube': 'https://youtube.com/@lemm',
+    Telefone: '+55 62 3946-1000',
+    WhatsApp: '+55 62 9 0000-0000',
+    LinkedIn: 'https://linkedin.com/company/lemm',
+    Instagram: 'https://instagram.com/lemm',
+    GitHub: 'https://github.com/lemm',
+    YouTube: 'https://youtube.com/@lemm',
     'Twitter / X': 'https://x.com/lemm',
-    'Facebook': 'https://facebook.com/lemm',
-    'Site': 'https://lemm.pucgoias.edu.br',
-    'Telegram': 'https://t.me/lemm',
-    'Localização': 'Área III — PUC Goiás, Goiânia, GO',
-    'Outro': 'Descrição livre',
+    Facebook: 'https://facebook.com/lemm',
+    Site: 'https://lemm.pucgoias.edu.br',
+    Telegram: 'https://t.me/lemm',
+    Localização: 'Área III — PUC Goiás, Goiânia, GO',
+    Outro: 'Descrição livre',
   }
 
   return (
     <Dialog open={open} onOpenChange={v => !v && handleClose()}>
       <DialogContent className="border-white/10 bg-[#18181b] text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white/90">Novo canal de contato</DialogTitle>
+          <DialogTitle className="text-white/90">
+            Novo canal de contato
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSave} className="space-y-4 pt-1">
@@ -605,8 +688,15 @@ function AddChannelModal({
                 {CONTACT_TYPES.map(t => {
                   const Icon = ICON_MAP[t.icon] ?? Link
                   return (
-                    <SelectItem key={t.label} value={t.label} className="focus:bg-white/10 focus:text-white">
-                      <Icon size={14} className="mr-1.5 inline-block opacity-70" />
+                    <SelectItem
+                      key={t.label}
+                      value={t.label}
+                      className="focus:bg-white/10 focus:text-white"
+                    >
+                      <Icon
+                        size={14}
+                        className="mr-1.5 inline-block opacity-70"
+                      />
                       {t.label}
                     </SelectItem>
                   )
@@ -618,7 +708,9 @@ function AddChannelModal({
           <div className="grid gap-1.5">
             <Label className="text-sm text-white/70">
               Ícone{' '}
-              <span className="font-normal text-white/40">(definido pelo tipo)</span>
+              <span className="font-normal text-white/40">
+                (definido pelo tipo)
+              </span>
             </Label>
             <div
               className={`flex h-10 w-full items-center gap-2.5 rounded-md border px-3 ${INPUT_CLS} pointer-events-none select-none ${
@@ -634,7 +726,8 @@ function AddChannelModal({
                     className: 'shrink-0 text-white/70',
                   })}
                   <span className="truncate text-sm">
-                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ?? iconKey}
+                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ??
+                      iconKey}
                   </span>
                 </>
               ) : (
@@ -650,7 +743,9 @@ function AddChannelModal({
             <Input
               value={value}
               onChange={e => handleValueChange(e.target.value)}
-              placeholder={label ? (placeholder[label] ?? '') : 'Preencha o tipo primeiro…'}
+              placeholder={
+                label ? (placeholder[label] ?? '') : 'Preencha o tipo primeiro…'
+              }
               className={`${INPUT_CLS} h-10 text-sm ${valueError ? 'border-rose-500/60' : ''}`}
             />
             {valueError && (
@@ -659,11 +754,24 @@ function AddChannelModal({
           </div>
 
           <DialogFooter className="pt-2">
-            <Button type="button" variant="ghost" size="sm" className="text-white/50 hover:bg-white/5 hover:text-white" onClick={handleClose} disabled={saving}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-white/50 hover:bg-white/5 hover:text-white"
+              onClick={handleClose}
+              disabled={saving}
+            >
               Cancelar
             </Button>
-            <Button type="submit" size="sm" disabled={saving || !label} className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50">
-              {saving ? 'Salvando…' : 'Adicionar'}
+            <Button
+              type="submit"
+              size="sm"
+              loading={saving}
+              disabled={!label}
+              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
+            >
+              Adicionar
             </Button>
           </DialogFooter>
         </form>
@@ -702,10 +810,12 @@ export function ContatoWorkspace() {
                 name: string
                 displayName?: string
                 photoMimeType: string | null
+                active?: boolean
               }) => ({
                 id: m.id,
                 name: m.displayName ?? m.name,
                 photoMimeType: m.photoMimeType,
+                active: m.active !== false,
               })
             )
           : []
@@ -717,7 +827,9 @@ export function ContatoWorkspace() {
     }
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   return (
     <>
@@ -747,13 +859,25 @@ export function ContatoWorkspace() {
         </div>
       ) : data ? (
         <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          <DirectorCard data={data} teamMembers={teamMembers} onSaved={setData} />
+          <DirectorCard
+            data={data}
+            teamMembers={teamMembers}
+            membersForPicker={teamMembers.filter(
+              m =>
+                m.active ||
+                (data.directorTeamMemberId != null &&
+                  m.id === data.directorTeamMemberId)
+            )}
+            onSaved={setData}
+          />
           <MapCard data={data} onSaved={setData} />
           {channels.map(ch => (
             <ChannelCard
               key={ch.id}
               channel={ch}
-              onDeleted={id => setChannels(prev => prev.filter(c => c.id !== id))}
+              onDeleted={id =>
+                setChannels(prev => prev.filter(c => c.id !== id))
+              }
             />
           ))}
         </div>

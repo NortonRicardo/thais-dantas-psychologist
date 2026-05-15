@@ -42,6 +42,7 @@ export type TeamMemberRow = {
   photoMimeType: string | null
   linkedinUrl: string | null
   lattesUrl: string | null
+  active: boolean
   updatedAt: string
 }
 
@@ -63,6 +64,7 @@ export function TeamDialog({ member, onSuccess }: Props) {
   const [categories, setCategories] = useState<CategoryOption[]>([])
   const [prefixes, setPrefixes] = useState<PrefixOption[]>([])
   const [degreeLevels, setDegreeLevels] = useState<DegreeLevelOption[]>([])
+  const [memberActive, setMemberActive] = useState(member?.active ?? true)
   const [categoryId, setCategoryId] = useState(member?.categoryId ?? '')
   const [namePrefixId, setNamePrefixId] = useState(
     () => member?.namePrefixId ?? '__none__'
@@ -112,17 +114,25 @@ export function TeamDialog({ member, onSuccess }: Props) {
           return data[0]?.id ?? ''
         })
         setNamePrefixId(prev => {
-          if (member?.namePrefixId && pfxData.some(p => p.id === member.namePrefixId)) {
+          if (
+            member?.namePrefixId &&
+            pfxData.some(p => p.id === member.namePrefixId)
+          ) {
             return member.namePrefixId
           }
-          if (prev !== '__none__' && pfxData.some(p => p.id === prev)) return prev
+          if (prev !== '__none__' && pfxData.some(p => p.id === prev))
+            return prev
           return '__none__'
         })
         setDegreeLevelId(prev => {
-          if (member?.degreeLevelId && degData.some(d => d.id === member.degreeLevelId)) {
+          if (
+            member?.degreeLevelId &&
+            degData.some(d => d.id === member.degreeLevelId)
+          ) {
             return member.degreeLevelId
           }
-          if (prev !== '__none__' && degData.some(d => d.id === prev)) return prev
+          if (prev !== '__none__' && degData.some(d => d.id === prev))
+            return prev
           return '__none__'
         })
       } catch {
@@ -143,6 +153,7 @@ export function TeamDialog({ member, onSuccess }: Props) {
       setLattesSuffix(stripUrlScheme(member?.lattesUrl ?? ''))
       setImagePreview(null)
       setRemoveImage(false)
+      setMemberActive(member?.active ?? true)
     }
     setOpen(newOpen)
   }
@@ -176,6 +187,7 @@ export function TeamDialog({ member, onSuccess }: Props) {
     fd.set('linkedinUrl', toHttpsStored(linkedinSuffix))
     fd.set('lattesUrl', toHttpsStored(lattesSuffix))
     if (removeImage) fd.set('removePhoto', 'true')
+    if (isEdit) fd.set('active', memberActive ? 'true' : 'false')
 
     const url = isEdit ? `/api/team/${member.id}` : '/api/team'
     const method = isEdit ? 'PUT' : 'POST'
@@ -184,7 +196,9 @@ export function TeamDialog({ member, onSuccess }: Props) {
       const res = await fetch(url, { method, body: fd })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(typeof err.error === 'string' ? err.error : 'Erro ao salvar')
+        throw new Error(
+          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
+        )
       }
       toast.success(isEdit ? 'Membro atualizado!' : 'Membro criado!')
       setOpen(false)
@@ -215,7 +229,7 @@ export function TeamDialog({ member, onSuccess }: Props) {
       </DialogTrigger>
 
       <DialogContent
-        className="max-h-[90vh] max-w-lg overflow-y-auto bg-[#071525] text-white border-white/10 [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
+        className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto bg-[#071525] text-white border-white/10 sm:max-w-3xl [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>
@@ -242,7 +256,11 @@ export function TeamDialog({ member, onSuccess }: Props) {
             {previewSrc ? (
               <div className="group relative h-28 w-28 overflow-hidden rounded-full border border-white/10">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={previewSrc} alt="Preview" className="h-full w-full object-cover" />
+                <img
+                  src={previewSrc}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/55 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
                     type="button"
@@ -274,62 +292,135 @@ export function TeamDialog({ member, onSuccess }: Props) {
             )}
           </div>
 
-          {/* Categoria */}
-          <div className="grid gap-1.5">
-            <Label className="text-white/70">Categoria *</Label>
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                <SelectValue
-                  placeholder={!categories.length ? 'Carregando…' : 'Selecionar…'}
-                />
-              </SelectTrigger>
-              <SelectContent className="bg-[#071525] border-white/10 text-white">
-                {categories.map(c => (
-                  <SelectItem
-                    key={c.id}
-                    value={c.id}
-                    className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.color}`} />
-                      {c.title}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Categoria + situação (lado a lado no topo em edição) */}
+          <div
+            className={`grid gap-4 ${isEdit ? 'sm:grid-cols-2' : 'grid-cols-1'}`}
+          >
+            <div className="grid min-w-0 gap-1.5">
+              <Label className="text-white/70">Categoria *</Label>
+              <Select value={categoryId} onValueChange={setCategoryId}>
+                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
+                  <SelectValue
+                    placeholder={
+                      !categories.length ? 'Carregando…' : 'Selecionar…'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent className="bg-[#071525] border-white/10 text-white">
+                  {categories.map(c => (
+                    <SelectItem
+                      key={c.id}
+                      value={c.id}
+                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.color}`}
+                        />
+                        {c.title}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {isEdit ? (
+              <div className="grid min-w-0 gap-1.5">
+                <Label className="text-white/70">
+                  Situação na página Equipe
+                </Label>
+                <Select
+                  value={memberActive ? 'active' : 'inactive'}
+                  onValueChange={v => setMemberActive(v === 'active')}
+                >
+                  <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#071525] border-white/10 text-white">
+                    <SelectItem
+                      value="active"
+                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                    >
+                      Ativo — aparece na equipe pública
+                    </SelectItem>
+                    <SelectItem
+                      value="inactive"
+                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                    >
+                      Inativo — oculto da equipe pública (vínculos em projetos
+                      são mantidos)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
           </div>
 
-          {/* Tratamento (opcional) */}
-          <div className="grid gap-1.5">
-            <Label className="text-white/70">Tratamento</Label>
-            <Select value={namePrefixId} onValueChange={setNamePrefixId}>
-              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                <SelectValue placeholder={!prefixes.length ? 'Carregando…' : 'Nenhum'} />
-              </SelectTrigger>
-              <SelectContent className="bg-[#071525] border-white/10 text-white">
-                <SelectItem
-                  value="__none__"
-                  className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                >
-                  — Nenhum —
-                </SelectItem>
-                {prefixes.map(p => (
+          {/* Tratamento + grau acadêmico */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-1.5">
+              <Label className="text-white/70">Tratamento</Label>
+              <Select value={namePrefixId} onValueChange={setNamePrefixId}>
+                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
+                  <SelectValue
+                    placeholder={!prefixes.length ? 'Carregando…' : 'Nenhum'}
+                  />
+                </SelectTrigger>
+                <SelectContent className="bg-[#071525] border-white/10 text-white">
                   <SelectItem
-                    key={p.id}
-                    value={p.id}
+                    value="__none__"
                     className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
                   >
-                    {p.label}
+                    — Nenhum —
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  {prefixes.map(p => (
+                    <SelectItem
+                      key={p.id}
+                      value={p.id}
+                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                    >
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid min-w-0 gap-1.5">
+              <Label className="text-white/70">Grau acadêmico</Label>
+              <Select value={degreeLevelId} onValueChange={setDegreeLevelId}>
+                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
+                  <SelectValue
+                    placeholder={
+                      !degreeLevels.length ? 'Carregando…' : 'Nenhum'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent className="bg-[#071525] border-white/10 text-white">
+                  <SelectItem
+                    value="__none__"
+                    className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                  >
+                    — Nenhum —
+                  </SelectItem>
+                  {degreeLevels.map(d => (
+                    <SelectItem
+                      key={d.id}
+                      value={d.id}
+                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                    >
+                      {d.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Nome */}
           <div className="grid gap-1.5">
-            <Label htmlFor="name" className="text-white/70">Nome *</Label>
+            <Label htmlFor="name" className="text-white/70">
+              Nome *
+            </Label>
             <Input
               id="name"
               name="name"
@@ -343,7 +434,8 @@ export function TeamDialog({ member, onSuccess }: Props) {
           {/* LinkedIn */}
           <div className="grid gap-1.5">
             <Label htmlFor="linkedinSuffix" className="text-white/70">
-              LinkedIn <span className="text-white/35 font-normal">(opcional)</span>
+              LinkedIn{' '}
+              <span className="text-white/35 font-normal">(opcional)</span>
             </Label>
             <HttpsUrlSuffixField
               id="linkedinSuffix"
@@ -352,8 +444,9 @@ export function TeamDialog({ member, onSuccess }: Props) {
               placeholder="www.linkedin.com/in/seu-perfil"
             />
             <p className="text-[0.65rem] text-white/35">
-              Digite só o domínio e o caminho após <span className="text-white/50">https://</span>; o
-              endereço é salvo com https://.
+              Digite só o domínio e o caminho após{' '}
+              <span className="text-white/50">https://</span>; o endereço é
+              salvo com https://.
             </p>
           </div>
 
@@ -370,41 +463,14 @@ export function TeamDialog({ member, onSuccess }: Props) {
               placeholder="lattes.cnpq.br/0000000000000000"
             />
             <p className="text-[0.65rem] text-white/35">
-              Aceita <span className="text-white/50">lattes.cnpq.br/…</span> ou links do{' '}
-              <span className="text-white/50">buscatextual.cnpq.br</span> (visualização do CV). O
-              endereço é salvo com https://.
+              Aceita <span className="text-white/50">lattes.cnpq.br/…</span> ou
+              links do{' '}
+              <span className="text-white/50">buscatextual.cnpq.br</span>{' '}
+              (visualização do CV). O endereço é salvo com https://.
             </p>
           </div>
 
-          {/* Grau acadêmico (CRUD em Equipe → Graus) */}
-          <div className="grid gap-1.5">
-            <Label className="text-white/70">Grau acadêmico</Label>
-            <Select value={degreeLevelId} onValueChange={setDegreeLevelId}>
-              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                <SelectValue
-                  placeholder={!degreeLevels.length ? 'Carregando…' : 'Nenhum'}
-                />
-              </SelectTrigger>
-              <SelectContent className="bg-[#071525] border-white/10 text-white">
-                <SelectItem
-                  value="__none__"
-                  className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                >
-                  — Nenhum —
-                </SelectItem>
-                {degreeLevels.map(d => (
-                  <SelectItem
-                    key={d.id}
-                    value={d.id}
-                    className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                  >
-                    {d.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
+          {/* Instituição de formação */}
           <div className="grid gap-1.5">
             <Label htmlFor="formationInstitution" className="text-white/70">
               Instituição de formação{' '}
@@ -433,14 +499,17 @@ export function TeamDialog({ member, onSuccess }: Props) {
               className={INPUT_CLS}
             />
             <p className="text-[0.65rem] text-white/35">
-              Use o grau acadêmico acima para Mestrado/Doutorado etc.; aqui descreva a área, o cargo
-              ou a linha de pesquisa que aparece junto do nome no site.
+              Use o grau acadêmico acima para Mestrado/Doutorado etc.; aqui
+              descreva a área, o cargo ou a linha de pesquisa que aparece junto
+              do nome no site.
             </p>
           </div>
 
           {/* Descrição */}
           <div className="grid gap-1.5">
-            <Label htmlFor="description" className="text-white/70">Descrição</Label>
+            <Label htmlFor="description" className="text-white/70">
+              Descrição
+            </Label>
             <Textarea
               id="description"
               name="description"
@@ -462,10 +531,10 @@ export function TeamDialog({ member, onSuccess }: Props) {
             </Button>
             <Button
               type="submit"
-              disabled={loading}
-              className="bg-orange-800 text-orange-50 hover:bg-orange-700 border-0 disabled:opacity-50"
+              loading={loading}
+              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
-              {loading ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar'}
+              {isEdit ? 'Salvar alterações' : 'Criar'}
             </Button>
           </div>
         </form>

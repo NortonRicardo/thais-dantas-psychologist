@@ -1,6 +1,8 @@
+import { eq } from 'drizzle-orm'
 import { db } from './index'
 import {
   aboutTimelineEntries,
+  authUsers,
   collaborationPartners,
   contactInfo,
   developedPlatforms,
@@ -17,6 +19,7 @@ import {
   teamMembers,
   teamNamePrefixes,
 } from './schema'
+import { auth } from '@/lib/auth'
 import { teamMemberDisplayName } from '@/lib/team-member-display'
 import { normalizeLattesUrl } from '@/lib/team-lattes'
 
@@ -1016,6 +1019,39 @@ async function main() {
   console.warn(
     `✅ ${insertedProjCats.length} categorias, ${insertedProjThemes.length} temas, ${projectValues.length} projetos inseridos.`
   )
+
+  console.warn('🌱 Criando usuário admin…')
+  const adminUsername = process.env.ADMIN_USERNAME
+  const adminPassword = process.env.ADMIN_PASSWORD
+
+  if (!adminUsername || !adminPassword) {
+    console.warn('⚠️  ADMIN_USERNAME ou ADMIN_PASSWORD não definidos no .env — admin ignorado.')
+  } else {
+    const [existing] = await db
+      .select({ id: authUsers.id })
+      .from(authUsers)
+      .where(eq(authUsers.username, adminUsername))
+      .limit(1)
+
+    if (existing) {
+      console.warn(`⚠️  Admin "${adminUsername}" já existe — ignorado.`)
+    } else {
+      try {
+        await auth.api.signUpEmail({
+          body: {
+            name: adminUsername,
+            email: `${adminUsername}@lemm.internal`,
+            password: adminPassword,
+            username: adminUsername,
+          },
+        })
+        console.warn(`✅ Admin "${adminUsername}" criado.`)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error('❌ Falha ao criar admin:', msg)
+      }
+    }
+  }
 
   process.exit(0)
 }

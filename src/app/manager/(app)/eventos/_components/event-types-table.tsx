@@ -58,10 +58,18 @@ function resolveIcon(name: string): LucideIcon {
 }
 
 function IconPreview({ iconKey, color }: { iconKey: string; color: string }) {
-  const Icon = LUCIDE_NAMES.has(iconKey) ? resolveIcon(iconKey) : Lucide.Calendar
+  const Icon = LUCIDE_NAMES.has(iconKey)
+    ? resolveIcon(iconKey)
+    : Lucide.Calendar
   return (
-    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${color}`}>
-      {createElement(Icon, { size: 15, strokeWidth: 1.8, className: 'text-white' })}
+    <span
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${color}`}
+    >
+      {createElement(Icon, {
+        size: 15,
+        strokeWidth: 1.8,
+        className: 'text-white',
+      })}
     </span>
   )
 }
@@ -98,10 +106,15 @@ function EventTypeDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.name.trim()) { toast.error('Nome é obrigatório'); return }
+    if (!form.name.trim()) {
+      toast.error('Nome é obrigatório')
+      return
+    }
     setSaving(true)
     try {
-      const url = initial ? `/api/event-types/${initial.id}` : '/api/event-types'
+      const url = initial
+        ? `/api/event-types/${initial.id}`
+        : '/api/event-types'
       const method = initial ? 'PUT' : 'POST'
       const res = await fetch(url, {
         method,
@@ -130,12 +143,16 @@ function EventTypeDialog({
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>{initial ? 'Editar tipo' : 'Novo tipo de evento'}</DialogTitle>
+          <DialogTitle>
+            {initial ? 'Editar tipo' : 'Novo tipo de evento'}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-1">
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-white/60">Nome</label>
+            <label className="block text-xs font-medium text-white/60">
+              Nome
+            </label>
             <input
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -145,7 +162,9 @@ function EventTypeDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-white/60">Ícone</label>
+            <label className="block text-xs font-medium text-white/60">
+              Ícone
+            </label>
             <LucideIconPicker
               value={form.iconKey}
               onChange={v => setForm(f => ({ ...f, iconKey: v }))}
@@ -153,7 +172,9 @@ function EventTypeDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-white/60">Cor</label>
+            <label className="block text-xs font-medium text-white/60">
+              Cor
+            </label>
             <ColorSelector
               value={form.color}
               onChange={v => setForm(f => ({ ...f, color: v }))}
@@ -171,10 +192,10 @@ function EventTypeDialog({
             </Button>
             <Button
               type="submit"
-              disabled={saving}
-              className="bg-orange-700 hover:bg-orange-600 text-white"
+              loading={saving}
+              className="bg-orange-700 text-white hover:bg-orange-600"
             >
-              {saving ? 'Salvando…' : initial ? 'Salvar' : 'Criar'}
+              {initial ? 'Salvar' : 'Criar'}
             </Button>
           </DialogFooter>
         </form>
@@ -202,7 +223,9 @@ export function EventTypesTable() {
     }
   }, [])
 
-  useEffect(() => { fetchTypes() }, [fetchTypes])
+  useEffect(() => {
+    fetchTypes()
+  }, [fetchTypes])
 
   async function handleDelete(id: string) {
     try {
@@ -228,7 +251,9 @@ export function EventTypesTable() {
     <div className="space-y-4">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white/90">Tipo de Evento</h1>
+          <h1 className="text-xl font-semibold text-white/90">
+            Tipo de Evento
+          </h1>
           <p className="mt-0.5 text-sm text-white/40">
             Gerencie as categorias de eventos com ícone e cor.
           </p>
@@ -245,7 +270,8 @@ export function EventTypesTable() {
       <div
         className="w-full overflow-x-auto rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(255,255,255,0.1)',
@@ -287,80 +313,87 @@ export function EventTypesTable() {
 
             {!loading && rows.length === 0 && (
               <TableRow className="border-white/[0.07] hover:bg-transparent">
-                <TableCell colSpan={4} className="py-12 text-center text-sm text-white/30">
+                <TableCell
+                  colSpan={4}
+                  className="py-12 text-center text-sm text-white/30"
+                >
                   Nenhum tipo cadastrado ainda.
                 </TableCell>
               </TableRow>
             )}
 
-            {!loading && rows.map(row => (
-              <TableRow
-                key={row.id}
-                className="border-white/[0.07] transition-colors hover:bg-white/[0.04]"
-              >
-                <TableCell className="font-medium text-white/90">
-                  <div className="flex items-center gap-3">
-                    <IconPreview iconKey={row.iconKey} color={row.color} />
-                    <span>{row.name}</span>
-                  </div>
-                </TableCell>
+            {!loading &&
+              rows.map(row => (
+                <TableRow
+                  key={row.id}
+                  className="border-white/[0.07] transition-colors hover:bg-white/[0.04]"
+                >
+                  <TableCell className="font-medium text-white/90">
+                    <div className="flex items-center gap-3">
+                      <IconPreview iconKey={row.iconKey} color={row.color} />
+                      <span>{row.name}</span>
+                    </div>
+                  </TableCell>
 
-                <TableCell className="text-sm text-white/55">
-                  {row.iconKey || '—'}
-                </TableCell>
+                  <TableCell className="text-sm text-white/55">
+                    {row.iconKey || '—'}
+                  </TableCell>
 
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className={`h-4 w-4 rounded-full ${row.color}`} />
-                    <span className="text-xs text-white/40">{row.color.replace('bg-', '')}</span>
-                  </div>
-                </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className={`h-4 w-4 rounded-full ${row.color}`} />
+                      <span className="text-xs text-white/40">
+                        {row.color.replace('bg-', '')}
+                      </span>
+                    </div>
+                  </TableCell>
 
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-white/50 hover:text-white hover:bg-white/10"
-                      onClick={() => openEdit(row)}
-                    >
-                      <Pencil size={14} />
-                    </Button>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-white/50 hover:text-white hover:bg-white/10"
+                        onClick={() => openEdit(row)}
+                      >
+                        <Pencil size={14} />
+                      </Button>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Remover tipo?</AlertDialogTitle>
-                          <AlertDialogDescription className="text-white/50">
-                            &ldquo;{row.name}&rdquo; será removido permanentemente.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white">
-                            Cancelar
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
-                            onClick={() => handleDelete(row.id)}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-white/50 hover:text-rose-400 hover:bg-rose-400/10"
                           >
-                            Remover
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                            <Trash2 size={14} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remover tipo?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-white/50">
+                              &ldquo;{row.name}&rdquo; será removido
+                              permanentemente.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white">
+                              Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25"
+                              onClick={() => handleDelete(row.id)}
+                            >
+                              Remover
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>

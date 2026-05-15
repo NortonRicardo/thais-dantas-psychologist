@@ -1,23 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { eq, sql } from 'drizzle-orm'
+
 import { db } from '@/lib/db'
 import { teamCategories, teamMembers } from '@/lib/db/schema'
+import {
+  parseTeamCategoryForm,
+  uuidParamSafeParse,
+  validationErrorResponse,
+} from '@/lib/validation/team-api'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
   try {
     const { id } = await params
-    const fd = await req.formData()
-    const title = (fd.get('title') as string)?.trim()
-    const color = (fd.get('color') as string)?.trim()
-
-    if (!title || !color) {
+    const idCheck = uuidParamSafeParse(id)
+    if (!idCheck.success) {
       return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
+        {
+          error: idCheck.error.issues[0]?.message ?? 'Identificador inválido.',
+        },
         { status: 400 }
       )
     }
+
+    const fd = await req.formData()
+    const parsed = parseTeamCategoryForm(fd)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+
+    const { title, color } = parsed.data
 
     const [updated] = await db
       .update(teamCategories)
@@ -46,6 +57,13 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const { id } = await params
+  const idCheck = uuidParamSafeParse(id)
+  if (!idCheck.success) {
+    return NextResponse.json(
+      { error: idCheck.error.issues[0]?.message ?? 'Identificador inválido.' },
+      { status: 400 }
+    )
+  }
 
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -54,7 +72,10 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
 
   if (count > 0) {
     return NextResponse.json(
-      { error: 'Existem membros nesta categoria. Reatribua-os antes de excluir.' },
+      {
+        error:
+          'Não é possível excluir: há membros vinculados a esta categoria. Reatribua os membros antes de excluir.',
+      },
       { status: 409 }
     )
   }
