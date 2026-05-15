@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 const LUCIDE_ICON_NAMES = Object.keys(Lucide)
@@ -157,15 +158,15 @@ export function LucideIconPicker({
             compact ? 'h-8 text-xs' : 'text-sm'
           )}
         />
-        <div
+        <ScrollArea
           className={cn(
-            'overflow-y-auto overscroll-contain pr-1',
-            compact ? 'max-h-44' : 'max-h-52'
+            compact ? 'max-h-44' : 'max-h-52',
+            'overscroll-contain'
           )}
         >
           <div
             className={cn(
-              'grid gap-1',
+              'grid gap-1 pr-1',
               compact ? 'grid-cols-7' : 'grid-cols-6'
             )}
           >
@@ -196,7 +197,7 @@ export function LucideIconPicker({
               )
             })}
           </div>
-        </div>
+        </ScrollArea>
         {hasIcon && (
           <button
             type="button"

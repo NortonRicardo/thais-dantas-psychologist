@@ -16,11 +16,8 @@ import {
   X,
 } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export type EquipeProjectSummary = {
   slug: string
@@ -85,7 +82,9 @@ function TrayFilterPopover({
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const filtered = items.filter(i => i.label.toLowerCase().includes(search.toLowerCase()))
+  const filtered = items.filter(i =>
+    i.label.toLowerCase().includes(search.toLowerCase())
+  )
 
   function select(id: string) {
     onChange(id)
@@ -108,7 +107,9 @@ function TrayFilterPopover({
         {value ? (
           <span className="flex min-w-0 items-center gap-2 text-white/80">
             {selected?.dotClass ? (
-              <span className={`h-2 w-2 shrink-0 rounded-full ${selected.dotClass}`} />
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ${selected.dotClass}`}
+              />
             ) : (
               <span className="h-2 w-2 shrink-0 rounded-full bg-white/35" />
             )}
@@ -141,33 +142,39 @@ function TrayFilterPopover({
                 />
               </div>
             </div>
-            <div className="max-h-52 overflow-y-auto p-1" onWheel={e => e.stopPropagation()}>
-              <button
-                type="button"
-                onClick={() => select('')}
-                className={`w-full rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
-              >
-                {allLabel}
-              </button>
-              {filtered.map(i => (
+            <ScrollArea className="max-h-52">
+              <div className="p-1" onWheel={e => e.stopPropagation()}>
                 <button
-                  key={i.id}
                   type="button"
-                  onClick={() => select(i.id)}
-                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === i.id ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                  onClick={() => select('')}
+                  className={`w-full rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
                 >
-                  {i.dotClass ? (
-                    <span className={`h-2 w-2 shrink-0 rounded-full ${i.dotClass}`} />
-                  ) : (
-                    <span className="h-2 w-2 shrink-0 rounded-full bg-white/35" />
-                  )}
-                  <span className="truncate">{i.label}</span>
+                  {allLabel}
                 </button>
-              ))}
-              {filtered.length === 0 && (
-                <p className="py-2 text-center text-xs text-white/25">Sem resultados</p>
-              )}
-            </div>
+                {filtered.map(i => (
+                  <button
+                    key={i.id}
+                    type="button"
+                    onClick={() => select(i.id)}
+                    className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === i.id ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                  >
+                    {i.dotClass ? (
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${i.dotClass}`}
+                      />
+                    ) : (
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-white/35" />
+                    )}
+                    <span className="truncate">{i.label}</span>
+                  </button>
+                ))}
+                {filtered.length === 0 && (
+                  <p className="py-2 text-center text-xs text-white/25">
+                    Sem resultados
+                  </p>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         </>
       )}
@@ -175,7 +182,10 @@ function TrayFilterPopover({
   )
 }
 
-const categoryBadgeStyle: Record<string, { bg: string; border: string; text: string }> = {
+const categoryBadgeStyle: Record<
+  string,
+  { bg: string; border: string; text: string }
+> = {
   TCC: {
     bg: 'rgba(0,180,255,0.12)',
     border: 'rgba(0,180,255,0.35)',
@@ -247,8 +257,13 @@ export function TeamEquipeInteractive({ sections }: Props) {
             const hay = `${m.displayName} ${m.name}`.toLowerCase()
             if (!hay.includes(q)) return false
           }
-          if (filterCategoryId && m.categoryId !== filterCategoryId) return false
-          if (filterDegree && (m.degreeLevelLabel?.trim() ?? '') !== filterDegree) return false
+          if (filterCategoryId && m.categoryId !== filterCategoryId)
+            return false
+          if (
+            filterDegree &&
+            (m.degreeLevelLabel?.trim() ?? '') !== filterDegree
+          )
+            return false
           return true
         }),
       }))
@@ -338,7 +353,11 @@ export function TeamEquipeInteractive({ sections }: Props) {
               </h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {section.members.map(m => (
-                  <MemberCard key={m.id} member={m} onSelect={() => openMember(m)} />
+                  <MemberCard
+                    key={m.id}
+                    member={m}
+                    onSelect={() => openMember(m)}
+                  />
                 ))}
               </div>
             </section>
@@ -353,7 +372,9 @@ export function TeamEquipeInteractive({ sections }: Props) {
         >
           {selected ? (
             <>
-              <DialogTitle className="sr-only">{selected.displayName}</DialogTitle>
+              <DialogTitle className="sr-only">
+                {selected.displayName}
+              </DialogTitle>
               <div className="grid min-h-0 gap-8 p-6 sm:p-8 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-stretch md:gap-10">
                 {/* Esquerda: foto, nome, links, formação (centralizados na coluna) */}
                 <div className="flex h-full min-h-0 flex-col items-center gap-4 border-b border-white/10 pb-6 text-center md:border-b-0 md:border-r md:border-white/10 md:pb-0 md:pr-8">
@@ -370,7 +391,9 @@ export function TeamEquipeInteractive({ sections }: Props) {
                     )}
                   </div>
                   <div className="w-full min-w-0 text-center">
-                    <p className="text-base font-semibold text-white">{selected.displayName}</p>
+                    <p className="text-base font-semibold text-white">
+                      {selected.displayName}
+                    </p>
                     <div className="mt-3 flex flex-col items-center gap-2">
                       {selected.linkedinUrl ? (
                         <a
@@ -417,7 +440,9 @@ export function TeamEquipeInteractive({ sections }: Props) {
                         {selected.description}
                       </p>
                     ) : (
-                      <p className="mt-2 text-sm text-white/35">Sem descrição cadastrada.</p>
+                      <p className="mt-2 text-sm text-white/35">
+                        Sem descrição cadastrada.
+                      </p>
                     )}
                   </div>
                   <div>
@@ -428,14 +453,17 @@ export function TeamEquipeInteractive({ sections }: Props) {
                       <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {selected.projects.map(p => (
                           <li key={p.slug} className="min-w-0">
-                            <MemberProjectCard project={p} onNavigate={() => setOpen(false)} />
+                            <MemberProjectCard
+                              project={p}
+                              onNavigate={() => setOpen(false)}
+                            />
                           </li>
                         ))}
                       </ul>
                     ) : (
                       <p className="mt-2 text-sm text-white/35">
-                        Nenhum projeto vinculado (orientação, coorientação ou liderança de
-                        pesquisa).
+                        Nenhum projeto vinculado (orientação, coorientação ou
+                        liderança de pesquisa).
                       </p>
                     )}
                   </div>
@@ -476,7 +504,11 @@ function MemberProjectCard({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <span
           className="rounded-full px-2.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider"
-          style={{ background: cat.bg, border: `1px solid ${cat.border}`, color: cat.text }}
+          style={{
+            background: cat.bg,
+            border: `1px solid ${cat.border}`,
+            color: cat.text,
+          }}
         >
           {project.category}
         </span>
@@ -510,12 +542,16 @@ function MemberProjectCard({
             </span>
           ))}
           {project.themes.length > 6 ? (
-            <span className="text-[0.6rem] text-white/35">+{project.themes.length - 6}</span>
+            <span className="text-[0.6rem] text-white/35">
+              +{project.themes.length - 6}
+            </span>
           ) : null}
         </div>
       ) : null}
       {project.description?.trim() ? (
-        <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-white/50">{project.description}</p>
+        <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-white/50">
+          {project.description}
+        </p>
       ) : null}
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.65rem] text-white/40">
         {period ? (
@@ -564,7 +600,10 @@ function MemberProjectCard({
   )
 }
 
-function formatProjectPeriod(startIso: string, endIso: string | null): string | null {
+function formatProjectPeriod(
+  startIso: string,
+  endIso: string | null
+): string | null {
   try {
     const s = new Date(startIso)
     if (Number.isNaN(s.getTime())) return null
@@ -609,7 +648,8 @@ function MemberCard({
       onClick={onSelect}
       className="group flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl px-5 py-6 text-center outline-none transition ring-offset-2 ring-offset-[#0a1628] focus-visible:ring-2 focus-visible:ring-sky-500/60"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+        background:
+          'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         border: '1px solid rgba(255,255,255,0.18)',
@@ -628,7 +668,9 @@ function MemberCard({
         <p className="text-sm font-semibold text-white/90 group-hover:text-white">
           {member.displayName}
         </p>
-        <p className="mt-0.5 text-xs text-[#00d4ff]/80">{member.professionalLine}</p>
+        <p className="mt-0.5 text-xs text-[#00d4ff]/80">
+          {member.professionalLine}
+        </p>
         {(member.linkedinUrl || member.lattesUrl) && (
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             {member.linkedinUrl ? (
@@ -650,7 +692,9 @@ function MemberCard({
         )}
       </div>
       {member.description && (
-        <p className="line-clamp-3 text-xs leading-relaxed text-white/50">{member.description}</p>
+        <p className="line-clamp-3 text-xs leading-relaxed text-white/50">
+          {member.description}
+        </p>
       )}
     </button>
   )

@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export function FilterCombobox({
   value,
@@ -91,9 +92,9 @@ export function FilterCombobox({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-[var(--radix-popover-trigger-width)] min-w-0 border-white/10 bg-[#071525] p-0 shadow-xl"
+        className="scheme-dark flex max-h-[70vh] w-[var(--radix-popover-trigger-width)] min-w-0 flex-col overflow-hidden border-white/10 bg-[#071525] p-0 text-white shadow-xl"
       >
-        <div className="border-b border-white/10 px-2 py-2">
+        <div className="shrink-0 border-b border-white/10 px-2 py-2">
           <div className="relative">
             <Search
               size={12}
@@ -109,32 +110,37 @@ export function FilterCombobox({
           </div>
         </div>
 
-        <div className="max-h-52 overflow-y-auto p-1">
-          <button
-            type="button"
-            onClick={() => select('')}
-            className={`w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
-          >
-            {placeholder}
-          </button>
-
-          {filtered.length === 0 && (
-            <p className="py-2 text-center text-xs text-white/25">
-              Nenhum resultado
-            </p>
-          )}
-
-          {filtered.map(opt => (
+        <ScrollArea
+          type="always"
+          className="max-h-52 w-full shrink-0 overscroll-contain"
+        >
+          <div className="p-1">
             <button
-              key={opt}
               type="button"
-              onClick={() => select(opt)}
-              className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${value === opt ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+              onClick={() => select('')}
+              className={`w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
             >
-              {renderOption ? renderOption(opt) : opt}
+              {placeholder}
             </button>
-          ))}
-        </div>
+
+            {filtered.length === 0 && (
+              <p className="py-2 text-center text-xs text-white/25">
+                Nenhum resultado
+              </p>
+            )}
+
+            {filtered.map(opt => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => select(opt)}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${value === opt ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+              >
+                {renderOption ? renderOption(opt) : opt}
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
 
         {showClear && value && (
           <div className="border-t border-white/10 p-1">

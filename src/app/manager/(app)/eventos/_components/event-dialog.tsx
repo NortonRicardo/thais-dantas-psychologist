@@ -31,6 +31,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -130,9 +131,9 @@ function TypeCombobox({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-[--radix-popover-trigger-width] border-white/10 bg-[#071525] p-0 shadow-xl"
+        className="scheme-dark flex max-h-[70vh] w-[var(--radix-popover-trigger-width)] min-w-0 flex-col overflow-hidden border-white/10 bg-[#071525] p-0 text-white shadow-xl"
       >
-        <div className="border-b border-white/10 px-2 py-2">
+        <div className="shrink-0 border-b border-white/10 px-2 py-2">
           <div className="relative">
             <Search
               size={12}
@@ -157,28 +158,35 @@ function TypeCombobox({
           </div>
         </div>
 
-        <div className="max-h-48 overflow-y-auto overscroll-contain p-1">
-          {filtered.length === 0 && (
-            <p className="py-2 text-center text-xs text-white/25">
-              Nenhum resultado
-            </p>
-          )}
-          {filtered.map(opt => (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => select(opt.name)}
-              className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
-                value === opt.name
-                  ? 'bg-white/10 text-white/90'
-                  : 'text-white/60 hover:bg-white/5 hover:text-white/80'
-              }`}
-            >
-              <span className={`h-2 w-2 shrink-0 rounded-full ${opt.color}`} />
-              {opt.name}
-            </button>
-          ))}
-        </div>
+        <ScrollArea
+          type="always"
+          className="max-h-48 w-full shrink-0 overscroll-contain"
+        >
+          <div className="p-1">
+            {filtered.length === 0 && (
+              <p className="py-2 text-center text-xs text-white/25">
+                Nenhum resultado
+              </p>
+            )}
+            {filtered.map(opt => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => select(opt.name)}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
+                  value === opt.name
+                    ? 'bg-white/10 text-white/90'
+                    : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                }`}
+              >
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${opt.color}`}
+                />
+                {opt.name}
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   )

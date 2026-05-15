@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { TeamMemberThumb } from '@/components/team-member-thumb'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { COLOR_HEX_MAP } from '@/components/constants/colors'
 import type { PublicEventData, PublicEventTypeData } from '@/lib/http/events'
 import {
@@ -378,37 +379,36 @@ function TypeFilterPopover({
                 />
               </div>
             </div>
-            <div
-              className="max-h-52 overflow-y-auto p-1"
-              onWheel={e => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                onClick={() => select('')}
-                className={`w-full rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
-              >
-                Todos os tipos
-              </button>
-              {filtered.map(t => (
+            <ScrollArea className="max-h-52">
+              <div className="p-1" onWheel={e => e.stopPropagation()}>
                 <button
-                  key={t.name}
                   type="button"
-                  onClick={() => select(t.name)}
-                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === t.name ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                  onClick={() => select('')}
+                  className={`w-full rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${!value ? 'bg-white/10 text-white/90' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
                 >
-                  <span
-                    className="h-2 w-2 rounded-full shrink-0"
-                    style={{ background: colorMap[t.name]?.text ?? '#fff' }}
-                  />
-                  {t.name}
+                  Todos os tipos
                 </button>
-              ))}
-              {filtered.length === 0 && (
-                <p className="py-2 text-center text-xs text-white/25">
-                  Sem resultados
-                </p>
-              )}
-            </div>
+                {filtered.map(t => (
+                  <button
+                    key={t.name}
+                    type="button"
+                    onClick={() => select(t.name)}
+                    className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${value === t.name ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                  >
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: colorMap[t.name]?.text ?? '#fff' }}
+                    />
+                    {t.name}
+                  </button>
+                ))}
+                {filtered.length === 0 && (
+                  <p className="py-2 text-center text-xs text-white/25">
+                    Sem resultados
+                  </p>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         </>
       )}

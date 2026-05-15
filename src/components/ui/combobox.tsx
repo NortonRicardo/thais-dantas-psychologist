@@ -5,6 +5,7 @@ import { Combobox as ComboboxPrimitive } from '@base-ui/react'
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useDialogContentRef } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -135,15 +136,19 @@ function ComboboxContent({
 
 function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   return (
-    <ComboboxPrimitive.List
-      data-slot="combobox-list"
-      onWheel={e => e.stopPropagation()}
+    <ScrollArea
       className={cn(
-        'max-h-[min(calc(--spacing(96)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 overflow-y-auto p-1 data-empty:p-0 z-50',
+        'max-h-[min(24rem,var(--available-height,70vh))]',
         className
       )}
-      {...props}
-    />
+    >
+      <ComboboxPrimitive.List
+        data-slot="combobox-list"
+        onWheel={e => e.stopPropagation()}
+        className="scroll-py-1 overflow-hidden p-1 data-empty:p-0 z-50"
+        {...props}
+      />
+    </ScrollArea>
   )
 }
 

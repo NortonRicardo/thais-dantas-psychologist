@@ -26,6 +26,7 @@ import { toast } from 'sonner'
 
 import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Dialog,
   DialogContent,
@@ -190,30 +191,31 @@ function TeamMemberSearch({
       />
       {open && (
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-white/10 bg-[#27272a] shadow-lg">
-          <ul
-            className="max-h-52 overflow-y-auto p-1"
-            onWheel={e => e.stopPropagation()}
-          >
-            {filtered.length > 0 ? (
-              filtered.map(m => (
-                <li
-                  key={m.id}
-                  onMouseDown={() => select(m)}
-                  className={`cursor-pointer rounded-sm px-2.5 py-1.5 text-sm transition-colors ${
-                    m.id === value
-                      ? 'bg-white/15 text-white'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  {m.name}
-                </li>
-              ))
-            ) : (
-              <li className="px-2.5 py-2 text-sm text-white/35">
-                Nenhum membro encontrado.
-              </li>
-            )}
-          </ul>
+          <div onWheel={e => e.stopPropagation()}>
+            <ScrollArea className="max-h-52">
+              <ul className="p-1">
+                {filtered.length > 0 ? (
+                  filtered.map(m => (
+                    <li
+                      key={m.id}
+                      onMouseDown={() => select(m)}
+                      className={`cursor-pointer rounded-sm px-2.5 py-1.5 text-sm transition-colors ${
+                        m.id === value
+                          ? 'bg-white/15 text-white'
+                          : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {m.name}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-2.5 py-2 text-sm text-white/35">
+                    Nenhum membro encontrado.
+                  </li>
+                )}
+              </ul>
+            </ScrollArea>
+          </div>
         </div>
       )}
     </div>

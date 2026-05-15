@@ -30,6 +30,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Select,
   SelectContent,
@@ -151,30 +152,32 @@ function CategoryCombobox({
           </div>
         </div>
 
-        <div className="max-h-48 overflow-y-auto overscroll-contain p-1">
-          {filtered.length === 0 && (
-            <p className="py-3 text-center text-xs text-white/30">
-              Nenhuma categoria encontrada.
-            </p>
-          )}
-          {filtered.map(o => (
-            <button
-              key={o.id}
-              type="button"
-              onClick={() => select(o.id)}
-              className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
-                value === o.id
-                  ? 'bg-white/10 text-white/90'
-                  : 'text-white/60 hover:bg-white/5 hover:text-white/85'
-              }`}
-            >
-              <span
-                className={`h-2 w-2 shrink-0 rounded-full ${extractBgColorKey(o.color)}`}
-              />
-              {o.title}
-            </button>
-          ))}
-        </div>
+        <ScrollArea className="max-h-48 overscroll-contain">
+          <div className="p-1">
+            {filtered.length === 0 && (
+              <p className="py-3 text-center text-xs text-white/30">
+                Nenhuma categoria encontrada.
+              </p>
+            )}
+            {filtered.map(o => (
+              <button
+                key={o.id}
+                type="button"
+                onClick={() => select(o.id)}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
+                  value === o.id
+                    ? 'bg-white/10 text-white/90'
+                    : 'text-white/60 hover:bg-white/5 hover:text-white/85'
+                }`}
+              >
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${extractBgColorKey(o.color)}`}
+                />
+                {o.title}
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   )

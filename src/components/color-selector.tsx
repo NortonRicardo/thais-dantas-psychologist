@@ -8,7 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { COLOR_OPTIONS, type AppColorOption } from '@/components/constants/colors'
+import {
+  COLOR_OPTIONS,
+  type AppColorOption,
+} from '@/components/constants/colors'
 import { cn } from '@/lib/utils'
 
 const DEFAULT_TOP_COUNT = 22
@@ -39,7 +42,10 @@ function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
 }
 
 function ColorButton({
-  option, selected, onClick, className,
+  option,
+  selected,
+  onClick,
+  className,
 }: {
   option: AppColorOption
   selected: boolean
@@ -53,7 +59,8 @@ function ColorButton({
       className={cn(
         'relative size-8 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         option.className,
-        selected && 'ring-3 ring-lime-800 dark:ring-lime-400 dark:ring-2 scale-110',
+        selected &&
+          'ring-3 ring-lime-800 dark:ring-lime-400 dark:ring-2 scale-110',
         className
       )}
       aria-pressed={selected}
@@ -70,7 +77,10 @@ function ColorButton({
 }
 
 function ColorDropdownGrid({
-  value, onChange, keys, optionByKey,
+  value,
+  onChange,
+  keys,
+  optionByKey,
 }: {
   value: string
   onChange: (key: string) => void
@@ -95,10 +105,10 @@ function ColorDropdownGrid({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           sideOffset={6}
-          className="max-h-[min(70vh,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto border border-white/10 bg-[#071525] p-2 text-white shadow-xl"
+          className="max-h-[min(70vh,var(--radix-dropdown-menu-content-available-height))] overflow-hidden border border-white/10 bg-[#071525] p-0 text-white shadow-xl"
           style={{ width }}
         >
-          <div className="grid grid-cols-12 gap-2">
+          <div className="grid grid-cols-12 gap-2 p-2">
             {keys.map(key => {
               const opt = optionByKey.get(key)
               if (!opt) return null
@@ -107,7 +117,10 @@ function ColorDropdownGrid({
                   key={key}
                   option={opt}
                   selected={value === key}
-                  onClick={() => { onChange(key); setOpen(false) }}
+                  onClick={() => {
+                    onChange(key)
+                    setOpen(false)
+                  }}
                 />
               )
             })}
@@ -125,12 +138,18 @@ export function ColorSelector({
   topCount = DEFAULT_TOP_COUNT,
 }: ColorSelectorProps) {
   const allKeys = React.useMemo(() => options.map(o => o.key), [options])
-  const baseTop = React.useMemo(() => allKeys.slice(0, Math.min(topCount, allKeys.length)), [allKeys, topCount])
+  const baseTop = React.useMemo(
+    () => allKeys.slice(0, Math.min(topCount, allKeys.length)),
+    [allKeys, topCount]
+  )
   const displayedTop = React.useMemo(() => {
     if (value && !baseTop.includes(value)) return [value, ...baseTop]
     return [...baseTop]
   }, [baseTop, value])
-  const restKeys = React.useMemo(() => allKeys.filter(k => !displayedTop.includes(k)), [allKeys, displayedTop])
+  const restKeys = React.useMemo(
+    () => allKeys.filter(k => !displayedTop.includes(k)),
+    [allKeys, displayedTop]
+  )
   const optionByKey = React.useMemo(() => {
     const map = new Map<string, AppColorOption>()
     for (const opt of options) map.set(opt.key, opt)
