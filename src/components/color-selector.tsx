@@ -86,13 +86,18 @@ function ColorDropdownGrid({
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="secondary"
-            className="h-8 w-full rounded-md mt-2"
+            type="button"
+            variant="outline"
+            className="mt-2 h-8 w-full rounded-md border-white/15 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white"
           >
             Outras cores
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent sideOffset={6} className="p-2" style={{ width }}>
+        <DropdownMenuContent
+          sideOffset={6}
+          className="max-h-[min(70vh,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto border border-white/10 bg-[#071525] p-2 text-white shadow-xl"
+          style={{ width }}
+        >
           <div className="grid grid-cols-12 gap-2">
             {keys.map(key => {
               const opt = optionByKey.get(key)

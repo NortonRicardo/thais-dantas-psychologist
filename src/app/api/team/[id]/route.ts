@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { teamMembers } from '@/lib/db/schema'
+import { teamCategories, teamMembers, teamNamePrefixes } from '@/lib/db/schema'
+import { normalizeLinkedinUrl } from '@/lib/team-linkedin'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -10,19 +11,53 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     const { id } = await params
     const fd = await req.formData()
 
-    const category = (fd.get('category') as string)?.trim()
+    const categoryId = (fd.get('categoryId') as string)?.trim()
+    const namePrefixIdRaw = (fd.get('namePrefixId') as string)?.trim()
+    const namePrefixId =
+      namePrefixIdRaw && namePrefixIdRaw !== '__none__' ? namePrefixIdRaw : null
     const name = (fd.get('name') as string)?.trim()
     const qualification = (fd.get('qualification') as string)?.trim()
     const description = (fd.get('description') as string)?.trim() || null
-    const sortOrder = parseInt(fd.get('sortOrder') as string) || 0
+    const linkedinUrl = normalizeLinkedinUrl(fd.get('linkedinUrl') as string | null)
 
-    if (!category || !name || !qualification) {
+    if (fd.get('linkedinUrl') && String(fd.get('linkedinUrl')).trim() && !linkedinUrl) {
+      return NextResponse.json({ error: 'URL do LinkedIn inválida (use linkedin.com/…)' }, { status: 400 })
+    }
+
+    if (!categoryId || !name || !qualification) {
       return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 })
+    }
+
+    const [cat] = await db
+      .select({ id: teamCategories.id })
+      .from(teamCategories)
+      .where(eq(teamCategories.id, categoryId))
+      .limit(1)
+
+    if (!cat) {
+      return NextResponse.json({ error: 'Categoria inválida' }, { status: 400 })
+    }
+
+    if (namePrefixId) {
+      const [pfx] = await db
+        .select({ id: teamNamePrefixes.id })
+        .from(teamNamePrefixes)
+        .where(eq(teamNamePrefixes.id, namePrefixId))
+        .limit(1)
+      if (!pfx) {
+        return NextResponse.json({ error: 'Tratamento inválido' }, { status: 400 })
+      }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const patch: Record<string, any> = {
-      category, name, qualification, description, sortOrder, updatedAt: new Date(),
+      categoryId,
+      namePrefixId,
+      name,
+      qualification,
+      description,
+      linkedinUrl,
+      updatedAt: new Date(),
     }
 
     if (fd.get('removePhoto') === 'true') {

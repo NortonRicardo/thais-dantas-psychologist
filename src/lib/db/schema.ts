@@ -170,17 +170,54 @@ export const contactChannels = pgTable('contact_channels', {
 export type ContactChannel = typeof contactChannels.$inferSelect
 export type NewContactChannel = typeof contactChannels.$inferInsert
 
+/** Categorias da equipe (agrupamento na página pública /equipe) */
+export const teamCategories = pgTable('team_categories', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  /** Classe Tailwind de fundo, ex.: bg-sky-500 (paleta do gestor) */
+  color: text('color').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type TeamCategory = typeof teamCategories.$inferSelect
+export type NewTeamCategory = typeof teamCategories.$inferInsert
+
+/** Tratamento exibido antes do nome (Dr., Prof. Dr., …) — CRUD em /manager/equipe/tratamentos */
+export const teamNamePrefixes = pgTable('team_name_prefixes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  label: text('label').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type TeamNamePrefix = typeof teamNamePrefixes.$inferSelect
+export type NewTeamNamePrefix = typeof teamNamePrefixes.$inferInsert
+
 /** Membros da equipe exibidos na página pública /equipe */
 export const teamMembers = pgTable('team_members', {
   id: uuid('id').defaultRandom().primaryKey(),
-  /** 'professores' | 'colaboradores' | 'convidados' */
-  category: text('category').notNull(),
+  categoryId: uuid('category_id')
+    .notNull()
+    .references(() => teamCategories.id, { onDelete: 'restrict' }),
+  namePrefixId: uuid('name_prefix_id').references(() => teamNamePrefixes.id, {
+    onDelete: 'set null',
+  }),
   name: text('name').notNull(),
   qualification: text('qualification').notNull(),
   description: text('description'),
+  /** URL completa do perfil (https://www.linkedin.com/in/…) */
+  linkedinUrl: text('linkedin_url'),
   photo: bytea('photo'),
   photoMimeType: text('photo_mime_type'),
-  sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),

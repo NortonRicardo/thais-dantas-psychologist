@@ -26,7 +26,9 @@ export function ManagerNav() {
         const isCurrent =
           href === '/manager/infraestrutura'
             ? pathname.startsWith('/manager/infraestrutura')
-            : pathname === href
+            : href === '/manager/equipe'
+              ? pathname.startsWith('/manager/equipe')
+              : pathname === href
         return (
           <Link
             key={label}

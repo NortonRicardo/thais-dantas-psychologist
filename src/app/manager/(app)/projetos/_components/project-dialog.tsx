@@ -48,7 +48,7 @@ export type ProjectRow = {
   updatedAt: string
 }
 
-type TeamOption = { id: string; name: string; category: string }
+type TeamOption = { id: string; name: string }
 
 const CATEGORIES = [
   'TCC',
@@ -114,8 +114,17 @@ export function ProjectDialog({ project, onSuccess }: Props) {
   async function loadTeamMembers() {
     try {
       const res = await fetch('/api/team')
-      const data: TeamOption[] = await res.json()
-      setTeamMembers(data)
+      const data = (await res.json()) as {
+        id: string
+        name: string
+        displayName?: string
+      }[]
+      setTeamMembers(
+        data.map(m => ({
+          id: m.id,
+          name: m.displayName ?? m.name,
+        }))
+      )
     } catch {
       toast.error('Erro ao carregar membros da equipe.')
     }
@@ -216,7 +225,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
   }
 
   const membersWithNone: TeamOption[] = [
-    { id: '__none__', name: '— Nenhum —', category: '' },
+    { id: '__none__', name: '— Nenhum —' },
     ...teamMembers,
   ]
 

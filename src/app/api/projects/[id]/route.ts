@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { projects, teamMembers } from '@/lib/db/schema'
+import { projects } from '@/lib/db/schema'
+import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -10,10 +11,7 @@ export async function GET(_: Request, { params }: Ctx) {
   const [row] = await db.select().from(projects).where(eq(projects.id, id))
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const members = await db
-    .select({ id: teamMembers.id, name: teamMembers.name })
-    .from(teamMembers)
-  const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]))
+  const memberMap = await fetchTeamMembersDisplayMap()
 
   return NextResponse.json({
     ...row,

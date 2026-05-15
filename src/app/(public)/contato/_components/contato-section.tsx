@@ -17,7 +17,8 @@ import {
 import { unstable_cache } from 'next/cache'
 import { asc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { contactChannels, contactInfo, teamMembers } from '@/lib/db/schema'
+import { contactChannels, contactInfo, teamMembers, teamNamePrefixes } from '@/lib/db/schema'
+import { teamMemberDisplayName } from '@/lib/team-member-display'
 
 const glassStyle = {
   background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
@@ -77,10 +78,12 @@ const getData = unstable_cache(
       ? db
           .select({
             name: teamMembers.name,
+            namePrefixLabel: teamNamePrefixes.label,
             photo: teamMembers.photo,
             photoMimeType: teamMembers.photoMimeType,
           })
           .from(teamMembers)
+          .leftJoin(teamNamePrefixes, eq(teamMembers.namePrefixId, teamNamePrefixes.id))
           .where(eq(teamMembers.id, info.directorTeamMemberId))
           .limit(1)
           .then(rows => rows[0] ?? null)
@@ -105,8 +108,13 @@ export async function ContatoSection() {
     photoSrc = `data:${director.photoMimeType};base64,${b64}`
   }
 
-  const initials = director?.name
-    ? director.name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('')
+  const directorDisplay =
+    director != null
+      ? teamMemberDisplayName(director.name, director.namePrefixLabel)
+      : null
+
+  const initials = directorDisplay
+    ? directorDisplay.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('')
     : null
 
   const totalCards = (showDirector ? 1 : 0) + channels.length
@@ -144,13 +152,13 @@ export async function ContatoSection() {
               <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-xl font-bold text-white/60">
                 {photoSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={photoSrc} alt={director?.name ?? ''} className="h-full w-full object-cover" />
+                  <img src={photoSrc} alt={directorDisplay ?? ''} className="h-full w-full object-cover" />
                 ) : (
                   initials ?? '?'
                 )}
               </span>
               <span className="text-[0.65rem] uppercase tracking-[3px] text-white/40">Diretor</span>
-              <span className="text-sm font-medium text-white/80">{director?.name}</span>
+              <span className="text-sm font-medium text-white/80">{directorDisplay}</span>
             </div>
           )}
 

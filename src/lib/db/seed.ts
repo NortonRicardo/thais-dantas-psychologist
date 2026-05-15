@@ -8,9 +8,12 @@ import {
   events,
   hardware,
   hardwareModules,
+  teamCategories,
   teamMembers,
+  teamNamePrefixes,
   projects,
 } from './schema'
+import { teamMemberDisplayName } from '@/lib/team-member-display'
 
 const seedEventTypes = [
   { name: 'Conferência', iconKey: 'Presentation', color: 'bg-sky-800' },
@@ -201,6 +204,31 @@ const seedHardwareBlocks = [
   },
 ]
 
+const LEGACY_TEAM_CATEGORY_TITLE: Record<string, string> = {
+  professores: 'Professores',
+  colaboradores: 'Colaboradores',
+  convidados: 'Convidados',
+}
+
+const seedTeamCategories = [
+  { title: 'Professores', color: 'bg-sky-500' },
+  { title: 'Colaboradores', color: 'bg-purple-600' },
+  { title: 'Convidados', color: 'bg-teal-600' },
+] as const
+
+const seedTeamNamePrefixes = [
+  { label: 'Dr.' },
+  { label: 'Dra.' },
+  { label: 'Prof.' },
+  { label: 'Profa.' },
+  { label: 'Prof. Dr.' },
+  { label: 'Profa. Dra.' },
+  { label: 'Mr.' },
+  { label: 'Mrs.' },
+  { label: 'Ms.' },
+  { label: 'Miss' },
+] as const
+
 const seedCollaborationPartners = [
   {
     name: 'INPE',
@@ -221,47 +249,56 @@ const seedCollaborationPartners = [
   },
 ]
 
-const seedTeamMembers = [
+type SeedTeamMemberEntry = {
+  category: 'professores' | 'colaboradores' | 'convidados'
+  namePrefixLabel?: string
+  name: string
+  qualification: string
+  description: string
+  linkedinUrl?: string | null
+}
+
+const seedTeamMembers: SeedTeamMemberEntry[] = [
   // Professores
   {
     category: 'professores',
-    name: 'Dra. Maria José Pereira Dantas',
+    namePrefixLabel: 'Dra.',
+    name: 'Maria José Pereira Dantas',
     qualification: 'Doutora em Ciência da Computação',
     description:
       'Coordenadora do LEMM. Pesquisa em IA, dados climáticos e otimização.',
-    sortOrder: 0,
   },
   {
     category: 'professores',
-    name: 'Dr. José Elmo de Menezes',
+    namePrefixLabel: 'Dr.',
+    name: 'José Elmo de Menezes',
     qualification: 'Doutor em Estatística',
     description:
       'Vice-coordenador do LEMM. Apoio metodológico em estatística, modelagem quantitativa e articulação de estudos internacionais.',
-    sortOrder: 1,
   },
   {
     category: 'professores',
-    name: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
+    namePrefixLabel: 'Prof. Dr.',
+    name: 'Wanderlei Malaquias Pereira Junior',
     qualification: 'Doutor em Engenharia de Produção',
     description:
       'Pesquisa em metaheurísticas, otimização combinatória e logística. Coorientador de ICs e colaborador no desenvolvimento da plataforma META TOOL BOX.',
-    sortOrder: 2,
   },
   {
     category: 'professores',
-    name: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
+    namePrefixLabel: 'Prof. Dr.',
+    name: 'Roussian Di Amaro Alves Gaioso',
     qualification: 'Doutor em Ciências Atmosféricas',
     description:
       'Pesquisa em modelagem climática urbana, ondas de calor e HPC. Estuda modelos WRF e experimentos de alto desempenho.',
-    sortOrder: 3,
   },
   {
     category: 'professores',
-    name: 'Prof. Dr. Felipe Veloso',
+    namePrefixLabel: 'Prof. Dr.',
+    name: 'Felipe Veloso',
     qualification: 'Doutor em Computação Aplicada',
     description:
       'Pesquisa em gêmeos digitais e sistemas ciber-físicos para agricultura.',
-    sortOrder: 4,
   },
   // Colaboradores
   {
@@ -270,7 +307,6 @@ const seedTeamMembers = [
     qualification: 'Pesquisador e Desenvolvedor Full-Stack',
     description:
       'Desenvolvedor da plataforma Weather Brasil. Premiado no Troféu Seriema 2025.',
-    sortOrder: 0,
   },
   {
     category: 'colaboradores',
@@ -278,14 +314,12 @@ const seedTeamMembers = [
     qualification: 'Pesquisador em IA e Clima — Mestrando INPE',
     description:
       'Pesquisa em Transformers para predição de precipitação no Cerrado. Egresso da PUC Goiás, mestrando em Computação Aplicada no INPE.',
-    sortOrder: 1,
   },
   {
     category: 'colaboradores',
     name: 'Mirela Marques',
     qualification: 'Pesquisadora em Clima e Urbanismo',
     description: 'Estudo sobre ondas de calor urbanas em centros goianos.',
-    sortOrder: 2,
   },
   {
     category: 'colaboradores',
@@ -293,7 +327,6 @@ const seedTeamMembers = [
     qualification: 'Pesquisador em Otimização e Agronegócio',
     description:
       'Metaheurísticas aplicadas à logística em cadeias agroindustriais.',
-    sortOrder: 3,
   },
   {
     category: 'colaboradores',
@@ -301,7 +334,6 @@ const seedTeamMembers = [
     qualification: 'Pesquisador em Ciência de Dados Climáticos',
     description:
       'Curadoria e imputação de dados meteorológicos do Centro-Oeste.',
-    sortOrder: 4,
   },
   {
     category: 'colaboradores',
@@ -309,7 +341,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Transformers e Clima',
     description:
       'Investigação de arquiteturas Transformer para predição de precipitação.',
-    sortOrder: 5,
   },
   {
     category: 'colaboradores',
@@ -317,7 +348,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Agricultura de Precisão',
     description:
       'Desenvolvimento de gêmeos digitais para agricultura de precisão.',
-    sortOrder: 6,
   },
   {
     category: 'colaboradores',
@@ -325,7 +355,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Gêmeo Digital',
     description:
       'Arquiteturas fog computing para tomada de decisão distribuída.',
-    sortOrder: 7,
   },
   // IC 2026/2027
   {
@@ -334,7 +363,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Eventos Extremos do Clima',
     description:
       'Estudo de eventos extremos do clima articulado ao projeto Tecnologias Disruptivas e à plataforma Weather Brasil.',
-    sortOrder: 8,
   },
   {
     category: 'colaboradores',
@@ -342,7 +370,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — HPC e WRF',
     description:
       'Modelagem climática com HPC e WRF em colaboração com o INPE e o mestrando Salatiel Jordão.',
-    sortOrder: 9,
   },
   {
     category: 'colaboradores',
@@ -350,7 +377,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — IA e Mercado Financeiro',
     description:
       'Pesquisa em IA aplicada ao mercado financeiro, continuidade de linha com publicações em congressos, Springer e revista Production. Alto potencial de gerar produto em trading com IA.',
-    sortOrder: 10,
   },
   {
     category: 'colaboradores',
@@ -358,7 +384,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — LSTM e Metaheurísticas Financeiras',
     description:
       'Pesquisa em LSTM e metaheurísticas com variáveis de rastreabilidade e sustentabilidade incorporadas na função objetivo.',
-    sortOrder: 11,
   },
   {
     category: 'colaboradores',
@@ -366,7 +391,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Eventos Climáticos Extremos',
     description:
       'Estudo de eventos climáticos extremos com potencial de aplicação no Cerrado. Grande potencial de publicação.',
-    sortOrder: 12,
   },
   {
     category: 'colaboradores',
@@ -374,7 +398,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Clima Urbano e Smart Cities',
     description:
       'Determinação de localizações ideais para infraestruturas verdes e soluções de Smart Cities, maximizando a redução térmica urbana.',
-    sortOrder: 13,
   },
   {
     category: 'colaboradores',
@@ -382,7 +405,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Precipitação e Estações Virtuais',
     description:
       'Ampliação da cobertura de dados meteorológicos de temperatura e precipitação no Cerrado Goiano, com estações meteorológicas virtuais.',
-    sortOrder: 14,
   },
   {
     category: 'colaboradores',
@@ -390,7 +412,6 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Queimadas e Monitoramento Ambiental',
     description:
       'Incorporação de variáveis climáticas a modelos de predição de incêndios no Cerrado, em articulação com o projeto SEM FOGO da UnB.',
-    sortOrder: 15,
   },
   {
     category: 'colaboradores',
@@ -398,32 +419,31 @@ const seedTeamMembers = [
     qualification: 'Iniciação Científica — Risco Aeronáutico e Meteorologia',
     description:
       'Estimativa de risco de ocorrência aeronáutica a partir de variáveis meteorológicas observadas, com inclusão de variáveis de clima como elemento inovador.',
-    sortOrder: 16,
   },
   // Convidados
   {
     category: 'convidados',
-    name: 'Dr. Reinaldo Rosa (INPE)',
+    namePrefixLabel: 'Dr.',
+    name: 'Reinaldo Rosa (INPE)',
     qualification: 'Pesquisador Sênior, INPE',
     description:
       'Colaboração em modelos híbridos IA-física para predição de seca no Cerrado.',
-    sortOrder: 0,
   },
   {
     category: 'convidados',
-    name: 'Profa. Dra. Marta Luz',
+    namePrefixLabel: 'Profa. Dra.',
+    name: 'Marta Luz',
     qualification: 'Pesquisadora — Furnas',
     description:
       'Integração entre variáveis climáticas, conservação do solo, cadeias agroindustriais e políticas/regulações públicas e privadas.',
-    sortOrder: 1,
   },
   {
     category: 'convidados',
-    name: 'Prof. Dr. Antônio Zamuner',
+    namePrefixLabel: 'Prof. Dr.',
+    name: 'Antônio Zamuner',
     qualification: 'Doutor em Engenharia de Produção — UFCAT',
     description:
       'Pesquisa em cadeias agroindustriais, emissões de CO₂, microclima, ondas de calor urbano, blockchain e rastreabilidade logística.',
-    sortOrder: 2,
   },
 ]
 
@@ -737,13 +757,56 @@ async function main() {
 
   console.warn('🌱 Seeding equipe…')
   await db.delete(teamMembers)
+  await db.delete(teamCategories)
+  await db.delete(teamNamePrefixes)
+
+  const insertedCategories = await db
+    .insert(teamCategories)
+    .values([...seedTeamCategories])
+    .returning({ id: teamCategories.id, title: teamCategories.title })
+  const titleToCategoryId = Object.fromEntries(
+    insertedCategories.map(c => [c.title, c.id])
+  )
+
+  const insertedPrefixes = await db
+    .insert(teamNamePrefixes)
+    .values([...seedTeamNamePrefixes])
+    .returning({ id: teamNamePrefixes.id, label: teamNamePrefixes.label })
+  const labelToPrefixId = Object.fromEntries(
+    insertedPrefixes.map(p => [p.label, p.id])
+  )
+
+  const memberValues = seedTeamMembers.map(m => {
+    const title = LEGACY_TEAM_CATEGORY_TITLE[m.category]
+    const categoryId = title ? titleToCategoryId[title] : undefined
+    if (!categoryId) {
+      throw new Error(`Categoria de equipe desconhecida: ${m.category}`)
+    }
+    const namePrefixLabel = m.namePrefixLabel?.trim() || null
+    return {
+      categoryId,
+      namePrefixId:
+        namePrefixLabel && labelToPrefixId[namePrefixLabel]
+          ? labelToPrefixId[namePrefixLabel]
+          : null,
+      name: m.name,
+      qualification: m.qualification,
+      description: m.description ?? null,
+      linkedinUrl: m.linkedinUrl?.trim() || null,
+    }
+  })
   const insertedMembers = await db
     .insert(teamMembers)
-    .values(seedTeamMembers)
+    .values(memberValues)
     .returning({ id: teamMembers.id, name: teamMembers.name })
-  const memberNameToId = Object.fromEntries(
-    insertedMembers.map(m => [m.name, m.id])
-  )
+
+  const memberNameToId: Record<string, string> = {}
+  seedTeamMembers.forEach((m, i) => {
+    const row = insertedMembers[i]
+    if (!row) return
+    const display = teamMemberDisplayName(m.name, m.namePrefixLabel ?? null)
+    memberNameToId[display] = row.id
+  })
   console.warn(`✅ ${insertedMembers.length} membros inseridos.`)
 
   console.warn('🌱 Seeding contato…')

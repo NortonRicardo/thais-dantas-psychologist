@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { projects, teamMembers } from '@/lib/db/schema'
+import { projects } from '@/lib/db/schema'
+import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
 
 export async function GET() {
   const rows = await db
@@ -26,10 +27,7 @@ export async function GET() {
     .from(projects)
     .orderBy(projects.startDate)
 
-  const members = await db
-    .select({ id: teamMembers.id, name: teamMembers.name })
-    .from(teamMembers)
-  const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]))
+  const memberMap = await fetchTeamMembersDisplayMap()
 
   const result = rows.map(r => ({
     ...r,

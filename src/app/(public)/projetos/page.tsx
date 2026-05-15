@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
 import { db } from '@/lib/db'
-import { projects, teamMembers } from '@/lib/db/schema'
+import { projects } from '@/lib/db/schema'
+import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { ProjectsGrid } from './_components/projects-grid'
 
@@ -38,10 +39,7 @@ async function fetchProjects() {
     .from(projects)
     .orderBy(projects.startDate)
 
-  const members = await db
-    .select({ id: teamMembers.id, name: teamMembers.name })
-    .from(teamMembers)
-  const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]))
+  const memberMap = await fetchTeamMembersDisplayMap()
 
   return rows.map(r => ({
     ...r,

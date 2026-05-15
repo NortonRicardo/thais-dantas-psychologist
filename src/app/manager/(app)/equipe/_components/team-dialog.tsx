@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ImageIcon, Pencil, Plus, Trash2, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -22,23 +22,27 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
+import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
 
 export type TeamMemberRow = {
   id: string
-  category: string
+  categoryId: string
+  categoryTitle: string
+  categoryColor: string
+  namePrefixId: string | null
+  namePrefixLabel: string | null
   name: string
+  displayName: string
   qualification: string
   description: string | null
   photoMimeType: string | null
-  sortOrder: number
+  linkedinUrl: string | null
   updatedAt: string
 }
 
-const CATEGORIES = [
-  { value: 'professores', label: 'Professores' },
-  { value: 'colaboradores', label: 'Colaboradores' },
-  { value: 'convidados', label: 'Convidados' },
-]
+type CategoryOption = { id: string; title: string; color: string }
+type PrefixOption = { id: string; label: string }
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
@@ -51,9 +55,17 @@ type Props = {
 export function TeamDialog({ member, onSuccess }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [category, setCategory] = useState(member?.category ?? '')
+  const [categories, setCategories] = useState<CategoryOption[]>([])
+  const [prefixes, setPrefixes] = useState<PrefixOption[]>([])
+  const [categoryId, setCategoryId] = useState(member?.categoryId ?? '')
+  const [namePrefixId, setNamePrefixId] = useState(
+    () => member?.namePrefixId ?? '__none__'
+  )
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [removeImage, setRemoveImage] = useState(false)
+  const [linkedinSuffix, setLinkedinSuffix] = useState(() =>
+    stripUrlScheme(member?.linkedinUrl ?? '')
+  )
   const fileRef = useRef<HTMLInputElement>(null)
 
   const isEdit = !!member
@@ -64,9 +76,47 @@ export function TeamDialog({ member, onSuccess }: Props) {
       : null
   const previewSrc = imagePreview ?? existingImageUrl
 
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [catRes, pfxRes] = await Promise.all([
+          fetch('/api/team/categories'),
+          fetch('/api/team/prefixes'),
+        ])
+        if (!catRes.ok || !pfxRes.ok) throw new Error('fetch')
+        const data: CategoryOption[] = await catRes.json()
+        const pfxData: PrefixOption[] = await pfxRes.json()
+        if (cancelled) return
+        setCategories(data)
+        setPrefixes(pfxData)
+        setCategoryId(prev => {
+          if (member?.categoryId) return member.categoryId
+          if (prev && data.some(c => c.id === prev)) return prev
+          return data[0]?.id ?? ''
+        })
+        setNamePrefixId(prev => {
+          if (member?.namePrefixId && pfxData.some(p => p.id === member.namePrefixId)) {
+            return member.namePrefixId
+          }
+          if (prev !== '__none__' && pfxData.some(p => p.id === prev)) return prev
+          return '__none__'
+        })
+      } catch {
+        if (!cancelled) toast.error('Erro ao carregar opções.')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [open, member])
+
   function handleOpenChange(newOpen: boolean) {
     if (newOpen) {
-      setCategory(member?.category ?? '')
+      setCategoryId(member?.categoryId ?? '')
+      setNamePrefixId(member?.namePrefixId ?? '__none__')
+      setLinkedinSuffix(stripUrlScheme(member?.linkedinUrl ?? ''))
       setImagePreview(null)
       setRemoveImage(false)
     }
@@ -88,7 +138,7 @@ export function TeamDialog({ member, onSuccess }: Props) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!category) {
+    if (!categoryId) {
       toast.error('Selecione uma categoria.')
       return
     }
@@ -96,7 +146,9 @@ export function TeamDialog({ member, onSuccess }: Props) {
 
     const form = e.currentTarget
     const fd = new FormData(form)
-    fd.set('category', category)
+    fd.set('categoryId', categoryId)
+    fd.set('namePrefixId', namePrefixId === '__none__' ? '' : namePrefixId)
+    fd.set('linkedinUrl', toHttpsStored(linkedinSuffix))
     if (removeImage) fd.set('removePhoto', 'true')
 
     const url = isEdit ? `/api/team/${member.id}` : '/api/team'
@@ -195,18 +247,50 @@ export function TeamDialog({ member, onSuccess }: Props) {
           {/* Categoria */}
           <div className="grid gap-1.5">
             <Label className="text-white/70">Categoria *</Label>
-            <Select value={category} onValueChange={setCategory}>
+            <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                <SelectValue placeholder="Selecionar…" />
+                <SelectValue
+                  placeholder={!categories.length ? 'Carregando…' : 'Selecionar…'}
+                />
               </SelectTrigger>
               <SelectContent className="bg-[#071525] border-white/10 text-white">
-                {CATEGORIES.map(c => (
+                {categories.map(c => (
                   <SelectItem
-                    key={c.value}
-                    value={c.value}
+                    key={c.id}
+                    value={c.id}
                     className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
                   >
-                    {c.label}
+                    <span className="flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.color}`} />
+                      {c.title}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tratamento (opcional) */}
+          <div className="grid gap-1.5">
+            <Label className="text-white/70">Tratamento</Label>
+            <Select value={namePrefixId} onValueChange={setNamePrefixId}>
+              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
+                <SelectValue placeholder={!prefixes.length ? 'Carregando…' : 'Nenhum'} />
+              </SelectTrigger>
+              <SelectContent className="bg-[#071525] border-white/10 text-white">
+                <SelectItem
+                  value="__none__"
+                  className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                >
+                  — Nenhum —
+                </SelectItem>
+                {prefixes.map(p => (
+                  <SelectItem
+                    key={p.id}
+                    value={p.id}
+                    className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
+                  >
+                    {p.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -221,9 +305,26 @@ export function TeamDialog({ member, onSuccess }: Props) {
               name="name"
               required
               defaultValue={member?.name}
-              placeholder="Prof. Dr. Nome Sobrenome"
+              placeholder="Nome completo (sem Dr., Prof., …)"
               className={INPUT_CLS}
             />
+          </div>
+
+          {/* LinkedIn */}
+          <div className="grid gap-1.5">
+            <Label htmlFor="linkedinSuffix" className="text-white/70">
+              LinkedIn <span className="text-white/35 font-normal">(opcional)</span>
+            </Label>
+            <HttpsUrlSuffixField
+              id="linkedinSuffix"
+              value={linkedinSuffix}
+              onChange={setLinkedinSuffix}
+              placeholder="www.linkedin.com/in/seu-perfil"
+            />
+            <p className="text-[0.65rem] text-white/35">
+              Digite só o domínio e o caminho após <span className="text-white/50">https://</span>; o
+              endereço é salvo com https://.
+            </p>
           </div>
 
           {/* Qualificação */}

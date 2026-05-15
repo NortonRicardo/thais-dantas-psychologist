@@ -1,24 +1,36 @@
+import { Linkedin } from 'lucide-react'
 import { db } from '@/lib/db'
-import { teamMembers } from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
-
-const CATEGORIES = [
-  { key: 'professores', label: 'Professores' },
-  { key: 'colaboradores', label: 'Colaboradores' },
-  { key: 'convidados', label: 'Convidados' },
-] as const
+import { teamCategories, teamMembers, teamNamePrefixes } from '@/lib/db/schema'
+import { teamMemberDisplayName } from '@/lib/team-member-display'
+import { asc, eq } from 'drizzle-orm'
 
 type Member = {
   id: string
   name: string
+  namePrefixLabel: string | null
+  displayName: string
   qualification: string
   description: string | null
   photoMimeType: string | null
   photo: Buffer | null
+  linkedinUrl: string | null
 }
 
+type Section = {
+  categoryId: string
+  title: string
+  members: Member[]
+}
+
+/** Ordem fixa na página pública (independente do título no banco para outras categorias) */
+const SECTION_TITLE_ORDER = new Map<string, number>([
+  ['Professores', 0],
+  ['Colaboradores', 1],
+  ['Convidados', 2],
+])
+
 function MemberCard({ member }: { member: Member }) {
-  const initials = member.name
+  const initials = member.displayName
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
@@ -45,14 +57,25 @@ function MemberCard({ member }: { member: Member }) {
       <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-xl font-bold text-white/50">
         {photoSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photoSrc} alt={member.name} className="h-full w-full object-cover" />
+          <img src={photoSrc} alt={member.displayName} className="h-full w-full object-cover" />
         ) : (
           initials
         )}
       </div>
       <div>
-        <p className="text-sm font-semibold text-white/90">{member.name}</p>
+        <p className="text-sm font-semibold text-white/90">{member.displayName}</p>
         <p className="mt-0.5 text-xs text-[#00d4ff]/80">{member.qualification}</p>
+        {member.linkedinUrl ? (
+          <a
+            href={member.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1 text-xs text-sky-400/90 transition hover:text-sky-300"
+          >
+            <Linkedin className="h-3.5 w-3.5" />
+            LinkedIn
+          </a>
+        ) : null}
       </div>
       {member.description && (
         <p className="text-xs leading-relaxed text-white/50">{member.description}</p>
@@ -65,50 +88,83 @@ export async function TeamSection() {
   const rows = await db
     .select({
       id: teamMembers.id,
-      category: teamMembers.category,
       name: teamMembers.name,
+      namePrefixLabel: teamNamePrefixes.label,
       qualification: teamMembers.qualification,
       description: teamMembers.description,
       photo: teamMembers.photo,
       photoMimeType: teamMembers.photoMimeType,
+      linkedinUrl: teamMembers.linkedinUrl,
+      categoryId: teamCategories.id,
+      categoryTitle: teamCategories.title,
     })
     .from(teamMembers)
-    .orderBy(asc(teamMembers.sortOrder), asc(teamMembers.createdAt))
-
-  const grouped = Object.fromEntries(
-    CATEGORIES.map(c => [c.key, rows.filter(r => r.category === c.key)])
-  )
+    .innerJoin(teamCategories, eq(teamMembers.categoryId, teamCategories.id))
+    .leftJoin(teamNamePrefixes, eq(teamMembers.namePrefixId, teamNamePrefixes.id))
+    .orderBy(asc(teamCategories.title), asc(teamMembers.createdAt))
 
   const hasAny = rows.length > 0
 
   if (!hasAny) {
     return (
       <div className="mt-10 w-full pb-16">
-        <p className="text-center text-sm text-white/35">
-          Equipe em atualização.
-        </p>
+        <p className="text-center text-sm text-white/35">Equipe em atualização.</p>
       </div>
     )
   }
 
+  const sections: Section[] = []
+  const indexByCategory = new Map<string, number>()
+
+  for (const r of rows) {
+    let idx = indexByCategory.get(r.categoryId)
+    if (idx === undefined) {
+      idx = sections.length
+      indexByCategory.set(r.categoryId, idx)
+      sections.push({
+        categoryId: r.categoryId,
+        title: r.categoryTitle,
+        members: [],
+      })
+    }
+    sections[idx].members.push({
+      id: r.id,
+      name: r.name,
+      namePrefixLabel: r.namePrefixLabel,
+      displayName: teamMemberDisplayName(r.name, r.namePrefixLabel),
+      qualification: r.qualification,
+      description: r.description,
+      photo: r.photo,
+      photoMimeType: r.photoMimeType,
+      linkedinUrl: r.linkedinUrl,
+    })
+  }
+
+  sections.sort((a, b) => {
+    const pa = SECTION_TITLE_ORDER.has(a.title)
+      ? SECTION_TITLE_ORDER.get(a.title)!
+      : 100
+    const pb = SECTION_TITLE_ORDER.has(b.title)
+      ? SECTION_TITLE_ORDER.get(b.title)!
+      : 100
+    if (pa !== pb) return pa - pb
+    return a.title.localeCompare(b.title, 'pt-BR')
+  })
+
   return (
     <div className="mt-10 w-full space-y-12 pb-16">
-      {CATEGORIES.map(({ key, label }) => {
-        const members = grouped[key]
-        if (!members || members.length === 0) return null
-        return (
-          <section key={key}>
-            <h2 className="mb-6 text-xs font-semibold uppercase tracking-[4px] text-white/40">
-              {label}
-            </h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {members.map(m => (
-                <MemberCard key={m.id} member={m as Member} />
-              ))}
-            </div>
-          </section>
-        )
-      })}
+      {sections.map(section => (
+        <section key={section.categoryId}>
+          <h2 className="mb-6 text-xs font-semibold uppercase tracking-[4px] text-white/40">
+            {section.title}
+          </h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {section.members.map(m => (
+              <MemberCard key={m.id} member={m} />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   )
 }

@@ -1,10 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { ImageIcon, Linkedin, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -35,7 +34,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { TeamDialog, type TeamMemberRow } from './team-dialog'
+import {
+  TeamCategoryDialog,
+  type TeamCategoryRow,
+} from './team-category-dialog'
 
 const PAGE_SIZE = 10
 
@@ -47,35 +49,56 @@ function buildPages(current: number, total: number): (number | 'ellipsis')[] {
   return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', total]
 }
 
-export function TeamTable() {
-  const [rows, setRows] = useState<TeamMemberRow[]>([])
+export function TeamCategoriesTable() {
+  const [rows, setRows] = useState<TeamCategoryRow[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
 
-  const fetchMembers = useCallback(async () => {
+  const fetchCategories = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/team')
+      const res = await fetch('/api/team/categories')
       const data = await res.json()
-      setRows(data)
+      setRows(
+        data.map(
+          (r: {
+            id: string
+            title: string
+            color: string
+            updatedAt: string | Date
+          }) => ({
+            id: r.id,
+            title: r.title,
+            color: r.color,
+            updatedAt:
+              typeof r.updatedAt === 'string'
+                ? r.updatedAt
+                : new Date(r.updatedAt).toISOString(),
+          })
+        )
+      )
     } catch {
-      toast.error('Erro ao carregar equipe.')
+      toast.error('Erro ao carregar categorias.')
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    fetchMembers()
-  }, [fetchMembers])
+    fetchCategories()
+  }, [fetchCategories])
 
   async function handleDelete(id: string) {
     try {
-      await fetch(`/api/team/${id}`, { method: 'DELETE' })
-      toast.success('Membro removido.')
-      fetchMembers()
-    } catch {
-      toast.error('Erro ao remover membro.')
+      const res = await fetch(`/api/team/categories/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(typeof err.error === 'string' ? err.error : 'Erro ao remover')
+      }
+      toast.success('Categoria removida.')
+      fetchCategories()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao remover categoria.')
     }
   }
 
@@ -87,42 +110,40 @@ export function TeamTable() {
     <div className="space-y-4">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold text-white/90">Membros</h1>
+          <h1 className="text-xl font-semibold text-white/90">Categorias</h1>
           <p className="mt-0.5 text-sm text-white/40">
-            Cadastro de pessoas exibidas na página pública da equipe.
+            Agrupamento exibido na página pública da equipe (título e cor do selo).
           </p>
         </div>
         <div className="flex shrink-0 self-end sm:self-start sm:pt-0.5">
-          <TeamDialog onSuccess={fetchMembers} />
+          <TeamCategoryDialog onSuccess={fetchCategories} />
         </div>
       </div>
 
       <div
         className="w-full overflow-x-auto rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(255,255,255,0.1)',
           boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
         }}
       >
-        <Table className="min-w-[640px] [table-layout:fixed]">
+        <Table className="min-w-[560px] [table-layout:fixed]">
           <TableHeader>
             <TableRow
               className="border-white/[0.07] hover:bg-transparent"
               style={{ background: 'rgba(255,255,255,0.04)' }}
             >
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[38%]">
-                Nome
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[40%]">
+                Título
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[22%]">
-                Categoria
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[40%]">
+                Cor
               </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[30%]">
-                Qualificação
-              </TableHead>
-              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[10%] text-right">
+              <TableHead className="text-white/40 text-xs uppercase tracking-widest font-semibold w-[20%] text-right">
                 Ações
               </TableHead>
             </TableRow>
@@ -132,7 +153,7 @@ export function TeamTable() {
             {loading &&
               Array.from({ length: 4 }).map((_, i) => (
                 <TableRow key={i} className="border-white/[0.07]">
-                  {Array.from({ length: 4 }).map((_, j) => (
+                  {Array.from({ length: 3 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-4 w-full bg-white/10" />
                     </TableCell>
@@ -142,8 +163,11 @@ export function TeamTable() {
 
             {!loading && rows.length === 0 && (
               <TableRow className="border-white/[0.07] hover:bg-transparent">
-                <TableCell colSpan={4} className="py-12 text-center text-sm text-white/30">
-                  Nenhum membro cadastrado ainda.
+                <TableCell
+                  colSpan={3}
+                  className="py-12 text-center text-sm text-white/30"
+                >
+                  Nenhuma categoria cadastrada ainda.
                 </TableCell>
               </TableRow>
             )}
@@ -154,60 +178,26 @@ export function TeamTable() {
                   key={row.id}
                   className="border-white/[0.07] transition-colors hover:bg-white/[0.04]"
                 >
-                  <TableCell className="font-medium text-white/90">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
-                        {row.photoMimeType ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`/api/team/${row.id}/photo?t=${new Date(row.updatedAt).getTime()}`}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <ImageIcon size={14} className="text-white/20" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-                        <span className="truncate block">{row.displayName}</span>
-                        {row.linkedinUrl ? (
-                          <a
-                            href={row.linkedinUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-sky-400/90 transition hover:text-sky-300"
-                            title="LinkedIn"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <Linkedin className="h-4 w-4" />
-                          </a>
-                        ) : null}
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <Badge className="border border-white/15 bg-white/[0.06] text-[0.65rem] font-medium text-white/90">
-                      <span className="flex items-center gap-1.5">
-                        <span
-                          className={`h-2 w-2 shrink-0 rounded-full ${row.categoryColor}`}
-                        />
-                        {row.categoryTitle}
-                      </span>
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell className="text-sm text-white/55 max-w-[200px]">
+                  <TableCell className="font-medium text-white/90 max-w-[220px]">
                     <div className="overflow-hidden">
-                      <span className="truncate block">{row.qualification}</span>
+                      <span className="line-clamp-2">{row.title}</span>
                     </div>
                   </TableCell>
-
+                  <TableCell className="text-sm text-white/55">
+                    <div className="flex items-center gap-2">
+                      <span className={`h-4 w-4 shrink-0 rounded-full ${row.color}`} />
+                      <span className="text-xs text-white/40">
+                        {row.color.replace(/^bg-/, '')}
+                      </span>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <TeamDialog member={row} onSuccess={fetchMembers} />
+                      <TeamCategoryDialog
+                        category={row}
+                        onSuccess={fetchCategories}
+                      />
+
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -220,9 +210,9 @@ export function TeamTable() {
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-[#071525] border-white/10 text-white">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remover membro?</AlertDialogTitle>
+                            <AlertDialogTitle>Remover categoria?</AlertDialogTitle>
                             <AlertDialogDescription className="text-white/50">
-                              &ldquo;{row.displayName}&rdquo; será removido permanentemente.
+                              &ldquo;{row.title}&rdquo; será removida permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -264,6 +254,7 @@ export function TeamTable() {
                 }
               />
             </PaginationItem>
+
             {pages.map((p, i) =>
               p === 'ellipsis' ? (
                 <PaginationItem key={`e-${i}`}>
@@ -289,6 +280,7 @@ export function TeamTable() {
                 </PaginationItem>
               )
             )}
+
             <PaginationItem>
               <PaginationNext
                 href="#"

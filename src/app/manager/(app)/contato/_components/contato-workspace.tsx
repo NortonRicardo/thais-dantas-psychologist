@@ -694,7 +694,22 @@ export function ContatoWorkspace() {
       const team = await teamRes.json()
       setData(info)
       setChannels(Array.isArray(chs) ? chs : [])
-      setTeamMembers(Array.isArray(team) ? team : [])
+      setTeamMembers(
+        Array.isArray(team)
+          ? team.map(
+              (m: {
+                id: string
+                name: string
+                displayName?: string
+                photoMimeType: string | null
+              }) => ({
+                id: m.id,
+                name: m.displayName ?? m.name,
+                photoMimeType: m.photoMimeType,
+              })
+            )
+          : []
+      )
     } catch {
       toast.error('Erro ao carregar informações de contato.')
     } finally {

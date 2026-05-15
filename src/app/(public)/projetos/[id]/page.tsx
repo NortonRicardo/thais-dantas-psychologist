@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import { eq } from 'drizzle-orm'
 
 import { db } from '@/lib/db'
-import { projects, teamMembers } from '@/lib/db/schema'
+import { projects } from '@/lib/db/schema'
+import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
 import { LabSceneShell } from '../../_components/lab-scene-shell'
 import { LabPublicHeader } from '../../_components/lab-public-header'
 import { ProjectDetail } from './_components/project-detail'
@@ -20,10 +21,7 @@ async function fetchProject(slug: string) {
 
   if (!row) return null
 
-  const members = await db
-    .select({ id: teamMembers.id, name: teamMembers.name })
-    .from(teamMembers)
-  const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]))
+  const memberMap = await fetchTeamMembersDisplayMap()
 
   return {
     ...row,
