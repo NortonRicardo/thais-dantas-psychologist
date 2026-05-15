@@ -18,6 +18,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
       organizer: events.organizer,
       link: events.link,
       meetLink: events.meetLink,
+      recordingLink: events.recordingLink,
       featured: events.featured,
       imageMimeType: events.imageMimeType,
       createdAt: events.createdAt,
@@ -52,6 +53,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     const organizer = (fd.get('organizer') as string) || null
     const link = (fd.get('link') as string) || null
     const meetLink = (fd.get('meetLink') as string) || null
+    const recordingLink = (fd.get('recordingLink') as string) || null
     const featured = fd.get('featured') === 'true'
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,6 +66,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       organizer,
       link,
       meetLink,
+      recordingLink,
       featured,
       updatedAt: new Date(),
     }

@@ -6,6 +6,8 @@ import {
   Users,
   Video,
 } from 'lucide-react'
+import { COLOR_HEX_MAP } from '@/components/constants/colors'
+import type { PublicEventTypeData } from '@/lib/http/events'
 
 const glass = {
   background:
@@ -16,58 +18,37 @@ const glass = {
   boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
 } as const
 
-const TYPE_COLOR: Record<string, { bg: string; border: string; text: string }> =
-  {
-    Conferência: {
-      bg: 'rgba(0,180,255,0.18)',
-      border: 'rgba(0,180,255,0.35)',
-      text: 'rgb(100,210,255)',
-    },
-    Workshop: {
-      bg: 'rgba(160,0,255,0.18)',
-      border: 'rgba(160,0,255,0.35)',
-      text: 'rgb(210,130,255)',
-    },
-    Seminário: {
-      bg: 'rgba(0,200,120,0.18)',
-      border: 'rgba(0,200,120,0.35)',
-      text: 'rgb(80,220,150)',
-    },
-    Desafio: {
-      bg: 'rgba(255,140,0,0.18)',
-      border: 'rgba(255,140,0,0.35)',
-      text: 'rgb(255,180,60)',
-    },
-    Minicurso: {
-      bg: 'rgba(0,160,255,0.18)',
-      border: 'rgba(0,160,255,0.35)',
-      text: 'rgb(80,190,255)',
-    },
-    Defesa: {
-      bg: 'rgba(255,60,100,0.18)',
-      border: 'rgba(255,60,100,0.35)',
-      text: 'rgb(255,100,130)',
-    },
-    Palestra: {
-      bg: 'rgba(0,210,200,0.18)',
-      border: 'rgba(0,210,200,0.35)',
-      text: 'rgb(80,230,220)',
-    },
-    'Mesa-Redonda': {
-      bg: 'rgba(255,200,0,0.18)',
-      border: 'rgba(255,200,0,0.35)',
-      text: 'rgb(255,220,80)',
-    },
-    Encontro: {
-      bg: 'rgba(0,200,100,0.18)',
-      border: 'rgba(0,200,100,0.35)',
-      text: 'rgb(60,220,140)',
-    },
-  }
 const FALLBACK_COLOR = {
   bg: 'rgba(255,255,255,0.08)',
   border: 'rgba(255,255,255,0.2)',
   text: 'rgba(255,255,255,0.6)',
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const v = hex.replace('#', '')
+  return [
+    parseInt(v.slice(0, 2), 16),
+    parseInt(v.slice(2, 4), 16),
+    parseInt(v.slice(4, 6), 16),
+  ]
+}
+
+function buildBadgeColor(tailwindClass: string) {
+  const hex = COLOR_HEX_MAP[tailwindClass]
+  if (!hex) return FALLBACK_COLOR
+  const family = tailwindClass.match(/^bg-([a-z]+)-\d+$/)?.[1]
+  const textHex = (family && COLOR_HEX_MAP[`bg-${family}-400`]) ?? hex
+  const [r, g, b] = hexToRgb(hex)
+  const [tr, tg, tb] = hexToRgb(textHex)
+  return {
+    bg: `rgba(${r},${g},${b},0.18)`,
+    border: `rgba(${r},${g},${b},0.35)`,
+    text: `rgb(${tr},${tg},${tb})`,
+  }
+}
+
+function buildTypeColorMap(types: PublicEventTypeData[]) {
+  return Object.fromEntries(types.map(t => [t.name, buildBadgeColor(t.color)]))
 }
 
 export type PublicEvent = {
@@ -80,6 +61,7 @@ export type PublicEvent = {
   organizer: string | null
   link: string | null
   meetLink: string | null
+  recordingLink: string | null
   featured: boolean
   imageMimeType: string | null
   updatedAt: string
@@ -120,8 +102,10 @@ function imageUrl(event: PublicEvent) {
   return `/api/events/${event.id}/image?t=${new Date(event.updatedAt).getTime()}`
 }
 
-function TypeBadge({ type }: { type: string }) {
-  const c = TYPE_COLOR[type] ?? FALLBACK_COLOR
+type ColorMap = Record<string, { bg: string; border: string; text: string }>
+
+function TypeBadge({ type, colorMap }: { type: string; colorMap: ColorMap }) {
+  const c = colorMap[type] ?? FALLBACK_COLOR
   return (
     <span
       className="rounded-full px-2.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[2px]"
@@ -136,7 +120,7 @@ function TypeBadge({ type }: { type: string }) {
   )
 }
 
-function FeaturedCard({ event }: { event: PublicEvent }) {
+function FeaturedCard({ event, colorMap }: { event: PublicEvent; colorMap: ColorMap }) {
   const past = isPast(event.date)
   return (
     <div className="relative overflow-hidden rounded-3xl" style={glass}>
@@ -153,7 +137,7 @@ function FeaturedCard({ event }: { event: PublicEvent }) {
       )}
       <div className="relative z-10 flex flex-col gap-5 px-8 py-10 sm:px-12 sm:py-12">
         <div className="flex flex-wrap items-center gap-3">
-          <TypeBadge type={event.type} />
+          <TypeBadge type={event.type} colorMap={colorMap} />
           {past ? (
             <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[0.6rem] uppercase tracking-[2px] text-white/40">
               Encerrado
@@ -204,7 +188,7 @@ function FeaturedCard({ event }: { event: PublicEvent }) {
               Saiba mais <ExternalLink size={11} />
             </a>
           )}
-          {event.meetLink && (
+          {!past && event.meetLink && (
             <a
               href={event.meetLink}
               target="_blank"
@@ -214,13 +198,23 @@ function FeaturedCard({ event }: { event: PublicEvent }) {
               <Video size={11} /> Entrar na sala
             </a>
           )}
+          {past && event.recordingLink && (
+            <a
+              href={event.recordingLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-fit items-center gap-2 rounded-full border border-violet-400/40 bg-violet-400/10 px-5 py-2 text-xs font-medium text-violet-300 transition-colors hover:bg-violet-400/20"
+            >
+              <Video size={11} /> Assistir gravação
+            </a>
+          )}
         </div>
       </div>
     </div>
   )
 }
 
-function EventCard({ event }: { event: PublicEvent }) {
+function EventCard({ event, colorMap }: { event: PublicEvent; colorMap: ColorMap }) {
   const past = isPast(event.date)
   return (
     <div
@@ -228,7 +222,7 @@ function EventCard({ event }: { event: PublicEvent }) {
       style={{ ...glass, opacity: past ? 0.6 : 1 }}
     >
       <div className="flex items-start justify-between gap-2">
-        <TypeBadge type={event.type} />
+        <TypeBadge type={event.type} colorMap={colorMap} />
         {past && (
           <span className="text-[0.6rem] uppercase tracking-[2px] text-white/30">
             Encerrado
@@ -273,7 +267,7 @@ function EventCard({ event }: { event: PublicEvent }) {
           )}
         </div>
 
-        {event.meetLink && (
+        {!past && event.meetLink && (
           <div className="flex shrink-0 items-center justify-center">
             <a
               href={event.meetLink}
@@ -285,14 +279,28 @@ function EventCard({ event }: { event: PublicEvent }) {
             </a>
           </div>
         )}
+        {past && event.recordingLink && (
+          <div className="flex shrink-0 items-center justify-center">
+            <a
+              href={event.recordingLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-full border border-violet-400/35 bg-violet-400/10 px-3 py-1.5 text-[0.7rem] font-medium text-violet-300 transition-colors hover:bg-violet-400/20"
+            >
+              <Video size={11} /> Ver gravação
+            </a>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
-type Props = { events: PublicEvent[] }
+type Props = { events: PublicEvent[]; eventTypes: PublicEventTypeData[] }
 
-export function EventsSection({ events }: Props) {
+export function EventsSection({ events, eventTypes }: Props) {
+  const colorMap = buildTypeColorMap(eventTypes)
+
   const featuredList = events
     .filter(e => e.featured)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -305,7 +313,7 @@ export function EventsSection({ events }: Props) {
   return (
     <div className="mt-8 flex w-full flex-col gap-10 pb-16">
       {featuredList.map(event => (
-        <FeaturedCard key={event.id} event={event} />
+        <FeaturedCard key={event.id} event={event} colorMap={colorMap} />
       ))}
 
       {upcoming.length > 0 && (
@@ -315,7 +323,7 @@ export function EventsSection({ events }: Props) {
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.map(e => (
-              <EventCard key={e.id} event={e} />
+              <EventCard key={e.id} event={e} colorMap={colorMap} />
             ))}
           </div>
         </div>
@@ -328,7 +336,7 @@ export function EventsSection({ events }: Props) {
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {past.map(e => (
-              <EventCard key={e.id} event={e} />
+              <EventCard key={e.id} event={e} colorMap={colorMap} />
             ))}
           </div>
         </div>

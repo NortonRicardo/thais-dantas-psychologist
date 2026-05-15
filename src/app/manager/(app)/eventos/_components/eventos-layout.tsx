@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { EventsTable } from './events-table'
+import { EventTypesTable } from './event-types-table'
 
 type View = 'eventos' | 'tipo-evento'
 
@@ -42,11 +43,7 @@ export function EventosLayout() {
       <div className="flex-1 overflow-x-auto px-6 pb-16 pt-8">
         {view === 'eventos' && <EventsTable />}
 
-        {view === 'tipo-evento' && (
-          <>
-            <h1 className="text-xl font-semibold text-white/90">Tipo de Evento</h1>
-          </>
-        )}
+        {view === 'tipo-evento' && <EventTypesTable />}
       </div>
     </div>
   )

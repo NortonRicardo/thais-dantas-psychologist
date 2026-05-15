@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { ImageIcon, Pencil, Plus, Trash2, Upload } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, ImageIcon, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -15,12 +15,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -34,25 +32,163 @@ export type EventRow = {
   organizer: string | null
   link: string | null
   meetLink: string | null
+  recordingLink: string | null
   featured: boolean
   imageMimeType: string | null
   updatedAt: string
 }
 
-const EVENT_TYPES = [
-  'Conferência',
-  'Workshop',
-  'Seminário',
-  'Desafio',
-  'Minicurso',
-  'Defesa',
-  'Palestra',
-  'Mesa-Redonda',
-  'Encontro',
-]
+type EventTypeOption = { id: string; name: string; color: string }
+
+function TypeCombobox({
+  value,
+  onChange,
+  options,
+}: {
+  value: string
+  onChange: (v: string) => void
+  options: EventTypeOption[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const filtered = options.filter(o =>
+    o.name.toLowerCase().includes(search.toLowerCase())
+  )
+  const selected = options.find(o => o.name === value)
+
+  function select(name: string) {
+    onChange(name)
+    setOpen(false)
+    setSearch('')
+  }
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={o => {
+        setOpen(o)
+        if (o) setTimeout(() => inputRef.current?.focus(), 0)
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none hover:bg-white/[0.08] focus:border-white/20"
+        >
+          {selected ? (
+            <span className="flex items-center gap-2 text-white/90">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${selected.color}`} />
+              {selected.name}
+            </span>
+          ) : (
+            <span className="text-white/30">Selecionar…</span>
+          )}
+          <ChevronDown size={13} className="shrink-0 text-white/30" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        className="w-[--radix-popover-trigger-width] border-white/10 bg-[#071525] p-0 shadow-xl"
+      >
+        <div className="border-b border-white/10 px-2 py-2">
+          <div className="relative">
+            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar tipo…"
+              className="w-full rounded-md bg-white/5 py-1.5 pl-7 pr-7 text-sm text-white/80 placeholder:text-white/25 outline-none"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="max-h-48 overflow-y-auto overscroll-contain p-1" onWheel={e => e.stopPropagation()}>
+          {filtered.length === 0 && (
+            <p className="py-2 text-center text-xs text-white/25">Nenhum resultado</p>
+          )}
+          {filtered.map(opt => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => select(opt.name)}
+              className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
+                value === opt.name
+                  ? 'bg-white/10 text-white/90'
+                  : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+              }`}
+            >
+              <span className={`h-2 w-2 shrink-0 rounded-full ${opt.color}`} />
+              {opt.name}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
+
+function UrlInput({
+  id,
+  name,
+  defaultValue,
+  placeholder,
+  className,
+}: {
+  id?: string
+  name: string
+  defaultValue?: string
+  placeholder?: string
+  className?: string
+}) {
+  const [value, setValue] = useState(defaultValue ?? '')
+
+  function clean(v: string) {
+    return v.replace(/^https?:\/\//, '').replace(/^https?:\/?/, '')
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value
+    const body = clean(raw)
+    setValue(body ? `https://${body}` : '')
+  }
+
+  function handleFocus() {
+    if (!value) setValue('https://')
+  }
+
+  function handleBlur() {
+    if (!clean(value)) setValue('')
+  }
+
+  return (
+    <Input
+      id={id}
+      name={name}
+      value={value}
+      onChange={handleChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      className={className}
+      autoComplete="off"
+    />
+  )
+}
 
 function toDatetimeLocal(iso: string) {
   const d = new Date(iso)
@@ -72,9 +208,17 @@ export function EventDialog({ event, onSuccess }: Props) {
   const [type, setType] = useState(event?.type ?? '')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [removeImage, setRemoveImage] = useState(false)
+  const [eventTypeOptions, setEventTypeOptions] = useState<EventTypeOption[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
 
   const isEdit = !!event
+
+  useEffect(() => {
+    fetch('/api/event-types')
+      .then(r => r.json())
+      .then(d => setEventTypeOptions(Array.isArray(d) ? d : []))
+      .catch(() => {})
+  }, [])
 
   const existingImageUrl =
     isEdit && event.imageMimeType && !removeImage
@@ -151,7 +295,7 @@ export function EventDialog({ event, onSuccess }: Props) {
       </DialogTrigger>
 
       <DialogContent
-        className="max-h-[90vh] max-w-2xl overflow-y-auto bg-[#071525] text-white border-white/10 [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
+        className="max-h-[90vh] w-full sm:max-w-2xl overflow-y-auto bg-[#071525] text-white border-white/10 [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>
@@ -207,22 +351,11 @@ export function EventDialog({ event, onSuccess }: Props) {
             </div>
             <div className="grid gap-1.5">
               <Label className="text-white/70">Tipo *</Label>
-              <Select value={type} onValueChange={setType} required>
-                <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-0">
-                  <SelectValue placeholder="Selecionar…" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#071525] border-white/10 text-white">
-                  {EVENT_TYPES.map(t => (
-                    <SelectItem
-                      key={t}
-                      value={t}
-                      className="text-white/80 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer"
-                    >
-                      {t}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TypeCombobox
+                value={type}
+                onChange={setType}
+                options={eventTypeOptions}
+              />
             </div>
           </div>
 
@@ -258,12 +391,11 @@ export function EventDialog({ event, onSuccess }: Props) {
               <Label htmlFor="link" className="text-white/70">
                 Link (saiba mais)
               </Label>
-              <Input
+              <UrlInput
                 id="link"
                 name="link"
-                type="url"
-                placeholder="https://…"
                 defaultValue={event?.link ?? ''}
+                placeholder="https://…"
                 className={INPUT_CLS}
               />
             </div>
@@ -271,15 +403,28 @@ export function EventDialog({ event, onSuccess }: Props) {
               <Label htmlFor="meetLink" className="text-white/70">
                 Link da sala
               </Label>
-              <Input
+              <UrlInput
                 id="meetLink"
                 name="meetLink"
-                type="url"
-                placeholder="https://…"
                 defaultValue={event?.meetLink ?? ''}
+                placeholder="https://…"
                 className={INPUT_CLS}
               />
             </div>
+          </div>
+
+          {/* Recording link */}
+          <div className="grid gap-1.5">
+            <Label htmlFor="recordingLink" className="text-white/70">
+              Gravação da aula
+            </Label>
+            <UrlInput
+              id="recordingLink"
+              name="recordingLink"
+              defaultValue={event?.recordingLink ?? ''}
+              placeholder="https://drive.google.com/… ou link da aula gravada"
+              className={INPUT_CLS}
+            />
           </div>
 
           {/* Image */}

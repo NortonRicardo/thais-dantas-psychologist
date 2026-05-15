@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest) {
       .where(eq(contactInfo.id, existing.id))
       .returning(SELECTED_FIELDS)
 
-    revalidateTag('contato')
+    revalidateTag('contato', 'max')
     return NextResponse.json(updated)
   } catch (err) {
     console.error('[PUT /api/contato]', err)

@@ -16,6 +16,7 @@ export async function GET() {
         organizer: events.organizer,
         link: events.link,
         meetLink: events.meetLink,
+        recordingLink: events.recordingLink,
         featured: events.featured,
         imageMimeType: events.imageMimeType,
         createdAt: events.createdAt,
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
     const organizer = (fd.get('organizer') as string) || null
     const link = (fd.get('link') as string) || null
     const meetLink = (fd.get('meetLink') as string) || null
+    const recordingLink = (fd.get('recordingLink') as string) || null
     const featured = fd.get('featured') === 'true'
 
     const imageFile = fd.get('image') as File | null
@@ -76,6 +78,7 @@ export async function POST(req: NextRequest) {
         organizer,
         link,
         meetLink,
+        recordingLink,
         featured,
         image,
         imageMimeType,

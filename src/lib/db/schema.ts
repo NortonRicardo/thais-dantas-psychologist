@@ -25,6 +25,7 @@ export const events = pgTable('events', {
   organizer: text('organizer'),
   link: text('link'),
   meetLink: text('meet_link'),
+  recordingLink: text('recording_link'),
   featured: boolean('featured').default(false).notNull(),
   image: bytea('image'),
   imageMimeType: text('image_mime_type'),
@@ -211,3 +212,16 @@ export const projects = pgTable('projects', {
 
 export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
+
+/** Tipos de evento gerenciados pelo gestor (ex: Palestra, Workshop) */
+export const eventTypes = pgTable('event_types', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull().unique(),
+  iconKey: text('icon_key').notNull().default('calendar'),
+  color: text('color').notNull().default('bg-blue-500'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export type EventType = typeof eventTypes.$inferSelect
+export type NewEventType = typeof eventTypes.$inferInsert

@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@source inline('bg-{red,rose,pink,fuchsia,purple,violet,indigo,blue,sky,cyan,teal,emerald,green,lime,yellow,amber,orange,stone,slate,zinc,neutral}-{400,500,600,700,800,900}');
+
 @custom-variant dark (&:is(.dark *));
 
 @keyframes lemm-orbit {

@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       .values({ contactInfoId: info.id, label: label.trim(), iconKey: iconKey.trim(), value: value.trim(), sortOrder: nextOrder })
       .returning()
 
-    revalidateTag('contato')
+    revalidateTag('contato', 'max')
     return NextResponse.json(created, { status: 201 })
   } catch (err) {
     console.error('[POST /api/contato/channels]', err)

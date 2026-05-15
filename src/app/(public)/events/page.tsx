@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { getPublicEvents } from '@/lib/http/events'
+import { getPublicEventTypes, getPublicEvents } from '@/lib/http/events'
 import { PublicPageShell } from '../_components/public-page-shell'
 import { EventsSection } from './_components/events-section'
 
@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 }
 
 export default async function EventsPage() {
-  const data = await getPublicEvents()
+  const [data, types] = await Promise.all([getPublicEvents(), getPublicEventTypes()])
 
   return (
     <PublicPageShell
       aria-label="Eventos LEMM"
       title="Eventos"
       lead="Conferências, workshops, seminários e desafios científicos do ecossistema LEMM."
-      fullWidthContent={<EventsSection events={data} />}
+      fullWidthContent={<EventsSection events={data} eventTypes={types} />}
     />
   )
 }

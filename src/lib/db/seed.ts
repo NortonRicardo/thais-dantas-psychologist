@@ -4,12 +4,25 @@ import {
   collaborationPartners,
   contactInfo,
   developedPlatforms,
+  eventTypes,
   events,
   hardware,
   hardwareModules,
   teamMembers,
   projects,
 } from './schema'
+
+const seedEventTypes = [
+  { name: 'Conferência',  iconKey: 'Presentation',  color: 'bg-sky-800' },
+  { name: 'Workshop',     iconKey: 'Wrench',         color: 'bg-purple-800' },
+  { name: 'Seminário',    iconKey: 'BookOpen',       color: 'bg-blue-800' },
+  { name: 'Desafio',      iconKey: 'Trophy',         color: 'bg-orange-800' },
+  { name: 'Minicurso',    iconKey: 'GraduationCap',  color: 'bg-green-800' },
+  { name: 'Defesa',       iconKey: 'Shield',         color: 'bg-rose-800' },
+  { name: 'Palestra',     iconKey: 'Mic',            color: 'bg-cyan-800' },
+  { name: 'Mesa-Redonda', iconKey: 'Users',          color: 'bg-yellow-800' },
+  { name: 'Encontro',     iconKey: 'Handshake',      color: 'bg-teal-800' },
+]
 
 const seedEvents = [
   {
@@ -499,6 +512,11 @@ const seedProjectsData: ProjectSeed[] = [
 ]
 
 async function main() {
+  console.warn('🌱 Seeding tipos de evento…')
+  await db.delete(eventTypes)
+  await db.insert(eventTypes).values(seedEventTypes)
+  console.warn(`✅ ${seedEventTypes.length} tipos inseridos.`)
+
   console.warn('🌱 Seeding events…')
   await db.delete(events)
   await db.insert(events).values(seedEvents)

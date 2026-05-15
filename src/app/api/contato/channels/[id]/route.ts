@@ -11,7 +11,7 @@ export async function DELETE(
   try {
     const { id } = await params
     await db.delete(contactChannels).where(eq(contactChannels.id, id))
-    revalidateTag('contato')
+    revalidateTag('contato', 'max')
     return new NextResponse(null, { status: 204 })
   } catch (err) {
     console.error('[DELETE /api/contato/channels/:id]', err)

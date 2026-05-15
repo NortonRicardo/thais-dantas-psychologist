@@ -1,7 +1,20 @@
 import 'server-only'
-import { desc } from 'drizzle-orm'
+import { asc, desc } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { events } from '@/lib/db/schema'
+import { eventTypes, events } from '@/lib/db/schema'
+
+export type PublicEventTypeData = {
+  name: string
+  color: string
+}
+
+export async function getPublicEventTypes(): Promise<PublicEventTypeData[]> {
+  const rows = await db
+    .select({ name: eventTypes.name, color: eventTypes.color })
+    .from(eventTypes)
+    .orderBy(asc(eventTypes.name))
+  return rows
+}
 
 export type PublicEventData = {
   id: string
@@ -13,6 +26,7 @@ export type PublicEventData = {
   organizer: string | null
   link: string | null
   meetLink: string | null
+  recordingLink: string | null
   featured: boolean
   imageMimeType: string | null
   updatedAt: string
@@ -30,6 +44,7 @@ export async function getPublicEvents(): Promise<PublicEventData[]> {
       organizer: events.organizer,
       link: events.link,
       meetLink: events.meetLink,
+      recordingLink: events.recordingLink,
       featured: events.featured,
       imageMimeType: events.imageMimeType,
       updatedAt: events.updatedAt,
