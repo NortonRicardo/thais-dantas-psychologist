@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Pencil, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { readApiError } from '@/lib/read-api-error'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -45,12 +46,7 @@ export function TeamDegreeLevelDialog({ degreeLevel, onSuccess }: Props) {
     const method = isEdit ? 'PUT' : 'POST'
     try {
       const res = await fetch(url, { method, body: fd })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(
-          typeof err.error === 'string' ? err.error : 'Erro ao salvar'
-        )
-      }
+      if (!res.ok) throw new Error(await readApiError(res))
       toast.success(isEdit ? 'Grau atualizado!' : 'Grau criado!')
       setOpen(false)
       onSuccess()
@@ -114,6 +110,7 @@ export function TeamDegreeLevelDialog({ degreeLevel, onSuccess }: Props) {
               type="button"
               variant="ghost"
               className="text-white/50 hover:text-white hover:bg-white/5"
+              disabled={loading}
               onClick={() => setOpen(false)}
             >
               Cancelar
@@ -121,6 +118,7 @@ export function TeamDegreeLevelDialog({ degreeLevel, onSuccess }: Props) {
             <Button
               type="submit"
               loading={loading}
+              loadingLabel={isEdit ? 'A guardar…' : 'A criar…'}
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >
               {isEdit ? 'Salvar alterações' : 'Criar'}
