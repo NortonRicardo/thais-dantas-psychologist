@@ -3,6 +3,8 @@ import { revalidateTag } from 'next/cache'
 import { asc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { contactChannels } from '@/lib/db/schema'
+import { contactChannelPostSchema } from '@/lib/validation/contato-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 import { getOrCreateContactInfo } from '../route'
 
 export async function GET() {
@@ -16,18 +18,20 @@ export async function GET() {
     return NextResponse.json(channels)
   } catch (err) {
     console.error('[GET /api/contato/channels]', err)
-    return NextResponse.json({ error: 'Erro ao buscar canais' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao buscar canais' },
+      { status: 500 }
+    )
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { label, iconKey, value } = body as { label: string; iconKey: string; value: string }
+    const raw = await req.json()
+    const parsed = contactChannelPostSchema.safeParse(raw)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    if (!label?.trim() || !iconKey?.trim() || !value?.trim()) {
-      return NextResponse.json({ error: 'Campos obrigatórios ausentes' }, { status: 400 })
-    }
+    const { label, iconKey, value } = parsed.data
 
     const info = await getOrCreateContactInfo()
 
@@ -37,13 +41,18 @@ export async function POST(req: NextRequest) {
       .where(eq(contactChannels.contactInfoId, info.id))
       .orderBy(asc(contactChannels.sortOrder))
 
-    const nextOrder = existing.length > 0
-      ? Math.max(...existing.map(r => r.sortOrder)) + 1
-      : 0
+    const nextOrder =
+      existing.length > 0 ? Math.max(...existing.map(r => r.sortOrder)) + 1 : 0
 
     const [created] = await db
       .insert(contactChannels)
-      .values({ contactInfoId: info.id, label: label.trim(), iconKey: iconKey.trim(), value: value.trim(), sortOrder: nextOrder })
+      .values({
+        contactInfoId: info.id,
+        label,
+        iconKey,
+        value,
+        sortOrder: nextOrder,
+      })
       .returning()
 
     revalidateTag('contato', 'max')

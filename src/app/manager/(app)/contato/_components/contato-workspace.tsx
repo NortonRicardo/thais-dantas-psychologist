@@ -19,6 +19,7 @@ import {
   Twitter,
   X,
   Youtube,
+  Loader2,
   type LucideIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -43,6 +44,11 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { stripUrlScheme, toHttpsStored } from '@/lib/url-https'
+import {
+  CONTACT_TYPES_UI,
+  contactChannelPostSchema,
+  contactInfoPutSchema,
+} from '@/lib/validation/contato-api'
 
 const INPUT_CLS =
   'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
@@ -72,21 +78,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   link: Link,
 }
 
-const CONTACT_TYPES = [
-  { label: 'E-mail', icon: 'mail' },
-  { label: 'Telefone', icon: 'phone' },
-  { label: 'WhatsApp', icon: 'message-circle' },
-  { label: 'LinkedIn', icon: 'linkedin' },
-  { label: 'Instagram', icon: 'instagram' },
-  { label: 'GitHub', icon: 'github' },
-  { label: 'YouTube', icon: 'youtube' },
-  { label: 'Twitter / X', icon: 'twitter' },
-  { label: 'Facebook', icon: 'facebook' },
-  { label: 'Site', icon: 'globe' },
-  { label: 'Localização', icon: 'map-pin' },
-  { label: 'Telegram', icon: 'send' },
-  { label: 'Outro', icon: 'link' },
-]
+const CONTACT_TYPES = CONTACT_TYPES_UI
 
 const ICON_OPTIONS = [
   { key: 'mail', label: 'E-mail' },
@@ -114,37 +106,20 @@ function applyPhoneMask(raw: string): string {
 
 const PHONE_LABELS = new Set(['Telefone', 'WhatsApp'])
 
-const URL_LABELS = new Set([
-  'LinkedIn',
-  'Instagram',
-  'GitHub',
-  'YouTube',
-  'Twitter / X',
-  'Facebook',
-  'Site',
-  'Telegram',
-])
-
-function validateValue(label: string, value: string): string | null {
-  const v = value.trim()
-  if (!v) return 'Campo obrigatório.'
-
-  if (label === 'E-mail') {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-      ? null
-      : 'Informe um e-mail válido.'
-  }
-  if (label === 'Telefone' || label === 'WhatsApp') {
-    return v.replace(/\D/g, '').length >= 8
-      ? null
-      : 'Informe um número válido (ex: (62) 9 0000-0000).'
-  }
-  if (URL_LABELS.has(label)) {
-    return /^https?:\/\/.+/.test(v)
-      ? null
-      : 'Informe uma URL válida (ex: https://...).'
-  }
-  return null
+function channelValueIssue(
+  label: string,
+  iconKey: string,
+  value: string
+): string | null {
+  if (!label) return null
+  const trial = contactChannelPostSchema.safeParse({
+    label,
+    iconKey,
+    value,
+  })
+  if (trial.success) return null
+  const vIssue = trial.error.issues.find(i => i.path[0] === 'value')
+  return vIssue?.message ?? null
 }
 
 type ContactData = {
@@ -272,15 +247,20 @@ function DirectorCard({
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    const parsed = contactInfoPutSchema.safeParse({
+      directorTeamMemberId: selectedId || null,
+      mapUrl: data.mapUrl,
+    })
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? 'Dados inválidos.')
+      return
+    }
     setSaving(true)
     try {
       const res = await fetch('/api/contato', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          directorTeamMemberId: selectedId || null,
-          mapUrl: data.mapUrl,
-        }),
+        body: JSON.stringify(parsed.data),
       })
       if (!res.ok) throw new Error()
       const updated: ContactData = await res.json()
@@ -384,6 +364,7 @@ function DirectorCard({
                 type="submit"
                 size="sm"
                 loading={saving}
+                loadingLabel="A guardar…"
                 className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
               >
                 Salvar
@@ -418,15 +399,20 @@ function MapCard({
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    const parsed = contactInfoPutSchema.safeParse({
+      directorTeamMemberId: data.directorTeamMemberId,
+      mapUrl: toHttpsStored(mapUrlSuffix).trim(),
+    })
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? 'Dados inválidos.')
+      return
+    }
     setSaving(true)
     try {
       const res = await fetch('/api/contato', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          directorTeamMemberId: data.directorTeamMemberId,
-          mapUrl: toHttpsStored(mapUrlSuffix).trim(),
-        }),
+        body: JSON.stringify(parsed.data),
       })
       if (!res.ok) throw new Error()
       const updated: ContactData = await res.json()
@@ -513,6 +499,7 @@ function MapCard({
                 type="submit"
                 size="sm"
                 loading={saving}
+                loadingLabel="A guardar…"
                 className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
               >
                 Salvar
@@ -561,10 +548,19 @@ function ChannelCard({
         type="button"
         onClick={handleDelete}
         disabled={deleting}
+        aria-busy={deleting}
         className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full text-white/25 opacity-0 transition-all group-hover:opacity-100 hover:bg-rose-500/15 hover:text-rose-400 disabled:opacity-40"
         title="Remover canal"
       >
-        <Trash2 size={11} />
+        {deleting ? (
+          <Loader2
+            size={11}
+            className="animate-spin text-rose-400/90"
+            aria-hidden
+          />
+        ) : (
+          <Trash2 size={11} />
+        )}
       </button>
 
       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/60">
@@ -610,7 +606,7 @@ function AddChannelModal({
   function handleValueChange(v: string) {
     const masked = PHONE_LABELS.has(label) ? applyPhoneMask(v) : v
     setValue(masked)
-    if (valueError) setValueError(validateValue(label, masked))
+    if (valueError) setValueError(channelValueIssue(label, iconKey, masked))
   }
 
   function handleClose() {
@@ -623,9 +619,17 @@ function AddChannelModal({
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
-    const err = validateValue(label, value)
-    if (err) {
-      setValueError(err)
+    const parsed = contactChannelPostSchema.safeParse({
+      label,
+      iconKey,
+      value,
+    })
+    if (!parsed.success) {
+      const msg =
+        parsed.error.issues.find(i => i.path[0] === 'value')?.message ??
+        parsed.error.issues[0]?.message ??
+        'Dados inválidos.'
+      setValueError(msg)
       return
     }
     setSaving(true)
@@ -633,7 +637,7 @@ function AddChannelModal({
       const res = await fetch('/api/contato/channels', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ label, iconKey, value: value.trim() }),
+        body: JSON.stringify(parsed.data),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
@@ -768,6 +772,7 @@ function AddChannelModal({
               type="submit"
               size="sm"
               loading={saving}
+              loadingLabel="A adicionar…"
               disabled={!label}
               className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
             >

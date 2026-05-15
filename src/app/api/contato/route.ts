@@ -3,6 +3,8 @@ import { revalidateTag } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { contactInfo } from '@/lib/db/schema'
+import { contactInfoPutSchema } from '@/lib/validation/contato-api'
+import { validationErrorResponse } from '@/lib/validation/team-api'
 
 const SELECTED_FIELDS = {
   id: contactInfo.id,
@@ -29,24 +31,27 @@ export async function GET() {
     return NextResponse.json(row)
   } catch (err) {
     console.error('[GET /api/contato]', err)
-    return NextResponse.json({ error: 'Erro ao buscar contato' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao buscar contato' },
+      { status: 500 }
+    )
   }
 }
 
 export async function PUT(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { directorTeamMemberId, mapUrl } = body as {
-      directorTeamMemberId?: string | null
-      mapUrl?: string
-    }
+    const raw = await req.json()
+    const parsed = contactInfoPutSchema.safeParse(raw)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+
+    const { directorTeamMemberId, mapUrl } = parsed.data
 
     const existing = await getOrCreateContactInfo()
     const [updated] = await db
       .update(contactInfo)
       .set({
-        directorTeamMemberId: directorTeamMemberId ?? null,
-        mapUrl: mapUrl?.trim() ?? '',
+        directorTeamMemberId,
+        mapUrl,
         updatedAt: new Date(),
       })
       .where(eq(contactInfo.id, existing.id))
@@ -56,6 +61,9 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(updated)
   } catch (err) {
     console.error('[PUT /api/contato]', err)
-    return NextResponse.json({ error: 'Erro ao atualizar contato' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao atualizar contato' },
+      { status: 500 }
+    )
   }
 }
