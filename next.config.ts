@@ -36,7 +36,17 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: 'standalone',
   async headers() {
-    return [{ source: '/(.*)', headers: securityHeaders }]
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      // PDF iframe: precisa de frame-ancestors 'self' para funcionar no <iframe>
+      {
+        source: '/api/projects/:id/pdf',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: "default-src 'none'; frame-ancestors 'self'" },
+        ],
+      },
+    ]
   },
   async redirects() {
     return [
