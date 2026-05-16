@@ -3,11 +3,15 @@ import { asc, eq, inArray } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import {
   projectCategories,
+  projectOtherMembers,
   projectProjectThemes,
   projects,
   projectThemes,
+  teamMembers,
+  teamNamePrefixes,
 } from '@/lib/db/schema'
 import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
+import { teamMemberDisplayName } from '@/lib/team-member-display'
 
 export type ProjectThemeTag = { name: string; pillColor: string }
 
@@ -27,7 +31,10 @@ export type HydratedProjectBase = {
   description: string
   imageMimeType: string | null
   pdfMimeType: string | null
+  /** Display names of "outros" membros (sourced from junction table) */
   authors: string[]
+  /** IDs dos "outros" membros (para hidratar o form de edição) */
+  otherMemberIds: string[]
   startDate: string
   endDate: string | null
   gitUrl: string | null
@@ -54,7 +61,6 @@ type JoinedProjectRow = {
   description: string
   imageMimeType: string | null
   pdfMimeType: string | null
-  authors: string[]
   startDate: Date
   endDate: Date | null
   gitUrl: string | null
@@ -78,7 +84,6 @@ const projectSelectFields = {
   description: projects.description,
   imageMimeType: projects.imageMimeType,
   pdfMimeType: projects.pdfMimeType,
-  authors: projects.authors,
   startDate: projects.startDate,
   endDate: projects.endDate,
   gitUrl: projects.gitUrl,
@@ -95,36 +100,55 @@ async function attachThemesAndMembers(
   if (rows.length === 0) return []
 
   const ids = rows.map(r => r.id)
-  const themeLinks = await db
-    .select({
-      projectId: projectProjectThemes.projectId,
-      themeId: projectThemes.id,
-      name: projectThemes.name,
-      pillColor: projectThemes.pillColor,
-    })
-    .from(projectProjectThemes)
-    .innerJoin(
-      projectThemes,
-      eq(projectProjectThemes.themeId, projectThemes.id)
-    )
-    .where(inArray(projectProjectThemes.projectId, ids))
 
-  const byProject = new Map<
-    string,
-    { name: string; pillColor: string; id: string }[]
-  >()
+  const [themeLinks, otherMemberLinks, memberMap] = await Promise.all([
+    db
+      .select({
+        projectId: projectProjectThemes.projectId,
+        themeId: projectThemes.id,
+        name: projectThemes.name,
+        pillColor: projectThemes.pillColor,
+      })
+      .from(projectProjectThemes)
+      .innerJoin(projectThemes, eq(projectProjectThemes.themeId, projectThemes.id))
+      .where(inArray(projectProjectThemes.projectId, ids)),
+
+    db
+      .select({
+        projectId: projectOtherMembers.projectId,
+        memberId: projectOtherMembers.memberId,
+        sortOrder: projectOtherMembers.sortOrder,
+        name: teamMembers.name,
+        prefixLabel: teamNamePrefixes.label,
+      })
+      .from(projectOtherMembers)
+      .innerJoin(teamMembers, eq(projectOtherMembers.memberId, teamMembers.id))
+      .leftJoin(teamNamePrefixes, eq(teamMembers.namePrefixId, teamNamePrefixes.id))
+      .where(inArray(projectOtherMembers.projectId, ids))
+      .orderBy(projectOtherMembers.sortOrder),
+
+    fetchTeamMembersDisplayMap(),
+  ])
+
+  const byProject = new Map<string, { name: string; pillColor: string; id: string }[]>()
   for (const l of themeLinks) {
     const list = byProject.get(l.projectId) ?? []
     list.push({ id: l.themeId, name: l.name, pillColor: l.pillColor })
     byProject.set(l.projectId, list)
   }
 
-  const memberMap = await fetchTeamMembersDisplayMap()
+  const otherByProject = new Map<string, { memberId: string; displayName: string }[]>()
+  for (const l of otherMemberLinks) {
+    const list = otherByProject.get(l.projectId) ?? []
+    list.push({ memberId: l.memberId, displayName: teamMemberDisplayName(l.name, l.prefixLabel) })
+    otherByProject.set(l.projectId, list)
+  }
 
   return rows.map(row => {
     const tags = (byProject.get(row.id) ?? []).sort((a, b) =>
       a.name.localeCompare(b.name, 'pt-BR')
     )
+    const otherMembers = otherByProject.get(row.id) ?? []
     return {
       id: row.id,
       slug: row.slug,
@@ -141,7 +165,8 @@ async function attachThemesAndMembers(
       description: row.description,
       imageMimeType: row.imageMimeType,
       pdfMimeType: row.pdfMimeType,
-      authors: row.authors,
+      authors: otherMembers.map(m => m.displayName),
+      otherMemberIds: otherMembers.map(m => m.memberId),
       startDate: row.startDate.toISOString(),
       endDate: row.endDate ? row.endDate.toISOString() : null,
       gitUrl: row.gitUrl,
@@ -151,12 +176,8 @@ async function attachThemesAndMembers(
       researchLeadId: row.researchLeadId,
       updatedAt: row.updatedAt.toISOString(),
       advisorName: row.advisorId ? (memberMap[row.advisorId] ?? null) : null,
-      coAdvisorName: row.coAdvisorId
-        ? (memberMap[row.coAdvisorId] ?? null)
-        : null,
-      researchLeadName: row.researchLeadId
-        ? (memberMap[row.researchLeadId] ?? null)
-        : null,
+      coAdvisorName: row.coAdvisorId ? (memberMap[row.coAdvisorId] ?? null) : null,
+      researchLeadName: row.researchLeadId ? (memberMap[row.researchLeadId] ?? null) : null,
     }
   })
 }
@@ -242,7 +263,6 @@ export async function fetchProjectSummariesForEquipe(): Promise<
       title: projects.title,
       category: projectCategories.title,
       description: projects.description,
-      authors: projects.authors,
       startDate: projects.startDate,
       endDate: projects.endDate,
       gitUrl: projects.gitUrl,
@@ -257,17 +277,25 @@ export async function fetchProjectSummariesForEquipe(): Promise<
   const ids = base.map(r => r.id)
   if (ids.length === 0) return []
 
-  const themeLinks = await db
-    .select({
-      projectId: projectProjectThemes.projectId,
-      name: projectThemes.name,
-    })
-    .from(projectProjectThemes)
-    .innerJoin(
-      projectThemes,
-      eq(projectProjectThemes.themeId, projectThemes.id)
-    )
-    .where(inArray(projectProjectThemes.projectId, ids))
+  const [themeLinks, otherMemberLinks] = await Promise.all([
+    db
+      .select({ projectId: projectProjectThemes.projectId, name: projectThemes.name })
+      .from(projectProjectThemes)
+      .innerJoin(projectThemes, eq(projectProjectThemes.themeId, projectThemes.id))
+      .where(inArray(projectProjectThemes.projectId, ids)),
+
+    db
+      .select({
+        projectId: projectOtherMembers.projectId,
+        name: teamMembers.name,
+        prefixLabel: teamNamePrefixes.label,
+      })
+      .from(projectOtherMembers)
+      .innerJoin(teamMembers, eq(projectOtherMembers.memberId, teamMembers.id))
+      .leftJoin(teamNamePrefixes, eq(teamMembers.namePrefixId, teamNamePrefixes.id))
+      .where(inArray(projectOtherMembers.projectId, ids))
+      .orderBy(projectOtherMembers.sortOrder),
+  ])
 
   const byProject = new Map<string, string[]>()
   for (const l of themeLinks) {
@@ -276,10 +304,16 @@ export async function fetchProjectSummariesForEquipe(): Promise<
     byProject.set(l.projectId, list)
   }
 
+  const authorsByProject = new Map<string, string[]>()
+  for (const l of otherMemberLinks) {
+    const list = authorsByProject.get(l.projectId) ?? []
+    list.push(teamMemberDisplayName(l.name, l.prefixLabel))
+    authorsByProject.set(l.projectId, list)
+  }
+
   return base.map(row => ({
     ...row,
-    themes: (byProject.get(row.id) ?? []).sort((a, b) =>
-      a.localeCompare(b, 'pt-BR')
-    ),
+    themes: (byProject.get(row.id) ?? []).sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    authors: authorsByProject.get(row.id) ?? [],
   }))
 }

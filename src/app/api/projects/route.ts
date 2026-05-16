@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { fetchProjectsHydrated } from '@/lib/db/project-queries'
 import { syncProjectThemes } from '@/lib/db/sync-project-themes'
+import { syncProjectOtherMembers } from '@/lib/db/sync-project-other-members'
 import { projectCategoryManagerBadgeClasses } from '@/lib/project-category-badge'
 import { db } from '@/lib/db'
 import { projects } from '@/lib/db/schema'
@@ -29,6 +30,7 @@ function serializeManagerProject(
     imageMimeType: h.imageMimeType,
     pdfMimeType: h.pdfMimeType,
     authors: h.authors,
+    otherMemberIds: h.otherMemberIds,
     startDate: h.startDate,
     endDate: h.endDate,
     gitUrl: h.gitUrl,
@@ -89,7 +91,6 @@ export async function POST(req: Request) {
       imageMimeType: imageMimeType ?? null,
       pdf,
       pdfMimeType: pdfMimeType ?? null,
-      authors: d.authors,
       startDate: new Date(d.startDate),
       endDate: d.endDate ? new Date(d.endDate) : null,
       gitUrl: d.gitUrl,
@@ -107,7 +108,10 @@ export async function POST(req: Request) {
     )
   }
 
-  await syncProjectThemes(row.id, d.themeIds)
+  await Promise.all([
+    syncProjectThemes(row.id, d.themeIds),
+    syncProjectOtherMembers(row.id, d.otherMemberIds),
+  ])
 
   return NextResponse.json(row, { status: 201 })
 }

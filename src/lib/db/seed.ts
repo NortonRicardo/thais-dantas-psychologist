@@ -578,7 +578,6 @@ type ProjectSeed = {
   category: string
   themes: string[]
   description: string
-  authors: string[]
   startDate: Date
   endDate?: Date
   gitUrl?: string
@@ -598,7 +597,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Plataforma de curadoria, visualização e análise de dados climáticos brasileiros, integrando séries do INMET, mapas interativos e indicadores de risco climático. Premiada no Troféu Seriema 2025 (2º lugar — Inovação) e aceita para apresentação no WCERE 2026, em Lisboa, Portugal.',
-    authors: [],
     startDate: new Date('2023-03-01'),
     gitUrl: 'https://github.com/lemm-pucgoias/weather-brasil',
     advisorName: 'Dra. Maria José Pereira Dantas',
@@ -611,7 +609,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Otimização e Metaheurísticas', 'Matemática'],
     description:
       'Plataforma computacional com registro de software dedicada a algoritmos de otimização e metaheurísticas (PSO, GA, SA, ACO). Desenvolvida desde 2016, conta com módulos para problemas combinatórios, logística, portfólios financeiros e cadeias agroindustriais. Integra aprendizado de máquina com métodos exatos (Learning to Optimize).',
-    authors: [],
     startDate: new Date('2016-01-01'),
     gitUrl: 'https://github.com/lemm-pucgoias/meta-tool-box',
     advisorName: 'Dra. Maria José Pereira Dantas',
@@ -626,7 +623,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima', 'Matemática'],
     description:
       'Trabalho de Conclusão de Curso focado na construção de um dataset curado e imputado de variáveis meteorológicas (temperatura, precipitação, umidade) para o Centro-Oeste brasileiro, utilizando dados do INMET e técnicas de machine learning para preenchimento de falhas.',
-    authors: [],
     startDate: new Date('2024-03-01'),
     endDate: new Date('2024-12-10'),
     advisorName: 'Dra. Maria José Pereira Dantas',
@@ -641,7 +637,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima', 'Matemática'],
     description:
       'Dissertação de mestrado que desenvolve e valida modelos híbridos combinando física atmosférica e aprendizado profundo (Transformers, LSTM) para predição de eventos de seca no Cerrado brasileiro. Utiliza dados ERA5-Land, INMET e pipeline de data healing desenvolvido no LEMM.',
-    authors: ['Discente PPGEIIA'],
     startDate: new Date('2024-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Dr. Reinaldo Rosa (INPE)',
@@ -654,7 +649,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Otimização e Metaheurísticas', 'Agro & Sustentabilidade'],
     description:
       'Pesquisa em modelagem matemática e metaheurísticas aplicadas a problemas de roteamento e logística em cadeias de soja e carne bovina no Centro-Oeste. Incorpora variáveis de risco climático e sustentabilidade na função objetivo.',
-    authors: [],
     startDate: new Date('2025-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Wanderlei Malaquias Pereira Junior',
@@ -668,7 +662,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima', 'Matemática'],
     description:
       'Investigação de arquiteturas Transformer e mecanismos de atenção aplicados à predição de precipitação no Cerrado Goiano. Compara múltiplos modelos de baseline, utiliza dados ERA5 e INMET e integra técnicas de HPC. Resultados submetidos ao COMPSAC 2026.',
-    authors: [],
     startDate: new Date('2025-03-01'),
     gitUrl: 'https://github.com/lemm-pucgoias/transformer-precipitacao',
     advisorName: 'Dra. Maria José Pereira Dantas',
@@ -682,7 +675,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Estudo sobre identificação, modelagem e impacto de ondas de calor em centros urbanos goianos, com análise de perfis tipológicos, ilhas de calor e séries de temperatura. Articula dados do INMET com modelagem em WRF e aprendizado de máquina.',
-    authors: [],
     startDate: new Date('2025-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
@@ -695,7 +687,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Agro & Sustentabilidade', 'Matemática'],
     description:
       'Desenvolvimento de arquitetura híbrida voltada à tomada de decisão distribuída e adaptativa na agricultura de precisão, integrando fog computing, visão computacional e gêmeos digitais. Articula dados ambientais e sensoriamento remoto para apoio à decisão em campo.',
-    authors: [],
     startDate: new Date('2025-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Felipe Veloso',
@@ -708,7 +699,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Agro & Sustentabilidade'],
     description:
       'Estudo de arquiteturas fog computing voltadas à tomada de decisão distribuída em cadeias agroindustriais do Centro-Oeste. Segunda iniciação científica do aluno, com avanços importantes e artigo em redação para envio ao ENIAC 2026 (BRACIS 2026).',
-    authors: [],
     startDate: new Date('2025-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Felipe Veloso',
@@ -722,7 +712,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Investigação de eventos extremos do clima no Cerrado Goiano, integrado ao projeto "Tecnologias Disruptivas..." e à plataforma Weather Brasil. Inclui estudos de modelagem atmosférica com suporte de HPC. Acompanhado pelo mestrando Norton Ricardo Pereira e pelo Prof. Dr. Roussian Di Amaro Alves Gaioso.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
@@ -735,7 +724,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Estudo de modelagem climática utilizando computação de alto desempenho (HPC) e o modelo WRF, articulado ao projeto "Tecnologias Disruptivas..." e à rede INPE–PUC Goiás. Acompanhado pelo mestrando do INPE Salatiel A. A. Jordão e pelo Dr. Reinaldo Rosa.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
@@ -748,7 +736,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Otimização e Metaheurísticas'],
     description:
       'Pesquisa em inteligência artificial e trading aplicados ao mercado financeiro, em continuidade à linha do grupo desde 2020, com publicações em congressos nacionais, capítulo de livro Springer e revista Production. Alto potencial de gerar produto em trading com IA.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     researchLeadName: 'Arthur Felipe',
@@ -761,7 +748,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Otimização e Metaheurísticas'],
     description:
       'Pesquisa em mercado financeiro com uso de LSTM e metaheurísticas, incorporando variáveis de rastreabilidade e sustentabilidade diretamente na função objetivo. Articulado com artigo científico em desenvolvimento pelo egresso Danilo Milhomem.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     researchLeadName: 'Vitor Hugo',
@@ -773,7 +759,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Estudo de eventos climáticos extremos com potencial de aplicação no Cerrado, com grande potencial de publicação. Articulado com frentes de modelagem climática e agronomia do laboratório.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
@@ -786,7 +771,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Determinação de localizações ideais para implementação de infraestruturas verdes e soluções de Smart Cities, maximizando a redução térmica em centros urbanos. Articulado com estudos de ondas de calor e clima urbano do laboratório, com colaboração do Prof. Dr. Antônio Zamuner (UFCAT) e Prof. Dr. Roussian Di Amaro Alves Gaioso.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
@@ -799,7 +783,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Pesquisa voltada à ampliação da cobertura de dados meteorológicos de temperatura e precipitação no Cerrado Goiano, com desenvolvimento de estações meteorológicas virtuais. Articulada com estudos do pós-doutoramento no INPE (supervisor Dr. Reinaldo Rosa) e com HPC pelo Prof. Dr. Roussian Di Amaro Alves Gaioso.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     coAdvisorName: 'Prof. Dr. Roussian Di Amaro Alves Gaioso',
@@ -812,7 +795,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima', 'Agro & Sustentabilidade'],
     description:
       'Incorporação de variáveis climáticas (temperatura, umidade, vento e precipitação) a modelos de predição de incêndios no bioma Cerrado, em articulação com o projeto SEM FOGO da UnB (Profa. Priscilla Solis). Utilizará dataset curado do Centro-Oeste produzido no TCC de Davi Aquila.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     researchLeadName: 'Pedro Mota',
@@ -825,7 +807,6 @@ const seedProjectsData: ProjectSeed[] = [
     themes: ['Clima'],
     description:
       'Pesquisa com objetivo de estimar o risco de ocorrência aeronáutica a partir de variáveis meteorológicas observadas. A inclusão de variáveis climáticas (temperatura, umidade, vento e precipitação) é elemento inovador ao modelo de predição, com grande potencial de publicação.',
-    authors: [],
     startDate: new Date('2026-03-01'),
     advisorName: 'Dra. Maria José Pereira Dantas',
     researchLeadName: 'Rogério Torres',
@@ -1046,7 +1027,6 @@ async function main() {
       title: p.title,
       categoryId,
       description: p.description,
-      authors: p.authors,
       startDate: p.startDate,
       endDate: p.endDate ?? null,
       gitUrl: p.gitUrl ?? null,

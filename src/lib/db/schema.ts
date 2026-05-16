@@ -362,10 +362,6 @@ export const projects = pgTable(
     description: text('description').notNull(),
     image: bytea('image'),
     imageMimeType: text('image_mime_type'),
-    authors: text('authors')
-      .array()
-      .notNull()
-      .default(sql`ARRAY[]::text[]`),
     startDate: timestamp('start_date', { withTimezone: true }).notNull(),
     endDate: timestamp('end_date', { withTimezone: true }),
     gitUrl: text('git_url'),
@@ -412,6 +408,24 @@ export const projectProjectThemes = pgTable(
     primaryKey({ columns: [t.projectId, t.themeId] }),
     index('idx_ppt_project_id').on(t.projectId),
     index('idx_ppt_theme_id').on(t.themeId),
+  ]
+)
+
+/** Membros "outros" de um projeto (além de orientador/coorientador/responsável) */
+export const projectOtherMembers = pgTable(
+  'project_other_members',
+  {
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    memberId: uuid('member_id')
+      .notNull()
+      .references(() => teamMembers.id, { onDelete: 'cascade' }),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  t => [
+    primaryKey({ columns: [t.projectId, t.memberId] }),
+    index('idx_pom_project_id').on(t.projectId),
   ]
 )
 

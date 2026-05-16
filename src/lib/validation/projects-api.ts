@@ -42,10 +42,8 @@ export const projectFormSchema = z.object({
     .trim()
     .min(1, 'Descrição obrigatória.')
     .max(8000, 'Descrição: no máximo 8000 caracteres.'),
-  authors: z
-    .array(
-      z.string().trim().max(200, 'Nome de autor: no máximo 200 caracteres.')
-    )
+  otherMemberIds: z
+    .array(z.string().uuid('ID de membro inválido.'))
     .default([]),
   startDate: z
     .string()
@@ -78,14 +76,8 @@ export const projectFormSchema = z.object({
 export type ProjectFormParsed = z.infer<typeof projectFormSchema>
 
 export function parseProjectForm(form: FormData) {
-  const authorsRaw = fd(form, 'authors')
-  const authors = authorsRaw
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean)
-  const themeIds = (form.getAll('themeIds') as string[])
-    .map(t => t.trim())
-    .filter(Boolean)
+  const themeIds = (form.getAll('themeIds') as string[]).map(t => t.trim()).filter(Boolean)
+  const otherMemberIds = (form.getAll('otherMemberIds') as string[]).map(t => t.trim()).filter(Boolean)
 
   return projectFormSchema.safeParse({
     slug: fd(form, 'slug'),
@@ -93,7 +85,7 @@ export function parseProjectForm(form: FormData) {
     categoryId: fd(form, 'categoryId'),
     themeIds,
     description: fd(form, 'description'),
-    authors,
+    otherMemberIds,
     startDate: fd(form, 'startDate'),
     endDate: fd(form, 'endDate'),
     gitUrl: fd(form, 'gitUrl'),

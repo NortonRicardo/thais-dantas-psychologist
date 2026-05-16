@@ -51,6 +51,7 @@ export type ProjectRow = {
   imageMimeType: string | null
   pdfMimeType: string | null
   authors: string[]
+  otherMemberIds: string[]
   startDate: string
   endDate: string | null
   gitUrl: string | null
@@ -204,6 +205,9 @@ export function ProjectDialog({ project, onSuccess }: Props) {
   const [researchLeadId, setResearchLeadId] = useState(
     project?.researchLeadId ?? ''
   )
+  const [otherMemberIds, setOtherMemberIds] = useState<string[]>(
+    project?.otherMemberIds ?? []
+  )
   const [teamMembers, setTeamMembers] = useState<TeamOption[]>([])
 
   // Image state
@@ -279,6 +283,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       setAdvisorId(project?.advisorId ?? '')
       setCoAdvisorId(project?.coAdvisorId ?? '')
       setResearchLeadId(project?.researchLeadId ?? '')
+      setOtherMemberIds(project?.otherMemberIds ?? [])
       setImagePreview(null)
       setRemoveImage(false)
       setPdfFileName(null)
@@ -346,6 +351,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
     fd.set('advisorId', advisorId)
     fd.set('coAdvisorId', coAdvisorId)
     fd.set('researchLeadId', researchLeadId)
+    otherMemberIds.forEach(mid => fd.append('otherMemberIds', mid))
     fd.set('gitUrl', toHttpsStored(gitUrlSuffix))
     fd.set('publicationUrl', toHttpsStored(publicationUrlSuffix))
     if (removeImage) fd.set('removeImage', 'true')
@@ -727,21 +733,46 @@ export function ProjectDialog({ project, onSuccess }: Props) {
               />
             </div>
 
-            {/* Outros */}
+            {/* Outros membros */}
             <div className="grid min-w-0 gap-1.5">
-              <Label htmlFor="authors" className="text-white/70">
-                Outros{' '}
-                <span className="text-white/30 font-normal">
-                  (nomes separados por vírgula)
-                </span>
-              </Label>
-              <Input
-                id="authors"
-                name="authors"
-                defaultValue={project?.authors.join(', ')}
-                placeholder="Discente PPGEIIA, Nome Sobrenome"
-                className={INPUT_CLS}
-              />
+              <Label className="text-white/70">Outros membros</Label>
+              {teamMembers.length === 0 ? (
+                <p className="text-xs text-white/30">Carregando membros…</p>
+              ) : (
+                <div className="flex flex-wrap gap-1.5">
+                  {teamMembers.map(m => {
+                    const selected = otherMemberIds.includes(m.id)
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() =>
+                          setOtherMemberIds(prev =>
+                            selected
+                              ? prev.filter(id => id !== m.id)
+                              : [...prev, m.id]
+                          )
+                        }
+                        className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                          selected
+                            ? 'border-orange-500/50 bg-orange-800/50 text-orange-200'
+                            : 'border-white/10 bg-white/5 text-white/50 hover:border-white/25 hover:text-white/70'
+                        }`}
+                      >
+                        <TeamMemberThumb
+                          memberId={m.id}
+                          displayName={m.name}
+                          photoMimeType={m.photoMimeType}
+                          updatedAtIso={m.updatedAt}
+                          sizePx={16}
+                          frameClassName="border-white/10 bg-white/5"
+                        />
+                        {m.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

@@ -368,14 +368,14 @@ export function TeamEquipeInteractive({ sections }: Props) {
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
           showCloseButton
-          className="max-h-[min(92vh,800px)] max-w-[calc(100%-1.5rem)] gap-0 overflow-y-auto border-white/15 bg-[#071525]/95 p-0 text-white shadow-2xl sm:max-w-3xl [&_[data-slot='dialog-close']]:text-white/50 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white"
+          className="flex max-h-[min(92vh,860px)] max-w-[calc(100%-1.5rem)] flex-col gap-0 overflow-hidden border-white/15 bg-[#071525]/95 p-0 text-white shadow-2xl sm:max-w-6xl [&_[data-slot='dialog-close']]:text-white/50 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white"
         >
           {selected ? (
             <>
               <DialogTitle className="sr-only">
                 {selected.displayName}
               </DialogTitle>
-              <div className="grid min-h-0 gap-8 p-6 sm:p-8 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-stretch md:gap-10">
+              <div className="grid min-h-0 flex-1 overflow-hidden gap-8 p-6 sm:p-8 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-stretch md:gap-10">
                 {/* Esquerda: foto, nome, links, formação (centralizados na coluna) */}
                 <div className="flex h-full min-h-0 flex-col items-center gap-4 border-b border-white/10 pb-6 text-center md:border-b-0 md:border-r md:border-white/10 md:pb-0 md:pr-8">
                   <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-2xl font-bold text-white/45">
@@ -430,7 +430,7 @@ export function TeamEquipeInteractive({ sections }: Props) {
                 </div>
 
                 {/* Direita: descrição + projetos */}
-                <div className="flex min-h-0 min-w-0 flex-col gap-6">
+                <div className="flex min-h-0 min-w-0 flex-col gap-6 overflow-hidden">
                   <div>
                     <h3 className="text-xs font-semibold uppercase tracking-[3px] text-white/40">
                       Descrição
@@ -445,21 +445,23 @@ export function TeamEquipeInteractive({ sections }: Props) {
                       </p>
                     )}
                   </div>
-                  <div>
+                  <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                     <h3 className="text-xs font-semibold uppercase tracking-[3px] text-white/40">
                       Projetos
                     </h3>
                     {selected.projects.length > 0 ? (
-                      <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {selected.projects.map(p => (
-                          <li key={p.slug} className="min-w-0">
-                            <MemberProjectCard
-                              project={p}
-                              onNavigate={() => setOpen(false)}
-                            />
-                          </li>
-                        ))}
-                      </ul>
+                      <ScrollArea className="mt-3 flex-1 min-h-0 pr-1">
+                        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 pb-2">
+                          {selected.projects.map(p => (
+                            <li key={p.slug} className="min-w-0">
+                              <MemberProjectCard
+                                project={p}
+                                onNavigate={() => setOpen(false)}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </ScrollArea>
                     ) : (
                       <p className="mt-2 text-sm text-white/35">
                         Nenhum projeto vinculado (orientação, coorientação ou
