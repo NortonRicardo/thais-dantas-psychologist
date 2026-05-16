@@ -15,14 +15,19 @@ export type PublicProject = {
   imageMimeType: string | null
   pdfMimeType: string | null
   authors: string[]
+  otherMemberIds?: string[]
   startDate: string
   endDate: string | null
   gitUrl: string | null
   publicationUrl: string | null
+  advisorId?: string | null
+  coAdvisorId?: string | null
+  researchLeadId?: string | null
   advisorName: string | null
   coAdvisorName: string | null
   researchLeadName: string | null
   updatedAt: string
+  memberInfoMap?: Record<string, { displayName: string; photoMimeType: string | null; updatedAt: string }>
 }
 
 const glass = {

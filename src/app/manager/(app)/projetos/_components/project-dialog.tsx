@@ -26,6 +26,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FilterCombobox } from '@/components/filter-combobox'
+import { MultiSelectCombobox } from '@/components/multi-select-combobox'
 import { TeamMemberThumb } from '@/components/team-member-thumb'
 import {
   Popover,
@@ -338,8 +339,8 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       toast.error('Selecione ao menos um tema.')
       return
     }
-    if (!advisorId) {
-      toast.error('Selecione um orientador.')
+    if (!researchLeadId) {
+      toast.error('Selecione o responsável pela pesquisa.')
       return
     }
     setLoading(true)
@@ -395,7 +396,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
       </DialogTrigger>
 
       <DialogContent
-        className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto border-white/10 bg-[#071525] text-white sm:max-w-4xl [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
+        className="w-full max-w-[calc(100%-2rem)] border-white/10 bg-[#071525] text-white sm:max-w-4xl [&_[data-slot='dialog-close']]:bg-transparent [&_[data-slot='dialog-close']]:text-white/40 [&_[data-slot='dialog-close']]:hover:bg-white/10 [&_[data-slot='dialog-close']]:hover:text-white/80 [&_[data-slot='dialog-close']]:rounded"
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>
@@ -404,7 +405,9 @@ export function ProjectDialog({ project, onSuccess }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-2 grid gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-0">
+          <ScrollArea className="max-h-[calc(90vh-9rem)]">
+          <div className="mt-2 grid gap-4 pr-3">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start">
             {/* Capa — esquerda */}
             <div className="flex flex-col gap-3">
@@ -523,7 +526,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-start">
             {/* Responsável pela pesquisa */}
             <div className="grid min-w-0 gap-1.5">
-              <Label className="text-white/70">Responsável pela pesquisa</Label>
+              <Label className="text-white/70">Responsável pela pesquisa *</Label>
               <FilterCombobox
                 value={researchLeadId}
                 onChange={setResearchLeadId}
@@ -581,7 +584,7 @@ export function ProjectDialog({ project, onSuccess }: Props) {
 
             {/* Orientador */}
             <div className="grid min-w-0 gap-1.5">
-              <Label className="text-white/70">Orientador(a) *</Label>
+              <Label className="text-white/70">Orientador(a)</Label>
               <FilterCombobox
                 value={advisorId}
                 onChange={setAdvisorId}
@@ -634,42 +637,6 @@ export function ProjectDialog({ project, onSuccess }: Props) {
                     </span>
                   )
                 }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Data início */}
-            <div className="grid gap-1.5">
-              <Label htmlFor="startDate" className="text-white/70">
-                Data de início *
-              </Label>
-              <Input
-                id="startDate"
-                name="startDate"
-                type="date"
-                required
-                defaultValue={
-                  project?.startDate ? project.startDate.slice(0, 10) : ''
-                }
-                className={INPUT_CLS}
-              />
-            </div>
-
-            {/* Data conclusão */}
-            <div className="grid gap-1.5">
-              <Label htmlFor="endDate" className="text-white/70">
-                Conclusão{' '}
-                <span className="text-white/30 font-normal">(opcional)</span>
-              </Label>
-              <Input
-                id="endDate"
-                name="endDate"
-                type="date"
-                defaultValue={
-                  project?.endDate ? project.endDate.slice(0, 10) : ''
-                }
-                className={INPUT_CLS}
               />
             </div>
           </div>
@@ -736,43 +703,83 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             {/* Outros membros */}
             <div className="grid min-w-0 gap-1.5">
               <Label className="text-white/70">Outros membros</Label>
-              {teamMembers.length === 0 ? (
-                <p className="text-xs text-white/30">Carregando membros…</p>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {teamMembers.map(m => {
-                    const selected = otherMemberIds.includes(m.id)
-                    return (
-                      <button
-                        key={m.id}
-                        type="button"
-                        onClick={() =>
-                          setOtherMemberIds(prev =>
-                            selected
-                              ? prev.filter(id => id !== m.id)
-                              : [...prev, m.id]
-                          )
-                        }
-                        className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ${
-                          selected
-                            ? 'border-orange-500/50 bg-orange-800/50 text-orange-200'
-                            : 'border-white/10 bg-white/5 text-white/50 hover:border-white/25 hover:text-white/70'
-                        }`}
-                      >
-                        <TeamMemberThumb
-                          memberId={m.id}
-                          displayName={m.name}
-                          photoMimeType={m.photoMimeType}
-                          updatedAtIso={m.updatedAt}
-                          sizePx={16}
-                          frameClassName="border-white/10 bg-white/5"
-                        />
-                        {m.name}
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
+              <MultiSelectCombobox
+                values={otherMemberIds}
+                onChange={setOtherMemberIds}
+                placeholder="Selecionar…"
+                options={teamMembers.map(m => m.id)}
+                labelForValue={id => teamMembers.find(m => m.id === id)?.name ?? ''}
+                renderSelectedValue={id => {
+                  const m = teamMembers.find(r => r.id === id)
+                  const label = m?.name ?? ''
+                  return (
+                    <span className="flex min-w-0 items-center gap-2 overflow-hidden">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label || id}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={22}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span className="block min-w-0 flex-1 truncate">{label}</span>
+                    </span>
+                  )
+                }}
+                renderOption={id => {
+                  const m = teamMembers.find(r => r.id === id)
+                  const label = m?.name ?? id
+                  return (
+                    <span className="flex min-w-0 items-center gap-2">
+                      <TeamMemberThumb
+                        memberId={id}
+                        displayName={label}
+                        photoMimeType={m?.photoMimeType ?? null}
+                        updatedAtIso={m?.updatedAt ?? null}
+                        sizePx={22}
+                        frameClassName="border-white/10 bg-white/5"
+                      />
+                      <span className="truncate" title={label}>{label}</span>
+                    </span>
+                  )
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Data início */}
+            <div className="grid gap-1.5">
+              <Label htmlFor="startDate" className="text-white/70">
+                Data de início *
+              </Label>
+              <Input
+                id="startDate"
+                name="startDate"
+                type="date"
+                required
+                defaultValue={
+                  project?.startDate ? project.startDate.slice(0, 10) : ''
+                }
+                className={INPUT_CLS}
+              />
+            </div>
+
+            {/* Data conclusão */}
+            <div className="grid gap-1.5">
+              <Label htmlFor="endDate" className="text-white/70">
+                Conclusão{' '}
+                <span className="text-white/30 font-normal">(opcional)</span>
+              </Label>
+              <Input
+                id="endDate"
+                name="endDate"
+                type="date"
+                defaultValue={
+                  project?.endDate ? project.endDate.slice(0, 10) : ''
+                }
+                className={INPUT_CLS}
+              />
             </div>
           </div>
 
@@ -884,7 +891,10 @@ export function ProjectDialog({ project, onSuccess }: Props) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-white/10 pt-4">
+          </div>
+          </ScrollArea>
+
+          <div className="flex justify-end gap-3 border-t border-white/10 pt-4 mt-2">
             <Button
               type="button"
               variant="ghost"

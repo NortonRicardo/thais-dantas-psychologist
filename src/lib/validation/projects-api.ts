@@ -64,13 +64,13 @@ export const projectFormSchema = z.object({
     ),
   gitUrl: optionalUrl,
   publicationUrl: optionalUrl,
-  advisorId: z
+  advisorId: optionalUuid,
+  coAdvisorId: optionalUuid,
+  researchLeadId: z
     .string()
     .trim()
-    .min(1, 'Selecione um orientador.')
-    .uuid({ error: 'Orientador inválido.' }),
-  coAdvisorId: optionalUuid,
-  researchLeadId: optionalUuid,
+    .min(1, 'Selecione o responsável pela pesquisa.')
+    .uuid({ error: 'Responsável inválido.' }),
 })
 
 export type ProjectFormParsed = z.infer<typeof projectFormSchema>

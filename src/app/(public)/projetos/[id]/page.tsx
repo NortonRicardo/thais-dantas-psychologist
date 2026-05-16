@@ -27,14 +27,19 @@ async function fetchPublicProject(slug: string) {
     imageMimeType: h.imageMimeType,
     pdfMimeType: h.pdfMimeType,
     authors: h.authors,
+    otherMemberIds: h.otherMemberIds,
     startDate: h.startDate,
     endDate: h.endDate,
     gitUrl: h.gitUrl,
     publicationUrl: h.publicationUrl,
+    advisorId: h.advisorId,
+    coAdvisorId: h.coAdvisorId,
+    researchLeadId: h.researchLeadId,
     advisorName: h.advisorName,
     coAdvisorName: h.coAdvisorName,
     researchLeadName: h.researchLeadName,
     updatedAt: h.updatedAt,
+    memberInfoMap: h.memberInfoMap,
   }
 }
 

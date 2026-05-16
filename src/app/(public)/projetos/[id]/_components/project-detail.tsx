@@ -4,12 +4,10 @@ import {
   Github,
   ExternalLink,
   CalendarDays,
-  Users,
-  GraduationCap,
-  FlaskConical,
   FileText,
 } from 'lucide-react'
 import type { PublicProject } from '../../_components/project-card'
+import { TeamMemberThumb } from '@/components/team-member-thumb'
 
 const glass = {
   background:
@@ -64,34 +62,44 @@ export function ProjectDetail({ project }: { project: PublicProject }) {
           style={glass}
         >
           {(() => {
-            const all = [
-              project.advisorName,
-              project.coAdvisorName,
-              project.researchLeadName,
-              ...project.authors,
-            ].filter((n, i, a): n is string => !!n && a.indexOf(n) === i)
-            return all.length > 0 ? (
-              <MetaRow
-                icon={Users}
-                label={all.length > 1 ? 'Autores' : 'Autor'}
-                value={all.join(', ')}
-              />
-            ) : null
+            const entries: { id: string; role: string }[] = [
+              project.researchLeadId ? { id: project.researchLeadId, role: 'Responsável' } : null,
+              project.advisorId ? { id: project.advisorId, role: 'Orientador(a)' } : null,
+              project.coAdvisorId ? { id: project.coAdvisorId, role: 'Coorientador(a)' } : null,
+              ...(project.otherMemberIds ?? []).map(id => ({ id, role: 'Autor(a)' })),
+            ].filter((e): e is { id: string; role: string } => e !== null)
+            if (entries.length === 0) return null
+            return (
+              <div className="flex flex-col gap-2.5">
+                <span className="text-[0.58rem] uppercase tracking-[2px] text-white/30">
+                  Autores
+                </span>
+                <div className="flex flex-col gap-2">
+                  {entries.map(({ id, role }) => {
+                    const info = project.memberInfoMap?.[id]
+                    const name = info?.displayName ?? '—'
+                    return (
+                      <div key={id} className="flex items-center gap-2">
+                        <TeamMemberThumb
+                          memberId={id}
+                          displayName={name}
+                          photoMimeType={info?.photoMimeType}
+                          updatedAtIso={info?.updatedAt}
+                          sizePx={26}
+                        />
+                        <div className="flex min-w-0 flex-col">
+                          <span className="truncate text-xs text-white/75">{name}</span>
+                          <span className="text-[0.58rem] text-white/35">{role}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
           })()}
 
-          <MetaRow
-            icon={CalendarDays}
-            label="Início"
-            value={formatDate(project.startDate)}
-          />
-
-          {project.endDate ? (
-            <MetaRow
-              icon={CalendarDays}
-              label="Conclusão"
-              value={formatDate(project.endDate)}
-            />
-          ) : (
+          {!project.endDate && (
             <div className="flex flex-col gap-0.5">
               <span className="text-[0.58rem] uppercase tracking-[2px] text-white/30">
                 Status
@@ -102,29 +110,20 @@ export function ProjectDetail({ project }: { project: PublicProject }) {
             </div>
           )}
 
-          {project.advisorName && (
+          <MetaRow
+            icon={CalendarDays}
+            label="Início"
+            value={formatDate(project.startDate)}
+          />
+
+          {project.endDate && (
             <MetaRow
-              icon={GraduationCap}
-              label="Orientador(a)"
-              value={project.advisorName}
+              icon={CalendarDays}
+              label="Conclusão"
+              value={formatDate(project.endDate)}
             />
           )}
 
-          {project.coAdvisorName && (
-            <MetaRow
-              icon={GraduationCap}
-              label="Coorientador(a)"
-              value={project.coAdvisorName}
-            />
-          )}
-
-          {project.researchLeadName && (
-            <MetaRow
-              icon={FlaskConical}
-              label="Responsável pela pesquisa"
-              value={project.researchLeadName}
-            />
-          )}
 
           {(project.gitUrl || project.publicationUrl) && (
             <div className="flex flex-col gap-2 border-t border-white/10 pt-4">

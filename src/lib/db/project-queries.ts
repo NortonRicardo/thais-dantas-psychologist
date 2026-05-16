@@ -10,7 +10,11 @@ import {
   teamMembers,
   teamNamePrefixes,
 } from '@/lib/db/schema'
-import { fetchTeamMembersDisplayMap } from '@/lib/db/team-member-display-map'
+import {
+  fetchTeamMembersDisplayMap,
+  fetchTeamMembersInfoMap,
+  type TeamMemberInfo,
+} from '@/lib/db/team-member-display-map'
 import { teamMemberDisplayName } from '@/lib/team-member-display'
 
 export type ProjectThemeTag = { name: string; pillColor: string }
@@ -46,6 +50,8 @@ export type HydratedProjectBase = {
   advisorName: string | null
   coAdvisorName: string | null
   researchLeadName: string | null
+  /** Info de todos os membros referenciados neste projeto (para avatares). */
+  memberInfoMap: Record<string, TeamMemberInfo>
 }
 
 type JoinedProjectRow = {
@@ -101,7 +107,7 @@ async function attachThemesAndMembers(
 
   const ids = rows.map(r => r.id)
 
-  const [themeLinks, otherMemberLinks, memberMap] = await Promise.all([
+  const [themeLinks, otherMemberLinks, memberMap, infoMap] = await Promise.all([
     db
       .select({
         projectId: projectProjectThemes.projectId,
@@ -128,6 +134,7 @@ async function attachThemesAndMembers(
       .orderBy(projectOtherMembers.sortOrder),
 
     fetchTeamMembersDisplayMap(),
+    fetchTeamMembersInfoMap(),
   ])
 
   const byProject = new Map<string, { name: string; pillColor: string; id: string }[]>()
@@ -149,6 +156,16 @@ async function attachThemesAndMembers(
       a.name.localeCompare(b.name, 'pt-BR')
     )
     const otherMembers = otherByProject.get(row.id) ?? []
+    const referencedIds = [
+      row.advisorId,
+      row.coAdvisorId,
+      row.researchLeadId,
+      ...otherMembers.map(m => m.memberId),
+    ].filter((id): id is string => id !== null)
+    const memberInfoMap: Record<string, TeamMemberInfo> = {}
+    for (const id of referencedIds) {
+      if (infoMap[id]) memberInfoMap[id] = infoMap[id]
+    }
     return {
       id: row.id,
       slug: row.slug,
@@ -178,6 +195,7 @@ async function attachThemesAndMembers(
       advisorName: row.advisorId ? (memberMap[row.advisorId] ?? null) : null,
       coAdvisorName: row.coAdvisorId ? (memberMap[row.coAdvisorId] ?? null) : null,
       researchLeadName: row.researchLeadId ? (memberMap[row.researchLeadId] ?? null) : null,
+      memberInfoMap,
     }
   })
 }
