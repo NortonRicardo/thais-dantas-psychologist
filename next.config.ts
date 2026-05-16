@@ -24,7 +24,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https://images.unsplash.com https://www.plantareducacao.com.br",
       "font-src 'self'",
       "connect-src 'self'",
-      "frame-src https://www.google.com https://maps.google.com",
+      "frame-src 'self' https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'",

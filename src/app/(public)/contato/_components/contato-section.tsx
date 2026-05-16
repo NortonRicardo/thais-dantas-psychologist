@@ -14,6 +14,7 @@ import {
   Youtube,
   type LucideIcon,
 } from 'lucide-react'
+import { MapIframe } from './map-iframe'
 import { unstable_cache } from 'next/cache'
 import { asc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -129,19 +130,8 @@ export async function ContatoSection() {
     <div className="mt-6 flex w-full flex-col items-center">
       {/* Mapa */}
       <div className="w-full overflow-hidden rounded-xl border border-white/10">
-        <iframe
-          title="Localização LEMM"
+        <MapIframe
           src={mapUrl ?? 'https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed'}
-          width="100%"
-          height="500"
-          style={{
-            border: 0,
-            display: 'block',
-            filter: 'grayscale(1) invert(0.9) contrast(0.85)',
-          }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
         />
       </div>
 
