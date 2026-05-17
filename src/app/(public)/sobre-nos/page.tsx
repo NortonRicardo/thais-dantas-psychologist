@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Sobre Nós | LEMM',
   description:
-    'Conheça o Laboratório de Estudos e Modelagem Matemática da PUC Goiás.',
+    'Conheça o Laboratório de Estatística e Modelagem Matemática da PUC Goiás.',
 }
 
 export default async function SobreNosPage() {

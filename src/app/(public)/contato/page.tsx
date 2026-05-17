@@ -8,7 +8,7 @@ import { ContatoSection } from './_components/contato-section'
 export const metadata: Metadata = {
   title: 'Contato | LEMM',
   description:
-    'Entre em contato com o Laboratório de Estudos e Modelagem Matemática.',
+    'Entre em contato com o Laboratório de Estatística e Modelagem Matemática.',
 }
 
 export default function ContatoPage() {
@@ -16,7 +16,7 @@ export default function ContatoPage() {
     <PublicPageShell
       aria-label="Contato LEMM"
       title="Contato"
-      lead="Canais oficiais do Laboratório de Estudos e Modelagem Matemática na PUC Goiás."
+      lead="Canais oficiais do Laboratório de Estatística e Modelagem Matemática na PUC Goiás."
       fullWidthContent={<ContatoSection />}
     />
   )

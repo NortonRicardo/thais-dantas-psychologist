@@ -5,9 +5,9 @@ import { LabLanding } from './_components/lab-landing'
 import { PublicFooter } from './_components/public-footer'
 
 export const metadata: Metadata = {
-  title: 'LEMM | Laboratório de Estudos e Modelagem Matemática — PUC Goiás',
+  title: 'LEMM | Laboratório de Estatística e Modelagem Matemática — PUC Goiás',
   description:
-    'Laboratório de Estudos e Modelagem Matemática (PUC Goiás / PPGEIIA): modelagem climática, IA, HPC, otimização e software aplicado à decisão.',
+    'Laboratório de Estatística e Modelagem Matemática (PUC Goiás / PPGEIIA): modelagem climática, IA, HPC, otimização e software aplicado à decisão.',
 }
 
 export default function Home() {

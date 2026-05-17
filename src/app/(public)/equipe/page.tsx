@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Equipe | LEMM',
   description:
-    'Conheça os professores, colaboradores e convidados do Laboratório de Estudos e Modelagem Matemática.',
+    'Conheça os professores, colaboradores e convidados do Laboratório de Estatística e Modelagem Matemática.',
 }
 
 export default function EquipePage() {
@@ -16,7 +16,7 @@ export default function EquipePage() {
     <PublicPageShell
       aria-label="Equipe LEMM"
       title="Equipe"
-      lead="Professores, colaboradores e convidados que integram o Laboratório de Estudos e Modelagem Matemática da PUC Goiás."
+      lead="Professores, colaboradores e convidados que integram o Laboratório de Estatística e Modelagem Matemática da PUC Goiás."
       fullWidthContent={<TeamSection />}
     />
   )

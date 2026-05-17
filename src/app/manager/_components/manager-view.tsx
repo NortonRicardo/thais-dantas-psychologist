@@ -65,7 +65,7 @@ export function ManagerView() {
           LEMM
         </h1>
         <p className="mt-3 text-sm font-light text-white/40">
-          Laboratório de Estudos e Modelagem Matemática
+          Laboratório de Estatística e Modelagem Matemática
         </p>
       </div>
 

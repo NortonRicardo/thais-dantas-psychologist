@@ -43,7 +43,7 @@ export function PublicFooter({ topBlur = true }: PublicFooterProps) {
         <div className="max-w-2xl space-y-4 text-sm font-light leading-relaxed text-white/55">
           <p>
             <span className="font-medium text-white/85">
-              Laboratório de Estudos e Modelagem Matemática (LEMM)
+              Laboratório de Estatística e Modelagem Matemática (LEMM)
             </span>
             <br />
             <span className="text-white/70">

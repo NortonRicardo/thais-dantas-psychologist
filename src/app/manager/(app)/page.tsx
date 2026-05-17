@@ -5,7 +5,7 @@ import { ManagerView } from '../_components/manager-view'
 export const metadata: Metadata = {
   title: 'Gestor | LEMM',
   description:
-    'Acesso rápido a eventos e projetos do Laboratório de Estudos e Modelagem Matemática.',
+    'Acesso rápido a eventos e projetos do Laboratório de Estatística e Modelagem Matemática.',
 }
 
 export default function ManagerPage() {
