@@ -45,7 +45,8 @@ export function LabSceneShell({
       >
         <PlexusBackground networkColor={networkColor} subtle={subtlePlexus} />
         <div
-          className="pointer-events-none absolute inset-0 z-1 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] opacity-[0.12]"
+          className="pointer-events-none absolute inset-0 z-1 opacity-[0.07]"
+          style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
           aria-hidden
         />
         <div

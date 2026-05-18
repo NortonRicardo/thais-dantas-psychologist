@@ -192,8 +192,8 @@ export function LabAreaSections() {
 
             <div
               className={cn(
-                'relative z-10 w-full max-w-[600px] py-16',
-                textRight && 'ml-auto text-right'
+                'relative z-10 w-full max-w-[600px] py-10 md:py-16',
+                textRight ? 'ml-auto text-right max-md:ml-0 max-md:text-left' : ''
               )}
             >
               <span

@@ -27,7 +27,8 @@ export function LabLanding() {
       >
         <PlexusBackground />
         <div
-          className="pointer-events-none absolute inset-0 z-1 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] opacity-[0.12]"
+          className="pointer-events-none absolute inset-0 z-1 opacity-[0.07]"
+          style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
           aria-hidden
         />
         <div
@@ -41,12 +42,13 @@ export function LabLanding() {
 
         <LabPublicHeader variant="absolute" />
 
-        <div className="relative z-6 max-w-[850px] pt-14 max-[900px]:pt-12">
+        <div className="relative z-6 max-w-[850px] pt-14 max-[900px]:pt-24 max-[600px]:pt-28">
           <p
             className={cn(
               'mb-8 flex items-center gap-[15px] text-[0.9rem] font-bold tracking-[5px] text-[#5aebff]',
-              "before:h-0.5 before:w-[50px] before:shrink-0 before:bg-[#5aebff] before:content-['']",
-              "after:h-0.5 after:w-[50px] after:shrink-0 after:bg-[#5aebff] after:content-['']",
+              'max-[600px]:text-[0.7rem] max-[600px]:tracking-[2px] max-[600px]:gap-2',
+              "before:h-0.5 before:w-[50px] before:shrink-0 before:bg-[#5aebff] before:content-[''] max-[600px]:before:w-[24px]",
+              "after:h-0.5 after:w-[50px] after:shrink-0 after:bg-[#5aebff] after:content-[''] max-[600px]:after:w-[24px]",
               fontOrbitron
             )}
           >
