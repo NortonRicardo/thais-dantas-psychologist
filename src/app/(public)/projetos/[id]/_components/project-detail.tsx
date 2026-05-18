@@ -56,7 +56,7 @@ export function ProjectDetail({ project }: { project: PublicProject }) {
   return (
     <div className="flex w-full flex-col gap-8 pb-16 lg:flex-row lg:items-start">
       {/* Sidebar — 1/4 */}
-      <aside className="w-full shrink-0 lg:w-1/4">
+      <aside className="order-2 w-full shrink-0 lg:order-1 lg:w-1/4">
         <div
           className="sticky top-6 flex flex-col gap-5 rounded-2xl px-5 py-6"
           style={glass}
@@ -154,7 +154,7 @@ export function ProjectDetail({ project }: { project: PublicProject }) {
       </aside>
 
       {/* Conteúdo principal — 3/4 */}
-      <main className="flex min-w-0 flex-1 flex-col gap-8">
+      <main className="order-1 flex min-w-0 flex-1 flex-col gap-8 lg:order-2">
         <div className="flex flex-col gap-4">
           <h1 className="text-xl font-black leading-tight tracking-tight text-white sm:text-2xl">
             {project.title}

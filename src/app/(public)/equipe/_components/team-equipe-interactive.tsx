@@ -95,14 +95,14 @@ function TrayFilterPopover({
   const selected = items.find(i => i.id === value)
 
   return (
-    <div className="relative">
+    <div className={`relative ${widthClass}`}>
       <button
         type="button"
         onClick={() => {
           setOpen(o => !o)
           setTimeout(() => inputRef.current?.focus(), 0)
         }}
-        className={`flex ${widthClass} items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10`}
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10"
       >
         {value ? (
           <span className="flex min-w-0 items-center gap-2 text-white/80">
@@ -124,9 +124,7 @@ function TrayFilterPopover({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div
-            className={`absolute left-0 top-full z-20 mt-1 ${widthClass} overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl`}
-          >
+          <div className="absolute left-0 top-full z-20 mt-1 w-full min-w-[200px] overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl">
             <div className="border-b border-white/10 p-2">
               <div className="relative">
                 <Search
@@ -283,8 +281,9 @@ export function TeamEquipeInteractive({ sections }: Props) {
   return (
     <>
       <div className="mt-10 flex w-full flex-col gap-8 pb-16">
-        <div className="flex w-full flex-wrap items-center justify-end gap-2">
-          <div className="relative w-72 max-w-full min-w-0">
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+          {/* Busca — full width no mobile */}
+          <div className="relative w-full min-w-0 sm:w-72">
             <Search
               size={13}
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
@@ -307,36 +306,41 @@ export function TeamEquipeInteractive({ sections }: Props) {
             ) : null}
           </div>
 
-          <TrayFilterPopover
-            value={filterCategoryId}
-            onChange={setFilterCategoryId}
-            items={categoryItems}
-            pillLabel="Categoria"
-            allLabel="Todas as categorias"
-            widthClass="w-52"
-          />
+          {/* Filtros — cada um em linha própria no mobile, em linha no sm+ */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <TrayFilterPopover
+              value={filterCategoryId}
+              onChange={setFilterCategoryId}
+              items={categoryItems}
+              pillLabel="Categoria"
+              allLabel="Todas as categorias"
+              widthClass="w-full sm:w-52"
+            />
 
-          <TrayFilterPopover
-            value={filterDegree}
-            onChange={setFilterDegree}
-            items={degreeItems}
-            pillLabel="Grau acadêmico"
-            allLabel="Todos os graus"
-            widthClass="w-52"
-          />
+            <div className="flex items-center gap-2">
+              <TrayFilterPopover
+                value={filterDegree}
+                onChange={setFilterDegree}
+                items={degreeItems}
+                pillLabel="Grau acadêmico"
+                allLabel="Todos os graus"
+                widthClass="flex-1 sm:w-52"
+              />
 
-          <button
-            type="button"
-            disabled={!hasFilters}
-            onClick={() => {
-              setFilterName('')
-              setFilterCategoryId('')
-              setFilterDegree('')
-            }}
-            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/40 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white/60 disabled:cursor-not-allowed disabled:text-white/20 disabled:opacity-50 disabled:hover:bg-white/5"
-          >
-            <X size={12} /> Limpar
-          </button>
+              <button
+                type="button"
+                disabled={!hasFilters}
+                onClick={() => {
+                  setFilterName('')
+                  setFilterCategoryId('')
+                  setFilterDegree('')
+                }}
+                className="flex shrink-0 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/40 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white/60 disabled:cursor-not-allowed disabled:text-white/20 disabled:opacity-50 disabled:hover:bg-white/5"
+              >
+                <X size={12} /> Limpar
+              </button>
+            </div>
+          </div>
         </div>
 
         {hasFilters && filteredSections.length === 0 ? (
@@ -375,10 +379,10 @@ export function TeamEquipeInteractive({ sections }: Props) {
               <DialogTitle className="sr-only">
                 {selected.displayName}
               </DialogTitle>
-              <div className="grid min-h-0 flex-1 overflow-hidden gap-8 p-6 sm:p-8 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-stretch md:gap-10">
-                {/* Esquerda: foto, nome, links, formação (centralizados na coluna) */}
-                <div className="flex h-full min-h-0 flex-col items-center gap-4 border-b border-white/10 pb-6 text-center md:border-b-0 md:border-r md:border-white/10 md:pb-0 md:pr-8">
-                  <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-2xl font-bold text-white/45">
+              <div className="grid min-h-0 flex-1 gap-5 overflow-hidden p-4 sm:p-6 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-stretch md:gap-10 md:p-8">
+                {/* Perfil: horizontal no mobile, coluna no desktop */}
+                <div className="flex min-h-0 gap-4 border-b border-white/10 pb-5 md:flex-col md:items-center md:gap-4 md:border-b-0 md:border-r md:border-white/10 md:pb-0 md:pr-8 md:text-center">
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-xl font-bold text-white/45 md:h-28 md:w-28 md:text-2xl">
                     {selected.hasPhoto ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -390,17 +394,17 @@ export function TeamEquipeInteractive({ sections }: Props) {
                       initialsFromName(selected.displayName)
                     )}
                   </div>
-                  <div className="w-full min-w-0 text-center">
+                  <div className="min-w-0 flex-1 md:w-full md:flex-none md:text-center">
                     <p className="text-base font-semibold text-white">
                       {selected.displayName}
                     </p>
-                    <div className="mt-3 flex flex-col items-center gap-2">
+                    <div className="mt-2 flex flex-col items-start gap-1.5 md:mt-3 md:items-center md:gap-2">
                       {selected.linkedinUrl ? (
                         <a
                           href={selected.linkedinUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 text-sm text-sky-400/95 transition hover:text-sky-300"
+                          className="inline-flex items-center gap-1.5 text-sm text-sky-400/95 transition hover:text-sky-300"
                         >
                           <Linkedin className="h-4 w-4 shrink-0" />
                           LinkedIn
@@ -411,14 +415,14 @@ export function TeamEquipeInteractive({ sections }: Props) {
                           href={selected.lattesUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 text-sm text-teal-400/95 transition hover:text-teal-300"
+                          className="inline-flex items-center gap-1.5 text-sm text-teal-400/95 transition hover:text-teal-300"
                         >
                           <FileText className="h-4 w-4 shrink-0" />
                           Currículo Lattes
                         </a>
                       ) : null}
                     </div>
-                    <div className="mt-4 border-t border-white/10 pt-4 text-center">
+                    <div className="mt-3 border-t border-white/10 pt-3 md:mt-4 md:pt-4 md:text-center">
                       <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-white/40">
                         Formação
                       </p>
@@ -648,7 +652,7 @@ function MemberCard({
     <button
       type="button"
       onClick={onSelect}
-      className="group flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl px-5 py-6 text-center outline-none transition ring-offset-2 ring-offset-[#0a1628] focus-visible:ring-2 focus-visible:ring-sky-500/60"
+      className="group flex w-full cursor-pointer flex-col items-center gap-2.5 rounded-2xl px-3 py-4 text-center outline-none transition ring-offset-2 ring-offset-[#0a1628] focus-visible:ring-2 focus-visible:ring-sky-500/60 sm:gap-3 sm:px-5 sm:py-6"
       style={{
         background:
           'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
@@ -658,7 +662,7 @@ function MemberCard({
         boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
       }}
     >
-      <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-xl font-bold text-white/50 transition group-hover:border-white/25">
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-lg font-bold text-white/50 transition group-hover:border-white/25 sm:h-20 sm:w-20 sm:text-xl">
         {photoSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photoSrc} alt="" className="h-full w-full object-cover" />

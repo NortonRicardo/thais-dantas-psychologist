@@ -157,7 +157,7 @@ export function ProjectsGrid({
   return (
     <div className="mt-8 pb-16">
       <div className="mb-6 flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-start gap-2">
           <span className="text-[0.65rem] font-medium uppercase tracking-wider text-white/35">
             Tema
           </span>
@@ -197,8 +197,8 @@ export function ProjectsGrid({
           })}
         </div>
 
-        <div className="flex w-full flex-col items-end gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-2">
-          <div className="relative w-full max-w-sm min-w-0 sm:max-w-none sm:w-1/2 sm:flex-none">
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-2">
+          <div className="relative w-full min-w-0 sm:w-1/2 sm:flex-none">
             <Search
               size={13}
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
@@ -228,37 +228,39 @@ export function ProjectsGrid({
             ) : null}
           </div>
 
-          <FilterCombobox
-            value={activeCategory?.title ?? ''}
-            onChange={handleCategoryTitle}
-            placeholder="Todas as categorias"
-            clearLabel="Limpar categoria"
-            options={categoryTitles}
-            width="w-full max-w-sm sm:w-52 sm:max-w-none sm:shrink-0"
-            renderOption={title => {
-              const opt = categoryOptions.find(c => c.title === title)
-              return (
-                <>
-                  <span
-                    className="h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: opt?.chipText }}
-                  />
-                  {title}
-                </>
-              )
-            }}
-          />
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:flex-none">
+            <FilterCombobox
+              value={activeCategory?.title ?? ''}
+              onChange={handleCategoryTitle}
+              placeholder="Todas as categorias"
+              clearLabel="Limpar categoria"
+              options={categoryTitles}
+              width="flex-1 sm:w-52 sm:flex-none"
+              renderOption={title => {
+                const opt = categoryOptions.find(c => c.title === title)
+                return (
+                  <>
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: opt?.chipText }}
+                    />
+                    {title}
+                  </>
+                )
+              }}
+            />
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!hasTitleOrCategoryFilter}
-            onClick={clearTitleAndCategory}
-            className="h-auto w-full max-w-sm shrink-0 rounded-lg border-white/10 bg-white/5 py-2 text-white/80 hover:bg-white/8 hover:text-white/90 disabled:opacity-40 sm:w-auto sm:max-w-none"
-          >
-            Limpar filtros
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!hasTitleOrCategoryFilter}
+              onClick={clearTitleAndCategory}
+              className="h-auto shrink-0 rounded-lg border-white/10 bg-white/5 py-2 text-white/80 hover:bg-white/8 hover:text-white/90 disabled:opacity-40"
+            >
+              Limpar
+            </Button>
+          </div>
         </div>
       </div>
 

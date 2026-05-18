@@ -132,7 +132,7 @@ function FeaturedCard({
           <div className="absolute inset-0 bg-gradient-to-r from-[#050a0f]/95 via-[#050a0f]/70 to-transparent" />
         </div>
       )}
-      <div className="relative z-10 flex flex-col gap-5 px-8 py-10 sm:px-12 sm:py-12">
+      <div className="relative z-10 flex flex-col gap-5 px-5 py-7 sm:px-12 sm:py-12">
         <div className="flex flex-wrap items-center gap-3">
           <TypeBadge type={event.type} colorMap={colorMap} />
           {past ? (
@@ -317,11 +317,13 @@ function TypeFilterPopover({
   onChange,
   types,
   colorMap,
+  widthClass = 'w-48',
 }: {
   value: string
   onChange: (v: string) => void
   types: PublicEventTypeData[]
   colorMap: ColorMap
+  widthClass?: string
 }) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -337,14 +339,14 @@ function TypeFilterPopover({
   }
 
   return (
-    <div className="relative">
+    <div className={`relative ${widthClass}`}>
       <button
         type="button"
         onClick={() => {
           setOpen(o => !o)
           setTimeout(() => inputRef.current?.focus(), 0)
         }}
-        className="flex w-48 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10"
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm backdrop-blur-sm transition-colors hover:bg-white/10"
       >
         {value ? (
           <span className="flex items-center gap-2 text-white/80">
@@ -363,7 +365,7 @@ function TypeFilterPopover({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl">
+          <div className="absolute left-0 top-full z-20 mt-1 w-full min-w-[200px] overflow-hidden rounded-xl border border-white/10 bg-[#050f1a] shadow-2xl">
             <div className="border-b border-white/10 p-2">
               <div className="relative">
                 <Search
@@ -452,46 +454,48 @@ export function EventsSection({ events, eventTypes }: Props) {
 
   return (
     <div className="flex w-full flex-col gap-10 pb-16">
-      {/* Header row: title+lead on left, filters on right */}
-      <div className="flex flex-wrap items-end justify-between gap-4 pt-2">
-        <div>
-          <h1 className="mb-2 text-xl font-black uppercase tracking-tight text-white sm:text-2xl [font-family:var(--font-orbitron),sans-serif]">
-            Eventos
-          </h1>
-          <p className="max-w-prose text-base leading-relaxed text-slate-300">
-            Conferências, workshops, seminários e desafios científicos do
-            ecossistema LEMM.
-          </p>
+      {/* Title + lead */}
+      <div className="pt-2">
+        <h1 className="mb-2 text-xl font-black uppercase tracking-tight text-white sm:text-2xl [font-family:var(--font-orbitron),sans-serif]">
+          Eventos
+        </h1>
+        <p className="max-w-prose text-base leading-relaxed text-slate-300">
+          Conferências, workshops, seminários e desafios científicos do
+          ecossistema LEMM.
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="relative w-full sm:w-72">
+          <Search
+            size={13}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+          />
+          <input
+            type="text"
+            value={filterTitle}
+            onChange={e => setFilterTitle(e.target.value)}
+            placeholder="Buscar por título…"
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/35 outline-none backdrop-blur-sm focus:border-white/20"
+          />
+          {filterTitle && (
+            <button
+              onClick={() => setFilterTitle('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+            >
+              <X size={12} />
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative">
-            <Search
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
-            />
-            <input
-              type="text"
-              value={filterTitle}
-              onChange={e => setFilterTitle(e.target.value)}
-              placeholder="Buscar por título…"
-              className="w-[26rem] rounded-xl border border-white/10 bg-white/5 py-2 pl-8 pr-8 text-sm text-white/80 placeholder:text-white/35 outline-none backdrop-blur-sm focus:border-white/20"
-            />
-            {filterTitle && (
-              <button
-                onClick={() => setFilterTitle('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-
+        <div className="flex items-center gap-2">
           <TypeFilterPopover
             value={filterType}
             onChange={setFilterType}
             types={eventTypes}
             colorMap={colorMap}
+            widthClass="flex-1 sm:w-48 sm:flex-none"
           />
 
           <button
