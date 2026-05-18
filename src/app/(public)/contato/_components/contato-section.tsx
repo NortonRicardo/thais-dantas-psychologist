@@ -120,11 +120,10 @@ export async function ContatoSection() {
 
   const totalCards = (showDirector ? 1 : 0) + channels.length
   const gridCols =
-    totalCards === 0 ? '' :
-    totalCards === 1 ? 'sm:grid-cols-1' :
+    totalCards <= 1 ? '' :
     totalCards === 2 ? 'sm:grid-cols-2' :
-    totalCards === 3 ? 'sm:grid-cols-3' :
-    'sm:grid-cols-4'
+    totalCards === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' :
+    'sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
 
   return (
     <div className="mt-6 flex w-full flex-col items-center">
@@ -136,10 +135,10 @@ export async function ContatoSection() {
       </div>
 
       {totalCards > 0 && (
-        <div className={`mt-4 grid w-full max-w-[900px] grid-cols-1 gap-4 ${gridCols}`}>
+        <div className={`mt-4 grid w-full max-w-5xl grid-cols-1 gap-4 ${gridCols}`}>
           {showDirector && (
-            <div className="flex flex-col items-center gap-3 px-4 py-6 text-center" style={glassStyle}>
-              <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-xl font-bold text-white/60">
+            <div className="flex flex-col items-center gap-3 px-4 py-7 text-center" style={glassStyle}>
+              <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-xl font-bold text-white/60">
                 {photoSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={photoSrc} alt={directorDisplay ?? ''} className="h-full w-full object-cover" />
@@ -148,7 +147,7 @@ export async function ContatoSection() {
                 )}
               </span>
               <span className="text-[0.65rem] uppercase tracking-[3px] text-white/40">Diretor</span>
-              <span className="text-sm font-medium text-white/80">{directorDisplay}</span>
+              <span className="text-sm font-medium leading-snug text-white/80">{directorDisplay}</span>
             </div>
           )}
 
@@ -161,14 +160,14 @@ export async function ContatoSection() {
                 href={href}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="group flex flex-col items-center gap-3 px-4 py-6 text-center transition-colors"
+                className="group flex flex-col items-center gap-3 px-4 py-7 text-center transition-colors"
                 style={glassStyle}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors group-hover:bg-white/15">
-                  <Icon size={18} strokeWidth={1.5} />
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors group-hover:bg-white/15">
+                  <Icon size={20} strokeWidth={1.5} />
                 </span>
                 <span className="text-[0.65rem] uppercase tracking-[3px] text-white/40">{ch.label}</span>
-                <span className="break-all text-sm text-white/70 transition-colors group-hover:text-white/90">
+                <span className="break-all text-sm leading-snug text-white/70 transition-colors group-hover:text-white/90">
                   {ch.value}
                 </span>
               </a>

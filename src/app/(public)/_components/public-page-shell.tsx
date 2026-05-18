@@ -29,7 +29,7 @@ export function PublicPageShell({
       <LabSceneShell aria-label={ariaLabel} subtlePlexus>
         <LabPublicHeader variant="static" />
         {(title || lead || children) && (
-          <div className="relative z-10 w-full max-w-3xl self-start pt-2 text-left">
+          <div className="relative z-10 w-full max-w-3xl self-start pt-2 text-left max-[900px]:pt-1">
             {title && (
               <h1
                 className={cn(
