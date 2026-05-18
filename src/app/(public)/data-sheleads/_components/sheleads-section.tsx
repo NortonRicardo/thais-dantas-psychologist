@@ -57,7 +57,7 @@ const topics = [
 
 export function SheLeadsSection() {
   return (
-    <div className="mt-8 flex w-full flex-col gap-12 pb-16">
+    <div className="mt-6 flex w-full flex-col gap-8 pb-16 md:gap-12">
       {/* Hero */}
       <div
         className="relative w-full overflow-hidden rounded-3xl"
@@ -76,7 +76,7 @@ export function SheLeadsSection() {
         </div>
 
         {/* Conteúdo */}
-        <div className="relative z-10 flex flex-col items-start gap-6 px-8 py-10 sm:flex-row sm:items-center sm:px-12 sm:py-14">
+        <div className="relative z-10 flex flex-col items-start gap-5 px-5 py-8 sm:flex-row sm:items-center sm:px-12 sm:py-14">
           {/* Logo */}
           <div className="shrink-0">
             <Image
@@ -84,14 +84,14 @@ export function SheLeadsSection() {
               alt="DataSheLeads logo"
               width={100}
               height={100}
-              className="rounded-2xl"
+              className="h-16 w-16 rounded-2xl sm:h-[100px] sm:w-[100px]"
               style={{ boxShadow: '0 0 40px rgba(180,0,255,0.3)' }}
             />
           </div>
 
           {/* Texto */}
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
                 Data<span className="text-purple-400">She</span>Leads
               </h2>
