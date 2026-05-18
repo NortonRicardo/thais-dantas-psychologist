@@ -28,12 +28,17 @@ export type TimelineEntryProps = {
 function TimelineCard({
   title,
   description,
+  className,
 }: {
   title: string
   description: string
+  className?: string
 }) {
   return (
-    <div className="max-w-xs rounded-2xl px-5 py-5 sm:max-w-sm" style={glass}>
+    <div
+      className={cn('rounded-2xl px-5 py-5', className)}
+      style={glass}
+    >
       <p className="text-sm font-semibold text-white/90">{title}</p>
       <p className="mt-2 text-xs leading-relaxed text-white/55">
         {description}
@@ -67,10 +72,31 @@ export function Timeline({ entries }: Props) {
   }
 
   return (
-    <div className="mt-12 w-full pb-16">
-      <div className="relative flex flex-col items-center">
-        <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-linear-to-b from-transparent via-white/20 to-transparent" />
+    <div className="mt-8 w-full pb-16 md:mt-12">
+      {/* Mobile: linha à esquerda, cartões à direita */}
+      <div className="relative md:hidden">
+        <div className="absolute left-7 top-0 h-full w-px bg-linear-to-b from-transparent via-white/20 to-transparent" />
+        <div className="flex flex-col gap-6">
+          {entries.map(event => (
+            <div key={event.id} className="relative flex items-start gap-4">
+              <div className="shrink-0">
+                <YearBubble year={event.year} />
+              </div>
+              <div className="min-w-0 flex-1 pt-3">
+                <TimelineCard
+                  title={event.title}
+                  description={event.description}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
+      {/* Desktop: alternado com linha central */}
+      <div className="relative hidden md:flex md:flex-col md:items-center">
+        <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-linear-to-b from-transparent via-white/20 to-transparent" />
         <div className="flex w-full flex-col">
           {entries.map((event, i) => {
             const isLeft = i % 2 === 0
@@ -87,6 +113,7 @@ export function Timeline({ entries }: Props) {
                     <TimelineCard
                       title={event.title}
                       description={event.description}
+                      className="max-w-xs sm:max-w-sm"
                     />
                   ) : (
                     <div />
@@ -100,6 +127,7 @@ export function Timeline({ entries }: Props) {
                     <TimelineCard
                       title={event.title}
                       description={event.description}
+                      className="max-w-xs sm:max-w-sm"
                     />
                   ) : (
                     <div />
