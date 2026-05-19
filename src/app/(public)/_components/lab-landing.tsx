@@ -43,17 +43,19 @@ export function LabLanding() {
         <LabPublicHeader variant="absolute" />
 
         <div className="relative z-6 max-w-[850px] pt-14 max-[900px]:pt-24 max-[600px]:pt-28">
-          <p
-            className={cn(
-              'mb-8 flex items-center gap-[15px] text-[0.9rem] font-bold tracking-[5px] text-[#5aebff]',
-              'max-[600px]:text-[0.7rem] max-[600px]:tracking-[2px] max-[600px]:gap-2',
-              "before:h-0.5 before:w-[50px] before:shrink-0 before:bg-[#5aebff] before:content-[''] max-[600px]:before:w-[24px]",
-              "after:h-0.5 after:w-[50px] after:shrink-0 after:bg-[#5aebff] after:content-[''] max-[600px]:after:w-[24px]",
-              fontOrbitron
-            )}
-          >
-            LABORATÓRIO DE ESTATÍSTICA E MODELAGEM MATEMÁTICA
-          </p>
+          <div className="mb-8 flex items-center gap-[15px] max-[600px]:gap-2">
+            <span className="h-0.5 w-[50px] shrink-0 bg-[#5aebff] max-[600px]:w-[24px]" />
+            <p
+              className={cn(
+                'text-center text-[0.9rem] font-bold tracking-[5px] text-[#5aebff] leading-[1.6]',
+                'max-[600px]:text-[0.7rem] max-[600px]:tracking-[2px]',
+                fontOrbitron
+              )}
+            >
+              LABORATÓRIO DE ESTATÍSTICA E<br />MODELAGEM MATEMÁTICA
+            </p>
+            <span className="h-0.5 w-[50px] shrink-0 bg-[#5aebff] max-[600px]:w-[24px]" />
+          </div>
 
           <h1
             className={cn(
