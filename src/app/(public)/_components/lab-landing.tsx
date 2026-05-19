@@ -52,7 +52,7 @@ export function LabLanding() {
               fontOrbitron
             )}
           >
-            LABORATÓRIO DE ESTATÍSTICA E PESQUISA AVANÇADA
+            LABORATÓRIO DE ESTATÍSTICA E MODELAGEM MATEMÁTICA
           </p>
 
           <h1
