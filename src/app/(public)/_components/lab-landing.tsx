@@ -16,7 +16,7 @@ export function LabLanding() {
             {/* Nav — pill próprio que funde para transparente no lado direito */}
             <nav
               aria-label="Navegação principal"
-              className="rounded-full bg-gradient-to-r from-white/20 via-white/10 to-transparent px-6 py-2.5 backdrop-blur-sm sm:px-8 sm:py-3"
+              className="mr-5 flex-1 rounded-full bg-[linear-gradient(to_right,rgba(255,255,255,0.18),rgba(255,255,255,0.18)_45%,rgba(255,255,255,0.12)_60%,rgba(255,255,255,0.06)_75%,rgba(255,255,255,0.02)_88%,transparent)] px-6 py-2.5 backdrop-blur-sm sm:px-8 sm:py-3"
             >
               <ul className="flex list-none gap-x-5 p-0 sm:gap-x-8">
                 {homeNavItems.map(({ href, label }) => (
@@ -69,7 +69,7 @@ export function LabLanding() {
             width={960}
             height={640}
             priority
-            className="h-auto w-full max-w-2xl object-contain sm:max-w-3xl lg:max-w-4xl"
+            className="h-auto w-full max-w-lg object-contain brightness-75 sm:max-w-xl lg:max-w-2xl"
           />
         </div>
 
