@@ -4,7 +4,8 @@ import { asc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { contactChannels } from '@/lib/db/schema'
 import { contactChannelPostSchema } from '@/lib/validation/contato-api'
-import { validationErrorResponse } from '@/lib/validation/team-api'
+import { validationErrorResponse } from '@/lib/validation/api'
+import { compactContactChannelSortOrders } from '@/lib/db/contact-channel-order'
 import { getOrCreateContactInfo } from '../route'
 
 export async function GET() {
@@ -41,8 +42,7 @@ export async function POST(req: NextRequest) {
       .where(eq(contactChannels.contactInfoId, info.id))
       .orderBy(asc(contactChannels.sortOrder))
 
-    const nextOrder =
-      existing.length > 0 ? Math.max(...existing.map(r => r.sortOrder)) + 1 : 0
+    const nextOrder = existing.length
 
     const [created] = await db
       .insert(contactChannels)

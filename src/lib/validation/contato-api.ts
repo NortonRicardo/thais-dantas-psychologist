@@ -128,10 +128,6 @@ export const contactChannelPostSchema = z
 export type ContactChannelPostBody = z.infer<typeof contactChannelPostSchema>
 
 export const contactInfoPutSchema = z.object({
-  directorTeamMemberId: z.union([
-    z.null(),
-    z.string().uuid({ error: 'Identificador do membro inválido.' }),
-  ]),
   mapUrl: z
     .string()
     .max(4000, 'URL do mapa: no máximo 4000 caracteres.')

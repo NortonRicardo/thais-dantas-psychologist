@@ -5,14 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const navItems = [
-  { href: '/manager/projetos', label: 'Projetos' },
-  { href: '/manager/eventos', label: 'Eventos' },
-  { href: '/manager/equipe', label: 'Equipe' },
-  { href: '/manager/sobre-nos', label: 'Sobre Nós' },
-  { href: '/manager/infraestrutura', label: 'Infraestrutura' },
-  { href: '/manager/contato', label: 'Contato' },
-]
+const navItems = [{ href: '/manager/contato', label: 'Contato' }]
 
 export function ManagerNav() {
   const pathname = usePathname()
@@ -23,14 +16,7 @@ export function ManagerNav() {
       aria-label="Principal"
     >
       {navItems.map(({ href, label }) => {
-        const isCurrent =
-          href === '/manager/infraestrutura'
-            ? pathname.startsWith('/manager/infraestrutura')
-            : href === '/manager/equipe'
-              ? pathname.startsWith('/manager/equipe')
-              : href === '/manager/projetos'
-                ? pathname.startsWith('/manager/projetos')
-                : pathname === href
+        const isCurrent = pathname === href || pathname.startsWith(`${href}/`)
         return (
           <Link
             key={label}

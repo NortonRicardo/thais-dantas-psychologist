@@ -1,13 +1,5 @@
-import type { Metadata } from 'next'
-
-import { ManagerView } from '../_components/manager-view'
-
-export const metadata: Metadata = {
-  title: 'Gestor | LEMM',
-  description:
-    'Acesso rápido a eventos e projetos do Laboratório de Estatística e Modelagem Matemática.',
-}
+import { redirect } from 'next/navigation'
 
 export default function ManagerPage() {
-  return <ManagerView />
+  redirect('/manager/contato')
 }

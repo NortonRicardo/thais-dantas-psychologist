@@ -4,11 +4,10 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { contactInfo } from '@/lib/db/schema'
 import { contactInfoPutSchema } from '@/lib/validation/contato-api'
-import { validationErrorResponse } from '@/lib/validation/team-api'
+import { validationErrorResponse } from '@/lib/validation/api'
 
 const SELECTED_FIELDS = {
   id: contactInfo.id,
-  directorTeamMemberId: contactInfo.directorTeamMemberId,
   mapUrl: contactInfo.mapUrl,
   createdAt: contactInfo.createdAt,
   updatedAt: contactInfo.updatedAt,
@@ -44,13 +43,12 @@ export async function PUT(req: NextRequest) {
     const parsed = contactInfoPutSchema.safeParse(raw)
     if (!parsed.success) return validationErrorResponse(parsed.error)
 
-    const { directorTeamMemberId, mapUrl } = parsed.data
+    const { mapUrl } = parsed.data
 
     const existing = await getOrCreateContactInfo()
     const [updated] = await db
       .update(contactInfo)
       .set({
-        directorTeamMemberId,
         mapUrl,
         updatedAt: new Date(),
       })

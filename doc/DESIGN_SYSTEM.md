@@ -2,123 +2,32 @@
 
 **Stack:** Next.js · Tailwind CSS v4 · shadcn/ui · Radix UI · Lucide Icons
 
-Este documento define os padrões de interface que devem ser seguidos à risca em todo o projeto. Para adaptar a outro projeto, troque apenas os valores na seção [1. Tokens de Cor](#1-tokens-de-cor). Todo o resto permanece igual.
+Este documento define padrões de interface para componentes, formulários e interações. **Paleta de cores e estrutura das páginas públicas ainda não estão definidas** — não documentar nem hardcodar esses aspectos até nova orientação.
 
 ---
 
 ## Índice
 
-1. [Tokens de Cor](#1-tokens-de-cor)
-2. [Tipografia](#2-tipografia)
-3. [Espaçamento e Raio de Borda](#3-espaçamento-e-raio-de-borda)
-4. [Sombras e Superfícies](#4-sombras-e-superfícies)
-5. [Botões](#5-botões)
-6. [Inputs e Campos de Formulário](#6-inputs-e-campos-de-formulário)
-7. [Select e Combobox](#7-select-e-combobox)
-8. [Labels e Descrições](#8-labels-e-descrições)
-9. [Validação e Feedback de Erro](#9-validação-e-feedback-de-erro)
-10. [Toasts e Notificações](#10-toasts-e-notificações)
-11. [Dialogs e Modais](#11-dialogs-e-modais)
-12. [Tabelas do Gestor](#12-tabelas-do-gestor)
-13. [ScrollArea](#13-scrollarea)
-14. [Ícones](#14-ícones)
-15. [Imagens](#15-imagens)
-16. [Temas: Público vs. Gestor](#16-temas-público-vs-gestor)
-17. [Animações](#17-animações)
-18. [Padrões de Composição](#18-padrões-de-composição)
+1. [Tipografia](#1-tipografia)
+2. [Espaçamento e Raio de Borda](#2-espaçamento-e-raio-de-borda)
+3. [Sombras](#3-sombras)
+4. [Botões](#4-botões)
+5. [Inputs e Campos de Formulário](#5-inputs-e-campos-de-formulário)
+6. [Select e Combobox](#6-select-e-combobox)
+7. [Labels e Descrições](#7-labels-e-descrições)
+8. [Validação e Feedback de Erro](#8-validação-e-feedback-de-erro)
+9. [Toasts e Notificações](#9-toasts-e-notificações)
+10. [Dialogs e Modais](#10-dialogs-e-modais)
+11. [Tabelas do Gestor](#11-tabelas-do-gestor)
+12. [ScrollArea](#12-scrollarea)
+13. [Ícones](#13-ícones)
+14. [Imagens](#14-imagens)
+15. [Animações](#15-animações)
+16. [Padrões de Composição](#16-padrões-de-composição)
 
 ---
 
-## 1. Tokens de Cor
-
-> **Para adaptar a outro projeto: substitua apenas os valores oklch abaixo.**  
-> O resto do sistema usa estes tokens por referência — nada de hardcode de cor fora daqui.
-
-### globals.css — variáveis semânticas
-
-```css
-:root {
-  --radius: 0.625rem;
-
-  /* Superfícies */
-  --background:         oklch(1 0 0);
-  --foreground:         oklch(0.145 0 0);
-  --card:               oklch(1 0 0);
-  --card-foreground:    oklch(0.145 0 0);
-  --popover:            oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-
-  /* Ação principal */
-  --primary:            oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-
-  /* Ação secundária */
-  --secondary:            oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-
-  /* Neutro */
-  --muted:            oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent:           oklch(0.97 0 0);
-  --accent-foreground:oklch(0.205 0 0);
-
-  /* Destrutivo */
-  --destructive: oklch(0.577 0.245 27.325);
-
-  /* Formulários */
-  --border: oklch(0.922 0 0);
-  --input:  oklch(0.922 0 0);
-  --ring:   oklch(0.708 0 0);
-}
-
-.dark {
-  --background:         oklch(14.1% 0.005 285.823);
-  --foreground:         oklch(0.985 0 0);
-  --card:               oklch(0.205 0 0);
-  --card-foreground:    oklch(0.985 0 0);
-  --popover:            oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary:            oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary:          oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted:              oklch(0.269 0 0);
-  --muted-foreground:   oklch(0.708 0 0);
-  --accent:             oklch(0.269 0 0);
-  --accent-foreground:  oklch(0.985 0 0);
-  --destructive:        oklch(0.704 0.191 22.216);
-  --border:             oklch(1 0 0 / 10%);
-  --input:              oklch(1 0 0 / 15%);
-  --ring:               oklch(0.556 0 0);
-}
-```
-
-### Hierarquia de uso
-
-| Token | Quando usar |
-|-------|-------------|
-| `background` / `foreground` | Fundo e texto da página |
-| `card` / `card-foreground` | Superfícies elevadas (cards, painéis) |
-| `primary` | Botão principal, links de ação |
-| `destructive` | Erros, deleções, alertas críticos |
-| `muted-foreground` | Texto secundário, placeholders de contexto |
-| `border` | Bordas de inputs, divisores |
-| `ring` | Anel de foco em todos os elementos interativos |
-
-### Cores de acento (fixas por projeto)
-
-Estas cores não são tokens — são escolhas do projeto específico que **não mudam entre temas**:
-
-| Cor | Uso |
-|-----|-----|
-| `teal-700` / `teal-600` | Botão de criação (`variant="create"`) |
-| `sky-400` | Hover de botão de edição |
-| `rose-500` | Hover de botão destrutivo (tabela) |
-| `orange-*` | Seleção de multi-tags (temas, categorias) |
-
----
-
-## 2. Tipografia
+## 1. Tipografia
 
 ### Fontes do projeto
 
@@ -130,10 +39,10 @@ const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', weight: [
 
 | Fonte | Variável CSS | Uso |
 |-------|-------------|-----|
-| **Inter** | `--font-inter` | Corpo, formulários, tabelas, gestor inteiro |
+| **Inter** | `--font-inter` | Corpo, formulários, tabelas, gestor |
 | **Cinzel** | `--font-cinzel` | Marca/logo, títulos institucionais |
 
-> Adicionar novas fontes apenas quando há uma necessidade editorial clara (ex.: Orbitron para hero de landing). O gestor usa exclusivamente Inter.
+> Adicionar novas fontes apenas quando houver necessidade editorial clara. O gestor usa exclusivamente Inter.
 
 ### Escala tipográfica — Gestor
 
@@ -142,34 +51,23 @@ const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', weight: [
 | Título de página | `text-2xl font-semibold tracking-tight` | 24px | 600 |
 | Título de seção | `text-lg font-semibold` | 18px | 600 |
 | Título de dialog | `text-lg leading-none font-semibold` | 18px | 600 |
-| Subtítulo / label de grupo | `text-sm font-medium text-muted-foreground` | 14px | 500 |
+| Subtítulo / label de grupo | `text-sm font-medium` | 14px | 500 |
 | Label de campo | `text-sm font-medium` | 14px | 500 |
 | Corpo / valor | `text-sm` | 14px | 400 |
-| Texto auxiliar / hint | `text-xs text-muted-foreground` | 12px | 400 |
-| Erro de campo | `text-xs text-destructive` | 12px | 400 |
-| Description de dialog | `text-sm text-muted-foreground` | 14px | 400 |
+| Texto auxiliar / hint | `text-xs` | 12px | 400 |
+| Erro de campo | `text-xs` | 12px | 400 |
+| Description de dialog | `text-sm` | 14px | 400 |
 | Badge / pill | `text-xs font-medium` | 12px | 500 |
-
-### Escala tipográfica — Site público
-
-| Elemento | Classes Tailwind | Notas |
-|----------|-----------------|-------|
-| H1 hero | `text-[clamp(1.65rem,5vw,3.75rem)] font-black uppercase leading-[1.05] tracking-tight` | Fluido com clamp |
-| H2 seção | `text-3xl font-bold tracking-tight` ou `text-4xl` | |
-| H3 card | `text-xl font-semibold` | |
-| Corpo principal | `text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed` | 15px/17px |
-| Label de contexto | `text-xs uppercase tracking-[2px] text-white/55` | Orbitron, acento decorativo |
 
 ### Regras
 
 - **Nunca** usar `text-base` (16px) no gestor — usar `text-sm` (14px) como padrão
 - Títulos de página e de dialog usam `font-semibold` (600), nunca `font-bold` (700)
-- Texto auxiliar e hints sempre em `text-muted-foreground`, nunca cor hardcoded
 - `antialiased` no `<body>` global — não repetir nos componentes
 
 ---
 
-## 3. Espaçamento e Raio de Borda
+## 2. Espaçamento e Raio de Borda
 
 ### Raio de borda
 
@@ -196,7 +94,7 @@ Derivados da variável `--radius: 0.625rem` (10px):
 
 ---
 
-## 4. Sombras e Superfícies
+## 3. Sombras
 
 ### Sombras utilitárias
 
@@ -211,45 +109,25 @@ Derivados da variável `--radius: 0.625rem` (10px):
     inset 0px 0px 0px 1px rgba(255,255,255,0.03),
     inset 0px 1px 0px rgba(255,255,255,0.03);
 }
-
-/* Uso: superfícies secundárias (inputs com elevação, popovers leves) */
-.shadow-rounded {
-  box-shadow:
-    0px 6px 10px rgba(0,0,0,0.1),
-    0px 2px 6px rgba(0,0,0,0.1),
-    inset 0px 1px 2px rgba(255,255,255,0.03);
-}
 ```
 
 `shadow-xs` (Tailwind padrão) → inputs, selects, botões — sombra mínima para profundidade.
 
-### Superfícies do gestor (tema escuro)
-
-| Superfície | Classe / valor |
-|-----------|----------------|
-| Fundo do dialog | `bg-[#071525]` ou `bg-card` |
-| Input sobre fundo escuro | `bg-white/5 border-white/10` |
-| Input focado | `border-white/30` |
-| Texto principal | `text-white` |
-| Texto secundário | `text-white/70` |
-| Texto de placeholder | `text-white/30` |
-| Separadores / bordas | `border-white/10` |
-
 ---
 
-## 5. Botões
+## 4. Botões
 
 ### Variantes
 
-| Variant | Quando usar | Aparência |
-|---------|-------------|-----------|
-| `default` | Ação principal neutra | `bg-primary text-primary-foreground` |
-| `create` | Criar novo registro | `bg-teal-700 text-white` |
-| `destructive` | Apagar, ação irreversível (modal de confirmação) | `bg-destructive text-white` |
-| `outline` | Ação secundária com borda | Fundo transparente + borda |
-| `secondary` | Alternativa suave ao outline | `bg-zinc-200 dark:bg-zinc-700` |
-| `ghost` | Ações em tabelas, ícone + texto, sem destaque | Hover sutil |
-| `link` | Navegação inline | Texto com underline |
+| Variant | Quando usar |
+|---------|-------------|
+| `default` | Ação principal neutra |
+| `create` | Criar novo registro |
+| `destructive` | Apagar, ação irreversível (modal de confirmação) |
+| `outline` | Ação secundária com borda |
+| `secondary` | Alternativa suave ao outline |
+| `ghost` | Ações em tabelas, ícone + texto, sem destaque |
+| `link` | Navegação inline |
 
 ### Tamanhos
 
@@ -258,7 +136,7 @@ Derivados da variável `--radius: 0.625rem` (10px):
 | `xs` | 24px | Ações em linha, chips, ações secundárias em tabela |
 | `sm` | 32px | Botões em cabeçalho de tabela, filtros |
 | `default` | 36px | **Padrão** — formulários, footers de dialog |
-| `lg` | 40px | CTA do site público |
+| `lg` | 40px | CTAs de destaque |
 | `icon` | 36×36px | Ícone sem texto |
 | `icon-sm` | 32×32px | Ícone secundário |
 | `icon-xs` | 24×24px | Ícone em linha |
@@ -281,27 +159,27 @@ Regras:
 
 ```tsx
 // Editar
-<Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-sky-400 hover:bg-sky-400/10">
+<Button variant="ghost" size="icon-sm">
   <PencilIcon />
 </Button>
 
 // Apagar
-<Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10">
+<Button variant="ghost" size="icon-sm">
   <Trash2Icon />
 </Button>
 ```
 
 ---
 
-## 6. Inputs e Campos de Formulário
+## 5. Inputs e Campos de Formulário
 
-### Input — padrão (fundo claro)
+### Input — padrão
 
 ```tsx
 <Input
   id="title"
   name="title"
-  placeholder="Título do projeto"
+  placeholder="Título"
   aria-invalid={!!errors.title}
 />
 ```
@@ -309,26 +187,18 @@ Regras:
 Especificações do componente:
 - Altura: `h-9` (36px)
 - Padding: `px-3 py-1`
-- Borda: `border border-input rounded-md`
-- Foco: `focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-2`
-- Erro: `aria-invalid:border-destructive aria-invalid:ring-destructive/20`
+- Borda: `border rounded-md`
+- Foco: `focus-visible:ring-2`
+- Erro: `aria-invalid` no campo
 - Texto: `text-sm` (md+), `text-base` (mobile)
 - Sombra: `shadow-xs`
-
-### Input — sobre fundo escuro (gestor)
-
-```tsx
-const INPUT_CLS = 'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
-
-<Input className={INPUT_CLS} />
-```
 
 ### Textarea
 
 ```tsx
 <Textarea
   rows={4}
-  placeholder="Descreva o projeto…"
+  placeholder="Descrição…"
   className="resize-none"
   aria-invalid={!!errors.description}
 />
@@ -344,22 +214,22 @@ const INPUT_CLS = 'bg-white/5 border-white/10 text-white placeholder:text-white/
 - Todo campo **obrigatório** tem `*` no label: `Título *`
 - Todo campo deve ter `id` e o Label correspondente com `htmlFor` igual
 - Nunca usar `placeholder` como substituto do label — label é sempre obrigatório
-- Hint abaixo do campo usa `<p className="text-xs text-muted-foreground">` com `id` e `aria-describedby` no input
+- Hint abaixo do campo usa `<p className="text-xs">` com `id` e `aria-describedby` no input
 - Campos desabilitados: `disabled` prop — nunca usar `opacity-50` manualmente
 
 ---
 
-## 7. Select e Combobox
+## 6. Select e Combobox
 
 ### Select (opções fixas, lista curta)
 
 ```tsx
 <Select name="categoryId" defaultValue={categoryId}>
   <SelectTrigger className="w-full">
-    <SelectValue placeholder="Selecione uma categoria" />
+    <SelectValue placeholder="Selecione uma opção" />
   </SelectTrigger>
   <SelectContent>
-    <SelectItem value="uuid-aqui">Nome da categoria</SelectItem>
+    <SelectItem value="uuid-aqui">Nome da opção</SelectItem>
   </SelectContent>
 </Select>
 ```
@@ -369,44 +239,39 @@ const INPUT_CLS = 'bg-white/5 border-white/10 text-white placeholder:text-white/
 - O `SelectContent` usa `ScrollArea` internamente — listas longas funcionam automaticamente
 - Erro: `aria-invalid` no `SelectTrigger`
 
-### FilterCombobox (busca + multi-select)
+### FilterCombobox (busca + seleção)
 
 Usar quando:
 - Lista > 8 itens
 - Usuário precisa buscar dentro da lista
-- Seleção múltipla (ex.: temas de um projeto)
 
 ```tsx
 <FilterCombobox
-  options={themes.map(t => ({ value: t.id, label: t.name }))}
-  selected={selectedIds}
-  onSelectedChange={setSelectedIds}
-  placeholder="Buscar tema…"
+  value={selectedId}
+  onChange={setSelectedId}
+  placeholder="Buscar…"
+  options={options}
+  labelForValue={id => labels[id] ?? id}
 />
 ```
 
 ### Regras
 
 - **Select** para listas curtas e fixas (até ~10 itens, sem busca)
-- **FilterCombobox** para listas longas, dinâmicas ou com multi-seleção
+- **FilterCombobox** para listas longas ou dinâmicas
 - Nunca usar `<select>` nativo — sempre os componentes Radix
 - Conteúdo do Select/Combobox dentro de Dialog: usar `useDialogContentRef()` para o portal
 
 ---
 
-## 8. Labels e Descrições
+## 7. Labels e Descrições
 
 ### Label de campo
 
 ```tsx
 // Obrigatório
 <Label htmlFor="slug">
-  Slug <span className="text-muted-foreground font-normal">(URL)</span> *
-</Label>
-
-// Sobre fundo escuro (gestor)
-<Label htmlFor="title" className="text-white/70">
-  Título *
+  Slug <span className="font-normal">(URL)</span> *
 </Label>
 
 // Com ícone de suporte
@@ -427,8 +292,8 @@ Especificações:
 <div className="space-y-1.5">
   <Label htmlFor="slug">Slug *</Label>
   <Input id="slug" aria-describedby="slug-hint" />
-  <p id="slug-hint" className="text-xs text-muted-foreground">
-    Usado na URL do projeto. Ex: weather-brasil
+  <p id="slug-hint" className="text-xs">
+    Usado na URL. Ex: minha-pagina
   </p>
 </div>
 ```
@@ -437,17 +302,17 @@ Especificações:
 
 ```tsx
 {errors.slug && (
-  <p className="text-xs text-destructive">{errors.slug}</p>
+  <p className="text-xs">{errors.slug}</p>
 )}
 ```
 
 ---
 
-## 9. Validação e Feedback de Erro
+## 8. Validação e Feedback de Erro
 
 ### Padrão `aria-invalid`
 
-Todos os componentes (Input, Textarea, Select, Button) aceitam `aria-invalid`. Quando `true`, o componente automaticamente aplica borda e anel na cor destrutiva.
+Todos os componentes (Input, Textarea, Select, Button) aceitam `aria-invalid`. Quando `true`, o componente aplica estilo de erro conforme o tema.
 
 ```tsx
 <Input
@@ -456,7 +321,7 @@ Todos os componentes (Input, Textarea, Select, Button) aceitam `aria-invalid`. Q
   aria-describedby={fieldError ? 'email-error' : undefined}
 />
 {fieldError && (
-  <p id="email-error" className="text-xs text-destructive">{fieldError}</p>
+  <p id="email-error" className="text-xs">{fieldError}</p>
 )}
 ```
 
@@ -467,17 +332,16 @@ Todos os componentes (Input, Textarea, Select, Button) aceitam `aria-invalid`. Q
 import { z } from 'zod'
 
 export const myFormSchema = z.object({
-  title:      z.string().trim().min(1, 'Título obrigatório.').max(300, 'Máximo 300 caracteres.'),
-  slug:       z.string().trim().min(1, 'Slug obrigatório.').max(200)
-                .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Apenas minúsculas, números e hífens.'),
-  categoryId: z.string().uuid('Selecione uma categoria.'),
-  url:        z.string().trim().url('URL inválida.').max(2000).nullable().optional(),
-  date:       z.string().trim().min(1, 'Data obrigatória.').refine(s => !isNaN(Date.parse(s)), 'Data inválida.'),
+  title: z.string().trim().min(1, 'Título obrigatório.').max(300, 'Máximo 300 caracteres.'),
+  slug:  z.string().trim().min(1, 'Slug obrigatório.').max(200)
+           .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Apenas minúsculas, números e hífens.'),
+  url:   z.string().trim().url('URL inválida.').max(2000).nullable().optional(),
+  date:  z.string().trim().min(1, 'Data obrigatória.').refine(s => !isNaN(Date.parse(s)), 'Data inválida.'),
 })
 ```
 
 Mensagens de erro:
-- **Tom:** direto e instrucional ("Slug obrigatório.", "Selecione uma categoria.")
+- **Tom:** direto e instrucional ("Slug obrigatório.", "Selecione uma opção.")
 - **Sem** "Campo inválido" genérico — sempre dizer o que fazer
 - **Sempre** com ponto final
 - Para campos de formato: incluir exemplo ("Apenas minúsculas, números e hífens.")
@@ -488,8 +352,7 @@ Mensagens de erro:
 async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault()
   const fd = new FormData(e.currentTarget)
-  
-  // Validar antes de enviar
+
   const parsed = myFormSchema.safeParse(Object.fromEntries(fd))
   if (!parsed.success) {
     const errs = parsed.error.flatten().fieldErrors
@@ -502,7 +365,8 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   try {
     const res = await fetch('/api/resources', { method: 'POST', body: fd })
     if (!res.ok) {
-      const msg = await readApiError(res)
+      const body = await res.json().catch(() => ({}))
+      const msg = typeof body.error === 'string' ? body.error : 'Erro ao salvar.'
       toast.error(msg)
       return
     }
@@ -519,37 +383,27 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
 ---
 
-## 10. Toasts e Notificações
+## 9. Toasts e Notificações
 
 ### Biblioteca: Sonner
 
 ```tsx
 import { toast } from 'sonner'
 
-toast.success('Projeto criado com sucesso!')
+toast.success('Salvo com sucesso!')
 toast.error('Erro ao salvar. Tente novamente.')
 toast.loading('Salvando…')
 ```
 
-### Ícones customizados (padrão do projeto)
+### Ícones customizados
 
 ```tsx
 import { CircleCheckIcon, OctagonXIcon, TriangleAlertIcon, Loader2Icon } from 'lucide-react'
 
-toast.success('Salvo!',   { icon: <CircleCheckIcon  className="size-4" /> })
-toast.error('Erro!',      { icon: <OctagonXIcon     className="size-4" /> })
-toast.warning('Atenção!', { icon: <TriangleAlertIcon className="size-4" /> })
-toast.loading('Aguarde…', { icon: <Loader2Icon      className="size-4 animate-spin" /> })
-```
-
-### Estilo do toast de erro (globals.css)
-
-```css
-[data-sonner-toast][data-type='error'] {
-  background-color: rgba(127, 29, 29, 0.94) !important;
-  border: 1px solid rgba(248, 113, 113, 0.55) !important;
-  color: rgb(254 242 242) !important;
-}
+toast.success('Salvo!',    { icon: <CircleCheckIcon  className="size-4" /> })
+toast.error('Erro!',       { icon: <OctagonXIcon     className="size-4" /> })
+toast.warning('Atenção!',  { icon: <TriangleAlertIcon className="size-4" /> })
+toast.loading('Aguarde…',  { icon: <Loader2Icon      className="size-4 animate-spin" /> })
 ```
 
 ### Quando usar cada tipo
@@ -559,18 +413,18 @@ toast.loading('Aguarde…', { icon: <Loader2Icon      className="size-4 animate-
 | `success` | Operação CRUD concluída |
 | `error` | Falha na API, erro de conexão, erro inesperado |
 | `warning` | Ação parcialmente bem-sucedida, avisos não bloqueantes |
-| `loading` | Operação demorada (upload, geração) — substituir por success/error ao concluir |
+| `loading` | Operação demorada — substituir por success/error ao concluir |
 
 ### Regras
 
 - **Nunca** usar `alert()` ou `confirm()` — sempre Sonner + AlertDialog
 - Para deleções: AlertDialog de confirmação + toast de sucesso/erro após
-- Mensagens de sucesso: concisas ("Projeto criado.", "Membro removido.")
+- Mensagens de sucesso: concisas ("Salvo.", "Removido.")
 - Mensagens de erro: acionáveis ("Erro ao salvar. Tente novamente." não "Erro 500")
 
 ---
 
-## 11. Dialogs e Modais
+## 10. Dialogs e Modais
 
 ### Estrutura obrigatória
 
@@ -578,15 +432,15 @@ toast.loading('Aguarde…', { icon: <Loader2Icon      className="size-4 animate-
 <Dialog open={open} onOpenChange={handleOpenChange}>
   <DialogTrigger asChild>
     <Button variant="create" size="sm">
-      <PlusIcon /> Novo projeto
+      <PlusIcon /> Novo item
     </Button>
   </DialogTrigger>
 
   <DialogContent className="sm:max-w-lg">
     <DialogHeader>
-      <DialogTitle>Criar projeto</DialogTitle>
+      <DialogTitle>Criar item</DialogTitle>
       <DialogDescription>
-        Preencha os dados do novo projeto.
+        Preencha os dados.
       </DialogDescription>
     </DialogHeader>
 
@@ -624,15 +478,12 @@ function handleOpenChange(next: boolean) {
   if (!next) {
     setErrors({})
     setLoading(false)
-    // resetar campos controlados se necessário
   }
   setOpen(next)
 }
 ```
 
 ### Combobox/Select dentro de Dialog
-
-Usar o contexto de ref para evitar portal issues:
 
 ```tsx
 const dialogRef = useDialogContentRef()
@@ -647,7 +498,7 @@ const dialogRef = useDialogContentRef()
 ```tsx
 <AlertDialog>
   <AlertDialogTrigger asChild>
-    <Button variant="ghost" size="icon-sm" className="hover:text-rose-400 hover:bg-rose-500/10">
+    <Button variant="ghost" size="icon-sm">
       <Trash2Icon />
     </Button>
   </AlertDialogTrigger>
@@ -660,10 +511,7 @@ const dialogRef = useDialogContentRef()
     </AlertDialogHeader>
     <AlertDialogFooter>
       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-      <AlertDialogAction
-        className="bg-destructive text-white hover:bg-destructive/90"
-        onClick={handleDelete}
-      >
+      <AlertDialogAction onClick={handleDelete}>
         Apagar
       </AlertDialogAction>
     </AlertDialogFooter>
@@ -673,7 +521,7 @@ const dialogRef = useDialogContentRef()
 
 ---
 
-## 12. Tabelas do Gestor
+## 11. Tabelas do Gestor
 
 ### Estrutura padrão
 
@@ -681,7 +529,7 @@ const dialogRef = useDialogContentRef()
 <div className="rounded-xl border overflow-hidden">
   <Table>
     <TableHeader>
-      <TableRow className="bg-muted/50">
+      <TableRow>
         <TableHead className="w-[300px]">Nome</TableHead>
         <TableHead>Categoria</TableHead>
         <TableHead className="text-right w-[100px]">Ações</TableHead>
@@ -691,7 +539,7 @@ const dialogRef = useDialogContentRef()
       {items.map(item => (
         <TableRow key={item.id}>
           <TableCell className="font-medium">{item.name}</TableCell>
-          <TableCell className="text-muted-foreground">{item.category}</TableCell>
+          <TableCell>{item.category}</TableCell>
           <TableCell className="text-right">
             <div className="flex justify-end gap-1">
               {/* Botão editar */}
@@ -703,7 +551,7 @@ const dialogRef = useDialogContentRef()
 
       {items.length === 0 && (
         <TableRow>
-          <TableCell colSpan={3} className="py-8 text-center text-sm text-muted-foreground">
+          <TableCell colSpan={3} className="py-8 text-center text-sm">
             Nenhum registro encontrado.
           </TableCell>
         </TableRow>
@@ -718,8 +566,7 @@ const dialogRef = useDialogContentRef()
 | Dado | Classes |
 |------|---------|
 | Nome / título principal | `font-medium` |
-| Dado secundário | `text-muted-foreground` |
-| Data | `text-muted-foreground tabular-nums` |
+| Data | `tabular-nums` |
 | Badge / status | Usar componente `<Badge>` |
 | Coluna de ações | `text-right` no `TableHead`, `flex justify-end gap-1` no `TableCell` |
 | Coluna de ícone/avatar | `w-10` no `TableHead` |
@@ -730,7 +577,7 @@ Sempre exibir mensagem quando a tabela está vazia. Nunca renderizar tabela com 
 
 ---
 
-## 13. ScrollArea
+## 12. ScrollArea
 
 ### Quando usar
 
@@ -747,20 +594,12 @@ Sempre exibir mensagem quando a tabela está vazia. Nunca renderizar tabela com 
 <ScrollArea className="h-48">
   <div className="p-1">
     {items.map(item => (
-      <div key={item.id} className="...">
+      <div key={item.id}>
         {item.label}
       </div>
     ))}
   </div>
 </ScrollArea>
-```
-
-### Scrollbar em fundo escuro
-
-Adicionar a classe utilitária `.scrollbar-dark` quando o ScrollArea estiver sobre fundo escuro:
-
-```tsx
-<ScrollArea className="h-64 scrollbar-dark">
 ```
 
 ### Regras
@@ -771,7 +610,7 @@ Adicionar a classe utilitária `.scrollbar-dark` quando o ScrollArea estiver sob
 
 ---
 
-## 14. Ícones
+## 13. Ícones
 
 ### Biblioteca: Lucide React
 
@@ -792,34 +631,25 @@ import { PlusIcon, PencilIcon, Trash2Icon, Loader2Icon } from 'lucide-react'
 
 ### Regras
 
-- Ícones dentro de `<Button>` **não precisam** de `className="size-*"` — o Button já define o tamanho via CSS `[&_svg:not([class*='size-'])]:size-4`
+- Ícones dentro de `<Button>` **não precisam** de `className="size-*"` — o Button já define o tamanho
 - Adicionar `aria-hidden` em ícones puramente decorativos
 - Nunca usar emojis como ícones funcionais — sempre Lucide
 
 ---
 
-## 15. Imagens
+## 14. Imagens
 
 ### Next.js `<Image>` — padrão
 
 ```tsx
 import Image from 'next/image'
 
-// Imagem local (public/)
 <Image
-  src="/foto-laboratorio.jpg"
+  src="/foto.jpg"
   alt="Descrição acessível e específica"
   width={800}
   height={600}
   className="rounded-lg object-cover"
-/>
-
-// Imagem remota (requer configuração em next.config.ts)
-<Image
-  src="https://images.unsplash.com/photo-xxx"
-  alt="Foto do laboratório"
-  fill
-  className="object-cover"
 />
 ```
 
@@ -827,107 +657,25 @@ import Image from 'next/image'
 
 ```typescript
 images: {
-  remotePatterns: [
-    { protocol: 'https', hostname: 'images.unsplash.com' },
-    // adicionar outros domínios conforme necessário
-  ],
   qualities: [75, 85],
   formats: ['image/avif', 'image/webp'],
-  minimumCacheTTL: 2592000,  // 30 dias
+  minimumCacheTTL: 2592000,
 },
 ```
 
-### Imagens servidas pelo banco (bytea)
+### Regras
 
-```tsx
-// Usar a rota de API como src — o Next.js não otimiza bytea
-<img
-  src={`/api/projects/${id}/image`}
-  alt={title}
-  className="w-full h-48 object-cover rounded-lg"
-  loading="lazy"
-/>
-```
-
-> Não usar `<Image>` do Next.js para rotas internas de bytea — ele tenta otimizar e falha. Usar `<img>` nativo com `loading="lazy"`.
-
-### Uploads — regras de aceite
-
-| Tipo | Formatos | Tamanho máximo | Validação |
-|------|----------|----------------|-----------|
-| Foto de membro | JPEG, PNG | 5 MB | Magic bytes `FF D8 FF` / `89 50 4E 47` |
-| Imagem de projeto/evento | JPEG, PNG | 5 MB | Magic bytes |
-| PDF | PDF | 20 MB | Magic bytes `25 50 44 46` |
-
-**Nunca** aceitar SVG em uploads de usuário — SVG pode conter scripts.
-
-### Avatar / foto de membro
-
-```tsx
-<Avatar className="size-10">
-  <AvatarImage src={`/api/team/${id}/photo`} alt={name} />
-  <AvatarFallback className="bg-muted text-muted-foreground text-sm font-medium">
-    {initials}
-  </AvatarFallback>
-</Avatar>
-```
-
-Sempre fornecer `AvatarFallback` com iniciais para quando a foto não carrega.
+- Sempre incluir `alt` descritivo
+- Preferir `<Image>` do Next.js para assets estáticos em `public/`
+- **Nunca** aceitar SVG em uploads de usuário — SVG pode conter scripts
 
 ---
 
-## 16. Temas: Público vs. Gestor
-
-O projeto tem dois contextos visuais distintos:
-
-### Site público (`(public)/`)
-
-| Aspecto | Padrão |
-|---------|--------|
-| Fundo | Gradientes escuros (slate, zinc, navy) |
-| Texto | `text-white`, `text-slate-300`, `text-slate-400` |
-| Acentos | Cyan, emerald, tailwind coloridos por categoria |
-| Fonte de destaque | Cinzel (`font-brand-title`) |
-| Radius de cards | `rounded-2xl` |
-| Sombras | `shadow-shape` em superfícies principais |
-
-### Gestor (`manager/`)
-
-| Aspecto | Padrão |
-|---------|--------|
-| Fundo | `bg-background` (sistema light/dark) |
-| Inputs sobre fundo escuro | `bg-white/5 border-white/10` |
-| Texto | Tokens semânticos (`text-foreground`, `text-muted-foreground`) |
-| Acentos | teal (criar), sky (editar), rose (apagar) |
-| Fonte | Inter exclusivamente |
-| Radius padrão | `rounded-lg` |
-| Sombras | `shadow-xs` em inputs; `shadow-shape` em dialogs |
-
-### Troca de tema (dark mode)
-
-O dark mode é controlado pela classe `.dark` no `<html>`. Usar `next-themes` para gerenciar:
-
-```tsx
-// providers.tsx
-import { ThemeProvider } from 'next-themes'
-
-<ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-  {children}
-</ThemeProvider>
-```
-
----
-
-## 17. Animações
+## 15. Animações
 
 ### Transições de estado
 
 Todos os componentes interativos usam `transition-[color,box-shadow]` para suavizar hover e focus. Nunca usar `transition-all` — é muito custoso.
-
-```css
-/* Input, Select, Button base */
-transition-[color,box-shadow]
-```
 
 ### Animações de entrada (dialogs, popovers)
 
@@ -956,12 +704,11 @@ data-[state=open]:zoom-in-95
 
 ---
 
-## 18. Padrões de Composição
+## 16. Padrões de Composição
 
 ### Wrapper de campo de formulário
 
 ```tsx
-// Padrão consistente para qualquer campo
 <div className="space-y-1.5">
   <Label htmlFor="fieldId">
     Nome do campo {required && '*'}
@@ -973,10 +720,10 @@ data-[state=open]:zoom-in-95
     aria-describedby={error ? 'fieldId-error' : hint ? 'fieldId-hint' : undefined}
   />
   {hint && !error && (
-    <p id="fieldId-hint" className="text-xs text-muted-foreground">{hint}</p>
+    <p id="fieldId-hint" className="text-xs">{hint}</p>
   )}
   {error && (
-    <p id="fieldId-error" className="text-xs text-destructive">{error}</p>
+    <p id="fieldId-error" className="text-xs">{error}</p>
   )}
 </div>
 ```
@@ -989,7 +736,7 @@ data-[state=open]:zoom-in-95
 
 // Formulário com 2 colunas em tela larga
 <form className="grid gap-4 sm:grid-cols-2">
-  <div className="sm:col-span-2">  {/* campo full-width */}
+  <div className="sm:col-span-2">
     <Label>Título *</Label>
     <Input name="title" />
   </div>
@@ -1002,27 +749,6 @@ data-[state=open]:zoom-in-95
     <Input type="date" name="endDate" />
   </div>
 </form>
-```
-
-### Padrão de leitura de erro da API
-
-```typescript
-// src/lib/read-api-error.ts
-export async function readApiError(res: Response): Promise<string> {
-  try {
-    const json = await res.json()
-    return json.error ?? 'Erro desconhecido.'
-  } catch {
-    return 'Erro de comunicação com o servidor.'
-  }
-}
-
-// Uso em qualquer fetch mutation
-const res = await fetch('/api/resources', { method: 'POST', body: fd })
-if (!res.ok) {
-  toast.error(await readApiError(res))
-  return
-}
 ```
 
 ### Estado de loading em lista (skeleton)

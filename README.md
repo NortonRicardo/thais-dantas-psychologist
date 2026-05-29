@@ -1,6 +1,6 @@
-# LEMM
+# Thais Dantas
 
-Website institucional do laboratório LEMM com painel administrativo para gerenciamento de projetos, equipe, eventos e infraestrutura.
+Website institucional da psicóloga Thais Dantas com painel administrativo para gerenciamento de conteúdo.
 
 ## Tecnologias
 
@@ -26,7 +26,7 @@ Website institucional do laboratório LEMM com painel administrativo para gerenc
 
 ```sh
 git clone <url-do-repositório>
-cd lemm
+cd thais-dantas-psychologist
 ```
 
 ### 2. Configure as variáveis de ambiente
@@ -39,9 +39,9 @@ Os valores padrão do `.env.sample` já funcionam para desenvolvimento local sem
 
 | Variável             | Descrição                                        |
 | -------------------- | ------------------------------------------------ |
-| `POSTGRES_USER`      | Usuário do banco (padrão: `lemm`)                |
-| `POSTGRES_PASSWORD`  | Senha do banco (padrão: `lemm`)                  |
-| `POSTGRES_DB`        | Nome do banco (padrão: `lemm`)                   |
+| `POSTGRES_USER`      | Usuário do banco (padrão: `thais_dantas`)                |
+| `POSTGRES_PASSWORD`  | Senha do banco (padrão: `thais_dantas`)                  |
+| `POSTGRES_DB`        | Nome do banco (padrão: `thais_dantas`)                   |
 | `DATABASE_URL`       | String de conexão com o PostgreSQL               |
 | `BETTER_AUTH_SECRET` | Segredo da sessão — gere com `openssl rand -hex 32` |
 | `BETTER_AUTH_URL`    | URL pública da aplicação                         |
@@ -134,8 +134,8 @@ Crie o `.env` na raiz do projeto no servidor com valores de produção:
 ```env
 POSTGRES_USER=seu_usuario_db
 POSTGRES_PASSWORD=senha_forte_db
-POSTGRES_DB=lemm
-DATABASE_URL=postgres://seu_usuario_db:senha_forte_db@db:5432/lemm
+POSTGRES_DB=thais_dantas
+DATABASE_URL=postgres://seu_usuario_db:senha_forte_db@db:5432/thais_dantas
 BETTER_AUTH_SECRET=<saída de: openssl rand -hex 32>
 BETTER_AUTH_URL=https://seu-dominio.com
 ADMIN_USERNAME=seu_usuario

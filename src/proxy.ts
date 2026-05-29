@@ -34,11 +34,6 @@ export async function proxy(req: NextRequest) {
   // Passa direto: página de login
   if (pathname === '/manager/login') return NextResponse.next()
 
-  // Passa direto: mídia pública (imagens e PDFs exibidos nas páginas públicas)
-  // Apenas GET — POST/PUT/DELETE continuam exigindo autenticação
-  const PUBLIC_MEDIA = /^\/api\/(projects|team|events)\/[^/]+\/(image|photo|pdf)$/
-  if (req.method === 'GET' && PUBLIC_MEDIA.test(pathname)) return NextResponse.next()
-
   // Verifica sessão
   const { data: session } = await betterFetch<Session>('/api/auth/get-session', {
     baseURL: process.env.BETTER_AUTH_BASE_URL ?? req.nextUrl.origin,

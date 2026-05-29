@@ -1,92 +1,20 @@
-import { Orbitron } from 'next/font/google'
-
-import { cn } from '@/lib/utils'
-
-import { LabPublicHeader } from './lab-public-header'
-import { PlexusBackground } from './plexus-background'
-
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  variable: '--font-orbitron',
-})
-
-const fontOrbitron = '[font-family:var(--font-orbitron),sans-serif]'
+import { PublicFooter } from './public-footer'
+import { PublicHeader } from './public-header'
 
 export function LabLanding() {
   return (
-    <div
-      className={cn(
-        orbitron.variable,
-        'relative min-h-screen bg-[#050a0f] text-white'
-      )}
-    >
-      <section
-        className="relative isolate flex min-h-screen w-full flex-col justify-center bg-[radial-gradient(circle_at_left_center,rgba(0,212,255,0.08)_0%,transparent_40%),radial-gradient(circle_at_75%_50%,#002d5a_0%,#050a0f_65%)] px-[8%]"
-        aria-label="Introdução LEMM"
-      >
-        <PlexusBackground />
-        <div
-          className="pointer-events-none absolute inset-0 z-1 opacity-[0.07]"
-          style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-0 z-4 h-[40vh] w-full bg-linear-to-t from-black to-transparent"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute right-0 top-0 z-4 h-full w-[18vw] min-w-[120px] max-w-[240px] bg-linear-to-l from-black/45 to-transparent"
-          aria-hidden
-        />
-
-        <LabPublicHeader variant="absolute" />
-
-        <div className="relative z-6 max-w-[850px] pt-14 max-[900px]:pt-24 max-[600px]:pt-28">
-          <div className="mb-8 flex items-center gap-[15px] max-[600px]:gap-2">
-            <span className="h-0.5 w-[50px] shrink-0 bg-[#5aebff] max-[600px]:w-[24px]" />
-            <p
-              className={cn(
-                'text-center text-[0.9rem] font-bold tracking-[5px] text-[#5aebff] leading-[1.6]',
-                'max-[600px]:text-[0.7rem] max-[600px]:tracking-[2px]',
-                fontOrbitron
-              )}
-            >
-              LABORATÓRIO DE ESTATÍSTICA E<br />MODELAGEM MATEMÁTICA
-            </p>
-            <span className="h-0.5 w-[50px] shrink-0 bg-[#5aebff] max-[600px]:w-[24px]" />
-          </div>
-
-          <h1
-            className={cn(
-              'mb-8 w-full min-w-0 whitespace-normal font-black uppercase leading-[1.05] tracking-tight text-white lg:whitespace-nowrap',
-              'text-[clamp(1.65rem,5vw,3.75rem)] max-[900px]:text-[1.8rem]',
-              fontOrbitron
-            )}
-          >
-            CIÊNCIA QUE ANTECIPA.
-          </h1>
-
-          <div
-            className={cn(
-              'mb-6 flex items-center gap-3 text-xs font-normal uppercase tracking-[2px] text-white/55',
-              'before:flex-1 before:h-px before:bg-white/15 before:content-[""]',
-              'after:flex-1 after:h-px after:bg-white/15 after:content-[""]',
-              'sm:text-sm sm:tracking-[2.5px]',
-              fontOrbitron
-            )}
-          >
-            INOVAÇÃO QUE TRANSFORMA
-          </div>
-
-          <p className="max-w-136 text-[0.9375rem] font-normal leading-relaxed text-slate-300 antialiased sm:text-[1.0625rem] sm:leading-[1.75]">
-            Explorando a convergência entre clima, inteligência artificial,
-            modelagem matemática e computação de alto desempenho. No LEMM, a
-            ciência transforma dados em previsões, desafios em soluções e
-            conhecimento em impacto real.
-          </p>
-        </div>
-      </section>
+    <div className="flex min-h-screen flex-col bg-white text-neutral-900">
+      <PublicHeader />
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-6 pb-20">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          Thais Dantas
+        </h1>
+        <p className="mt-4 max-w-lg text-base leading-relaxed text-neutral-600 sm:text-lg">
+          Psicóloga. Atendimento com escuta qualificada, acolhimento e cuidado
+          em cada encontro.
+        </p>
+      </main>
+      <PublicFooter />
     </div>
   )
 }

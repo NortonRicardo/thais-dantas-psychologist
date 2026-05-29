@@ -1,10 +1,10 @@
-name: lemm
+name: thais-dantas
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: lemm
+    container_name: thais-dantas
     ports:
       - '3020:3020'
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: lemm-db
+    container_name: thais-dantas-db
     restart: unless-stopped
     env_file:
       - .env

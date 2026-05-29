@@ -1,23 +1,25 @@
-export const dynamic = 'force-dynamic'
-
 import type { Metadata } from 'next'
 
-import { PublicPageShell } from '../_components/public-page-shell'
+import { PublicShell } from '../_components/public-shell'
 import { ContatoSection } from './_components/contato-section'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
-  title: 'Contato | LEMM',
-  description:
-    'Entre em contato com o Laboratório de Estatística e Modelagem Matemática.',
+  title: 'Contato | Thais Dantas',
+  description: 'Entre em contato com Thais Dantas.',
 }
 
 export default function ContatoPage() {
   return (
-    <PublicPageShell
-      aria-label="Contato LEMM"
-      title="Contato"
-      lead="Canais oficiais do Laboratório de Estatística e Modelagem Matemática na PUC Goiás."
-      fullWidthContent={<ContatoSection />}
-    />
+    <PublicShell>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-6 pb-16">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Contato</h1>
+        <p className="mt-3 max-w-lg text-base text-neutral-600 sm:text-lg">
+          Canais para agendamento e informações.
+        </p>
+        <ContatoSection />
+      </main>
+    </PublicShell>
   )
 }

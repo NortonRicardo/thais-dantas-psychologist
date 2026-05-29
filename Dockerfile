@@ -1,5 +1,5 @@
 # syntax=docker.io/docker/dockerfile:1
-# Build de produção (output standalone). Use: docker build -t lemm .
+# Build de produção (output standalone). Use: docker build -t thais-dantas .
 
 FROM oven/bun:1-slim AS deps
 WORKDIR /app

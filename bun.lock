@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "lemm",
+      "name": "thais-dantas",
       "dependencies": {
         "@base-ui/react": "^1.2.0",
         "@radix-ui/react-avatar": "^1.1.11",

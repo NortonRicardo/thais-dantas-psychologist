@@ -26,7 +26,7 @@ export default function LoginPage() {
         setLoading(false)
         return
       }
-      router.replace('/manager')
+      router.replace('/manager/contato')
       // Mantém loading até a nova rota montar (evita flash do botão «Entrar»).
     } catch {
       toast.error('Erro ao autenticar.')
@@ -54,7 +54,7 @@ export default function LoginPage() {
             <Lock size={20} className="text-white/60" />
           </div>
           <div className="text-center">
-            <h1 className="text-lg font-semibold text-white/90">Gestor LEMM</h1>
+            <h1 className="text-lg font-semibold text-white/90">Gestor Thais Dantas</h1>
             <p className="mt-0.5 text-sm text-white/40">
               Entre com suas credenciais
             </p>
@@ -88,7 +88,7 @@ export default function LoginPage() {
             loading={loading}
             loadingLabel="Entrando…"
             disabled={loading || !username.trim() || !password}
-            className="mt-1 w-full rounded-lg border-0 bg-orange-800 px-4 py-2.5 text-sm font-medium text-orange-50 hover:bg-orange-700 disabled:opacity-50"
+            className="mt-1 w-full rounded-lg border-0 bg-emerald-800 px-4 py-2.5 text-sm font-medium text-emerald-50 hover:bg-emerald-700 disabled:opacity-50"
           >
             Entrar
           </Button>

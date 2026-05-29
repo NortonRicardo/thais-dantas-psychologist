@@ -1,8 +1,8 @@
-# Arquitetura — LEMM
+# Arquitetura — Thais Dantas
 
 **Última revisão:** 2026-05-15
 
-Website institucional do laboratório LEMM com painel administrativo para gerenciamento de projetos, equipe, eventos e infraestrutura.
+Website institucional da psicóloga Thais Dantas com painel administrativo para gerenciamento de conteúdo.
 
 > Para padrões de implementação, segurança e infraestrutura, ver [`doc/STANDARDS.md`](./STANDARDS.md).
 
@@ -23,7 +23,7 @@ Website institucional do laboratório LEMM com painel administrativo para gerenc
 
 ## 1. Visão Geral
 
-O LEMM é um monolito Next.js com duas faces:
+O projeto é um monolito Next.js com duas faces:
 
 | Face | Área | Acesso |
 |------|------|--------|
@@ -46,14 +46,14 @@ Cloudflare  (WAF + CDN)
 Coolify / Nginx  (TLS, reverse proxy → porta 3020)
     │
     ▼
-Docker: web (lemm)
+Docker: web (thais-dantas)
     ├── proxy.ts          ← autenticação + rate limit
     ├── (public)/*        ← Server Components — lê banco direto
     ├── manager/*         ← Client Components — consome /api/*
     └── api/*             ← Route Handlers (CRUD + uploads)
     │
     ▼
-Docker: db (lemm-db)
+Docker: db (thais-dantas-db)
     PostgreSQL 16 — rede interna, porta 5432 não exposta
 ```
 
@@ -191,7 +191,7 @@ developed_platforms
 collaboration_partners
 about_timeline_entries (date)
 
-contact_info           (registro único, FK director_member)
+contact_info           (registro único — URL do mapa)
   └── contact_channels (FK contact_info, sort_order)
 ```
 
@@ -268,10 +268,10 @@ auth_verification
 
 | Variável | Dev (`.env`) | Produção (Coolify) |
 |----------|-------------|-------------------|
-| `POSTGRES_USER` | `lemm` | usuário único |
-| `POSTGRES_PASSWORD` | `lemm` | `openssl rand -base64 24` |
-| `POSTGRES_DB` | `lemm` | `lemm` |
-| `DATABASE_URL` | `postgres://lemm:lemm@localhost:5432/lemm` | `postgres://user:pass@db:5432/lemm` |
+| `POSTGRES_USER` | `thais_dantas` | usuário único |
+| `POSTGRES_PASSWORD` | `thais_dantas` | `openssl rand -base64 24` |
+| `POSTGRES_DB` | `thais_dantas` | `thais_dantas` |
+| `DATABASE_URL` | `postgres://thais_dantas:thais_dantas@localhost:5432/thais_dantas` | `postgres://user:pass@db:5432/thais_dantas` |
 | `BETTER_AUTH_SECRET` | valor dev | `openssl rand -hex 32` |
 | `BETTER_AUTH_URL` | `http://localhost:3000` | `https://dominio.com` |
 | `ADMIN_USERNAME` | `admin` | valor escolhido |

@@ -1,10 +1,10 @@
-name: lemm
+name: thais-dantas
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: lemm
+    container_name: thais-dantas
     ports:
       - '3000:3000'
     volumes:
@@ -24,7 +24,7 @@ services:
     environment:
       NODE_ENV: development
       WATCHPACK_POLLING: 'true'
-      DATABASE_URL: postgres://lemm:lemm@db:5432/lemm
+      DATABASE_URL: postgres://thais_dantas:thais_dantas@db:5432/thais_dantas
     depends_on:
       db:
         condition: service_healthy
@@ -33,18 +33,18 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: lemm-db
+    container_name: thais-dantas-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: lemm
-      POSTGRES_PASSWORD: lemm
-      POSTGRES_DB: lemm
+      POSTGRES_USER: thais_dantas
+      POSTGRES_PASSWORD: thais_dantas
+      POSTGRES_DB: thais_dantas
     ports:
       - '5432:5432'
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U lemm -d lemm']
+      test: ['CMD-SHELL', 'pg_isready -U thais_dantas -d thais_dantas']
       interval: 5s
       timeout: 5s
       retries: 5

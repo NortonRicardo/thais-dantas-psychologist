@@ -1,1 +1,0 @@
-ALTER TABLE "hardware_modules" ALTER COLUMN "icon_key" SET DEFAULT '';

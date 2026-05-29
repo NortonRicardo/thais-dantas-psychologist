@@ -18,7 +18,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <header
           className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-2"
           style={{
-            background: '#071525',
+            background: '#071812',
             borderRadius: '0 0 1rem 1rem',
             boxShadow: headerShadow,
           }}
@@ -26,10 +26,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         >
           <div className="flex min-w-0 shrink-0 items-center justify-self-start">
             <Link
-              href="/manager"
+              href="/manager/contato"
               className="text-[1.125rem] font-semibold leading-7 text-[#e4e4e7] hover:text-white transition-colors"
             >
-              LEMM
+              Thais Dantas
             </Link>
           </div>
           <ManagerNav />

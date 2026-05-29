@@ -6,11 +6,10 @@ import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: {
-    default: 'LEMM | Laboratório de Pesquisa Avançada',
-    template: '%s | LEMM',
+    default: 'Thais Dantas',
+    template: '%s | Thais Dantas',
   },
-  description:
-    'Laboratório de pesquisa avançada em clima, IA e alta computação.',
+  description: 'Psicóloga Thais Dantas — atendimento psicológico.',
   icons: {
     icon: '/favicon.png',
     apple: '/favicon.png',
@@ -38,7 +37,7 @@ export default function RootLayout({
       className={`${inter.variable} ${cinzel.variable}`}
       suppressHydrationWarning
     >
-      <body className="antialiased">
+      <body className={`${inter.className} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

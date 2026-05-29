@@ -17,7 +17,6 @@ import {
   Send,
   Trash2,
   Twitter,
-  X,
   Youtube,
   Loader2,
   type LucideIcon,
@@ -25,7 +24,6 @@ import {
 import { toast } from 'sonner'
 
 import { FilterCombobox } from '@/components/filter-combobox'
-import { TeamMemberThumb } from '@/components/team-member-thumb'
 import { HttpsUrlSuffixField } from '@/components/https-url-suffix-field'
 import { Button } from '@/components/ui/button'
 import {
@@ -107,11 +105,7 @@ function channelValueIssue(
   value: string
 ): string | null {
   if (!label) return null
-  const trial = contactChannelPostSchema.safeParse({
-    label,
-    iconKey,
-    value,
-  })
+  const trial = contactChannelPostSchema.safeParse({ label, iconKey, value })
   if (trial.success) return null
   const vIssue = trial.error.issues.find(i => i.path[0] === 'value')
   return vIssue?.message ?? null
@@ -119,17 +113,7 @@ function channelValueIssue(
 
 type ContactData = {
   id: string
-  directorTeamMemberId: string | null
   mapUrl: string
-}
-
-type TeamMember = {
-  id: string
-  name: string
-  photoMimeType: string | null
-  updatedAt: string
-  /** false = oculto na equipe pública; ainda pode ser diretor em contatos. */
-  active: boolean
 }
 
 type Channel = {
@@ -139,190 +123,6 @@ type Channel = {
   value: string
   sortOrder: number
 }
-
-// ─── Director card ────────────────────────────────────────────────────────────
-
-function DirectorCard({
-  data,
-  teamMembers,
-  membersForPicker,
-  onSaved,
-}: {
-  data: ContactData
-  teamMembers: TeamMember[]
-  /** Opções da busca (ex.: apenas ativos + diretor atual se inativo). */
-  membersForPicker: TeamMember[]
-  onSaved: (updated: ContactData) => void
-}) {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [selectedId, setSelectedId] = useState<string>(
-    data.directorTeamMemberId ?? ''
-  )
-
-  function openModal() {
-    setSelectedId(data.directorTeamMemberId ?? '')
-    setModalOpen(true)
-  }
-
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault()
-    const parsed = contactInfoPutSchema.safeParse({
-      directorTeamMemberId: selectedId || null,
-      mapUrl: data.mapUrl,
-    })
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? 'Dados inválidos.')
-      return
-    }
-    setSaving(true)
-    try {
-      const res = await fetch('/api/contato', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed.data),
-      })
-      if (!res.ok) throw new Error()
-      const updated: ContactData = await res.json()
-      onSaved(updated)
-      setModalOpen(false)
-      toast.success('Diretor atualizado!')
-    } catch {
-      toast.error('Erro ao salvar.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const director = teamMembers.find(m => m.id === data.directorTeamMemberId)
-  const photoSrc = director?.photoMimeType
-    ? `/api/team/${director.id}/photo`
-    : null
-
-  const initials = director
-    ? director.name
-        .split(' ')
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(w => w[0].toUpperCase())
-        .join('')
-    : 'D'
-
-  return (
-    <>
-      <div
-        className="group relative flex flex-col items-center gap-3 rounded-xl px-4 py-5 text-center"
-        style={GLASS}
-      >
-        <button
-          type="button"
-          onClick={openModal}
-          className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full text-white/25 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-white/60"
-          title="Alterar diretor"
-        >
-          <Pencil size={11} />
-        </button>
-
-        <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 text-sm font-bold text-white/50">
-          {photoSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={photoSrc}
-              alt={director?.name}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            initials
-          )}
-        </span>
-
-        <div className="space-y-0.5">
-          <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">
-            Diretor
-          </p>
-          <p className="text-sm font-medium text-white/80">
-            {director?.name ?? (
-              <span className="italic text-white/30">Não selecionado</span>
-            )}
-          </p>
-        </div>
-      </div>
-
-      <Dialog open={modalOpen} onOpenChange={v => !v && setModalOpen(false)}>
-        <DialogContent
-          className="border-white/10 bg-[#18181b] text-white sm:max-w-sm"
-          onOpenAutoFocus={e => e.preventDefault()}
-        >
-          <DialogHeader>
-            <DialogTitle className="text-white/90">
-              Selecionar diretor
-            </DialogTitle>
-          </DialogHeader>
-
-          <form onSubmit={handleSave} className="space-y-4 pt-1">
-            <div className="grid gap-1.5">
-              <Label className="text-sm text-white/70">Membro da equipe</Label>
-              <FilterCombobox
-                value={selectedId}
-                onChange={setSelectedId}
-                placeholder="Buscar membro…"
-                clearLabel="Remover diretor"
-                showClear={!!selectedId}
-                options={membersForPicker.map(m => m.id)}
-                labelForValue={id => membersForPicker.find(m => m.id === id)?.name ?? ''}
-                width="w-full min-w-0"
-                renderOption={id => {
-                  const m = membersForPicker.find(r => r.id === id)
-                  const label = m?.name ?? id
-                  return (
-                    <span className="flex min-w-0 items-center gap-2">
-                      <TeamMemberThumb memberId={id} displayName={label} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={22} frameClassName="border-white/10 bg-white/5" />
-                      <span className="truncate" title={label}>{label}</span>
-                    </span>
-                  )
-                }}
-                renderValue={id => {
-                  const m = membersForPicker.find(r => r.id === id)
-                  const label = m?.name ?? ''
-                  return (
-                    <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                      <TeamMemberThumb memberId={id} displayName={label || id} photoMimeType={m?.photoMimeType ?? null} updatedAtIso={m?.updatedAt ?? null} sizePx={24} frameClassName="border-white/10 bg-white/5" />
-                      <span className="block min-w-0 flex-1 truncate" title={label || undefined}>{label}</span>
-                    </span>
-                  )
-                }}
-              />
-            </div>
-
-            <DialogFooter className="pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-white/50 hover:bg-white/5 hover:text-white"
-                onClick={() => setModalOpen(false)}
-                disabled={saving}
-              >
-                <X size={13} className="mr-1" /> Cancelar
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                loading={saving}
-                loadingLabel="A guardar…"
-                className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
-              >
-                Salvar
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
-
-// ─── Map card (fixed) ─────────────────────────────────────────────────────────
 
 function MapCard({
   data,
@@ -345,7 +145,6 @@ function MapCard({
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     const parsed = contactInfoPutSchema.safeParse({
-      directorTeamMemberId: data.directorTeamMemberId,
       mapUrl: toHttpsStored(mapUrlSuffix).trim(),
     })
     if (!parsed.success) {
@@ -457,8 +256,6 @@ function MapCard({
   )
 }
 
-// ─── Channel card ─────────────────────────────────────────────────────────────
-
 function ChannelCard({
   channel,
   onDeleted,
@@ -524,8 +321,6 @@ function ChannelCard({
   )
 }
 
-// ─── Add channel modal ────────────────────────────────────────────────────────
-
 function AddChannelModal({
   open,
   onClose,
@@ -564,11 +359,7 @@ function AddChannelModal({
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
-    const parsed = contactChannelPostSchema.safeParse({
-      label,
-      iconKey,
-      value,
-    })
+    const parsed = contactChannelPostSchema.safeParse({ label, iconKey, value })
     if (!parsed.success) {
       const msg =
         parsed.error.issues.find(i => i.path[0] === 'value')?.message ??
@@ -602,18 +393,18 @@ function AddChannelModal({
   }
 
   const placeholder: Record<string, string> = {
-    'E-mail': 'lemm@pucgoias.edu.br',
-    Telefone: '+55 62 3946-1000',
+    'E-mail': 'contato@thaisdantas.com.br',
+    Telefone: '+55 62 9 0000-0000',
     WhatsApp: '+55 62 9 0000-0000',
-    LinkedIn: 'https://linkedin.com/company/lemm',
-    Instagram: 'https://instagram.com/lemm',
-    GitHub: 'https://github.com/lemm',
-    YouTube: 'https://youtube.com/@lemm',
-    'Twitter / X': 'https://x.com/lemm',
-    Facebook: 'https://facebook.com/lemm',
-    Site: 'https://lemm.pucgoias.edu.br',
-    Telegram: 'https://t.me/lemm',
-    Localização: 'Área III — PUC Goiás, Goiânia, GO',
+    LinkedIn: 'https://linkedin.com/in/thaisdantas',
+    Instagram: 'https://instagram.com/thaisdantas',
+    GitHub: 'https://github.com/thaisdantas',
+    YouTube: 'https://youtube.com/@thaisdantas',
+    'Twitter / X': 'https://x.com/thaisdantas',
+    Facebook: 'https://facebook.com/thaisdantas',
+    Site: 'https://thaisdantas.com.br',
+    Telegram: 'https://t.me/thaisdantas',
+    Localização: 'Endereço ou referência',
     Outro: 'Descrição livre',
   }
 
@@ -643,7 +434,10 @@ function AddChannelModal({
                 const Icon = t ? (ICON_MAP[t.icon] ?? Link) : Link
                 return (
                   <span className="flex items-center gap-2">
-                    {createElement(Icon, { size: 14, className: 'shrink-0 opacity-70' })}
+                    {createElement(Icon, {
+                      size: 14,
+                      className: 'shrink-0 opacity-70',
+                    })}
                     {l}
                   </span>
                 )
@@ -653,7 +447,10 @@ function AddChannelModal({
                 const Icon = t ? (ICON_MAP[t.icon] ?? Link) : Link
                 return (
                   <span className="flex min-w-0 flex-1 items-center gap-2">
-                    {createElement(Icon, { size: 14, className: 'shrink-0 opacity-70' })}
+                    {createElement(Icon, {
+                      size: 14,
+                      className: 'shrink-0 opacity-70',
+                    })}
                     <span className="truncate">{l}</span>
                   </span>
                 )
@@ -682,8 +479,7 @@ function AddChannelModal({
                     className: 'shrink-0 text-white/70',
                   })}
                   <span className="truncate text-sm">
-                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ??
-                      iconKey}
+                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ?? iconKey}
                   </span>
                 </>
               ) : (
@@ -737,48 +533,23 @@ function AddChannelModal({
   )
 }
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
-
 export function ContatoWorkspace() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ContactData | null>(null)
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [channels, setChannels] = useState<Channel[]>([])
   const [modalOpen, setModalOpen] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [infoRes, channelsRes, teamRes] = await Promise.all([
+      const [infoRes, channelsRes] = await Promise.all([
         fetch('/api/contato'),
         fetch('/api/contato/channels'),
-        fetch('/api/team'),
       ])
       const info = await infoRes.json()
       const chs = await channelsRes.json()
-      const team = await teamRes.json()
       setData(info)
       setChannels(Array.isArray(chs) ? chs : [])
-      setTeamMembers(
-        Array.isArray(team)
-          ? team.map(
-              (m: {
-                id: string
-                name: string
-                displayName?: string
-                photoMimeType: string | null
-                updatedAt?: string
-                active?: boolean
-              }) => ({
-                id: m.id,
-                name: m.displayName ?? m.name,
-                photoMimeType: m.photoMimeType,
-                updatedAt: m.updatedAt ?? '',
-                active: m.active !== false,
-              })
-            )
-          : []
-      )
     } catch {
       toast.error('Erro ao carregar informações de contato.')
     } finally {
@@ -792,53 +563,72 @@ export function ContatoWorkspace() {
 
   return (
     <>
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-white/90">Contato</h1>
-          <p className="mt-0.5 text-sm text-white/40">
-            Informações do diretor e canais públicos de contato.
-          </p>
-        </div>
-        <Button
-          type="button"
-          size="sm"
-          className="shrink-0 gap-1.5 border-0 bg-orange-800 text-orange-50 hover:bg-orange-700"
-          onClick={() => setModalOpen(true)}
-          disabled={loading}
-        >
-          <Plus size={14} /> Contato
-        </Button>
+      <div className="mb-8">
+        <h1 className="text-xl font-semibold text-white/90">Contato</h1>
+        <p className="mt-0.5 text-sm text-white/40">
+          Mapa e canais exibidos na página pública.
+        </p>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[140px] rounded-xl bg-white/10" />
-          ))}
+        <div className="space-y-8">
+          <Skeleton className="h-[140px] w-full max-w-md rounded-xl bg-white/10" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-[140px] rounded-xl bg-white/10" />
+            ))}
+          </div>
         </div>
       ) : data ? (
-        <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          <DirectorCard
-            data={data}
-            teamMembers={teamMembers}
-            membersForPicker={teamMembers.filter(
-              m =>
-                m.active ||
-                (data.directorTeamMemberId != null &&
-                  m.id === data.directorTeamMemberId)
+        <div className="space-y-10">
+          <section aria-labelledby="contato-mapa-heading">
+            <h2
+              id="contato-mapa-heading"
+              className="mb-4 text-sm font-medium uppercase tracking-[2px] text-white/45"
+            >
+              Mapa
+            </h2>
+            <div className="max-w-sm">
+              <MapCard data={data} onSaved={setData} />
+            </div>
+          </section>
+
+          <section aria-labelledby="contato-canais-heading">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <h2
+                id="contato-canais-heading"
+                className="text-sm font-medium uppercase tracking-[2px] text-white/45"
+              >
+                Canais de contato
+              </h2>
+              <Button
+                type="button"
+                size="sm"
+                className="shrink-0 gap-1.5 border-0 bg-orange-800 text-orange-50 hover:bg-orange-700"
+                onClick={() => setModalOpen(true)}
+              >
+                <Plus size={14} /> Adicionar canal
+              </Button>
+            </div>
+            {channels.length > 0 ? (
+              <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {channels.map(ch => (
+                  <ChannelCard
+                    key={ch.id}
+                    channel={ch}
+                    onDeleted={id =>
+                      setChannels(prev => prev.filter(c => c.id !== id))
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-white/35">
+                Nenhum canal cadastrado. Use &quot;Adicionar canal&quot; para
+                incluir e-mail, telefone ou redes sociais.
+              </p>
             )}
-            onSaved={setData}
-          />
-          <MapCard data={data} onSaved={setData} />
-          {channels.map(ch => (
-            <ChannelCard
-              key={ch.id}
-              channel={ch}
-              onDeleted={id =>
-                setChannels(prev => prev.filter(c => c.id !== id))
-              }
-            />
-          ))}
+          </section>
         </div>
       ) : null}
 

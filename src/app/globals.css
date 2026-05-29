@@ -4,15 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@keyframes lemm-orbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -52,46 +43,10 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --animate-lemm-orbit: lemm-orbit 12s linear infinite;
 }
 @layer utilities {
   .shadow-shape {
     @apply shadow-[0px_8px_8px_rgba(0,0,0,0.1),0px_4px_4px_rgba(0,0,0,0.1),0px_2px_2px_rgba(0,0,0,0.1),0px_0px_0px_1px_rgba(0,0,0,0.1),inset_0px_0px_0px_1px_rgba(255,255,255,0.03),inset_0px_1px_0px_rgba(255,255,255,0.03)];
-  }
-
-  .shadow-rounded {
-    @apply shadow-[0px_6px_10px_rgba(0,0,0,0.1),0px_2px_6px_rgba(0,0,0,0.1),inset_0px_1px_2px_rgba(255,255,255,0.03)];
-  }
-
-  .bg-chess {
-    background-image: url('/bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
-  .font-brand-title {
-    font-family: var(--font-cinzel), serif;
-    font-weight: 700;
-  }
-
-  .font-brand-subtitle {
-    font-family: var(--font-cinzel), serif;
-    font-weight: 400;
-  }
-
-  .bg-grid {
-    background-size: 40px 40px;
-    background-image:
-      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-  }
-
-  .bg-grid-gray {
-    background-size: 40px 40px;
-    background-image:
-      linear-gradient(to right, rgba(40, 36, 36, 0.28) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(40, 36, 36, 0.28) 1px, transparent 1px);
   }
 
   /**
@@ -202,17 +157,6 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
