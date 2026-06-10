@@ -40,7 +40,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
 function getHref(label: string, value: string): string {
   const l = label.toLowerCase()
   if (l === 'e-mail') return `mailto:${value}`
-  if (l === 'telefone' || l === 'whatsapp') return `tel:${value.replace(/\D/g, '')}`
+  if (l === 'telefone' || l === 'whatsapp')
+    return `tel:${value.replace(/\D/g, '')}`
   return value.startsWith('http') ? value : `https://${value}`
 }
 
@@ -61,7 +62,10 @@ const getData = unstable_cache(
           .select()
           .from(contactChannels)
           .where(eq(contactChannels.contactInfoId, info.id))
-          .orderBy(asc(contactChannels.sortOrder), asc(contactChannels.createdAt))
+          .orderBy(
+            asc(contactChannels.sortOrder),
+            asc(contactChannels.createdAt)
+          )
       : []
 
     return { info, channels }
@@ -99,7 +103,11 @@ export async function ContatoSection() {
                   <a
                     href={href}
                     target={href.startsWith('http') ? '_blank' : undefined}
-                    rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    rel={
+                      href.startsWith('http')
+                        ? 'noopener noreferrer'
+                        : undefined
+                    }
                     className="flex h-full flex-col gap-3 rounded-lg border border-neutral-200 p-5 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
                   >
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">

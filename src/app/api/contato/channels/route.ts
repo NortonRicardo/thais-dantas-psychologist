@@ -5,7 +5,6 @@ import { db } from '@/lib/db'
 import { contactChannels } from '@/lib/db/schema'
 import { contactChannelPostSchema } from '@/lib/validation/contato-api'
 import { validationErrorResponse } from '@/lib/validation/api'
-import { compactContactChannelSortOrders } from '@/lib/db/contact-channel-order'
 import { getOrCreateContactInfo } from '../route'
 
 export async function GET() {

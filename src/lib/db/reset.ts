@@ -3,7 +3,7 @@ import postgres from 'postgres'
 const client = postgres(process.env.DATABASE_URL!, { max: 1 })
 
 async function reset() {
-  console.log('Resetting database...')
+  console.warn('Resetting database...')
   await client.unsafe(`
     DO $$ DECLARE r RECORD;
     BEGIN
@@ -13,11 +13,11 @@ async function reset() {
     END $$;
   `)
   await client.unsafe(`DROP SCHEMA IF EXISTS drizzle CASCADE;`)
-  console.log('Database reset complete.')
+  console.warn('Database reset complete.')
   await client.end()
 }
 
-reset().catch((err) => {
+reset().catch(err => {
   console.error(err)
   process.exit(1)
 })

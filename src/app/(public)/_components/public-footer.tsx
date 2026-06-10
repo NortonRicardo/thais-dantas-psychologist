@@ -16,10 +16,7 @@ export function PublicFooter(_props: PublicFooterProps = {}) {
           <span className="text-neutral-500"> — Psicóloga</span>
         </p>
 
-        <nav
-          className="flex gap-6 text-sm"
-          aria-label="Rodapé"
-        >
+        <nav className="flex gap-6 text-sm" aria-label="Rodapé">
           <Link href="/" className="transition-colors hover:text-neutral-900">
             Início
           </Link>

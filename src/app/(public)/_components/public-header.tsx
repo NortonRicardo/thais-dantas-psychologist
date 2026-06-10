@@ -11,14 +11,16 @@ export function PublicHeader() {
 
   return (
     <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-8">
-      <Link href="/" className="text-lg font-bold tracking-tight text-neutral-900">
+      <Link
+        href="/"
+        className="text-lg font-bold tracking-tight text-neutral-900"
+      >
         Thais Dantas
       </Link>
       <nav aria-label="Navegação principal">
         <ul className="flex list-none gap-6 p-0">
           {labNavItems.map(({ href, label }) => {
-            const active =
-              pathname === href || pathname.startsWith(`${href}/`)
+            const active = pathname === href || pathname.startsWith(`${href}/`)
             return (
               <li key={label}>
                 <Link

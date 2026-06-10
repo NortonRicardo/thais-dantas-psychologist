@@ -4,9 +4,24 @@ import { authUsers, contactChannels, contactInfo } from './schema'
 import { auth } from '@/lib/auth'
 
 const seedChannels = [
-  { label: 'E-mail', iconKey: 'mail', value: 'contato@thaisdantas.com.br', sortOrder: 0 },
-  { label: 'WhatsApp', iconKey: 'message-circle', value: '+55 62 9 0000-0000', sortOrder: 1 },
-  { label: 'Instagram', iconKey: 'instagram', value: 'https://instagram.com/thaisdantas', sortOrder: 2 },
+  {
+    label: 'E-mail',
+    iconKey: 'mail',
+    value: 'contato@thaisdantas.com.br',
+    sortOrder: 0,
+  },
+  {
+    label: 'WhatsApp',
+    iconKey: 'message-circle',
+    value: '+55 62 9 0000-0000',
+    sortOrder: 1,
+  },
+  {
+    label: 'Instagram',
+    iconKey: 'instagram',
+    value: 'https://instagram.com/thaisdantas',
+    sortOrder: 2,
+  },
 ] as const
 
 async function main() {

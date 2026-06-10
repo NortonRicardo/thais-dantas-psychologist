@@ -36,9 +36,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: 'standalone',
   async headers() {
-    return [
-      { source: '/(.*)', headers: securityHeaders },
-    ]
+    return [{ source: '/(.*)', headers: securityHeaders }]
   },
   images: {
     qualities: [75, 85],

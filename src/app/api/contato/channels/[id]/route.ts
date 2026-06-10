@@ -24,7 +24,10 @@ export async function DELETE(
       .returning({ contactInfoId: contactChannels.contactInfoId })
 
     if (!removed) {
-      return NextResponse.json({ error: 'Canal não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Canal não encontrado' },
+        { status: 404 }
+      )
     }
 
     await compactContactChannelSortOrders(removed.contactInfoId)
@@ -32,6 +35,9 @@ export async function DELETE(
     return new NextResponse(null, { status: 204 })
   } catch (err) {
     console.error('[DELETE /api/contato/channels/:id]', err)
-    return NextResponse.json({ error: 'Erro ao remover canal' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao remover canal' },
+      { status: 500 }
+    )
   }
 }

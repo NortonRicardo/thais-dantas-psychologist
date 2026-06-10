@@ -54,7 +54,9 @@ export default function LoginPage() {
             <Lock size={20} className="text-white/60" />
           </div>
           <div className="text-center">
-            <h1 className="text-lg font-semibold text-white/90">Gestor Thais Dantas</h1>
+            <h1 className="text-lg font-semibold text-white/90">
+              Gestor Thais Dantas
+            </h1>
             <p className="mt-0.5 text-sm text-white/40">
               Entre com suas credenciais
             </p>

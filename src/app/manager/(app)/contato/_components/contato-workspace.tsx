@@ -479,7 +479,8 @@ function AddChannelModal({
                     className: 'shrink-0 text-white/70',
                   })}
                   <span className="truncate text-sm">
-                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ?? iconKey}
+                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ??
+                      iconKey}
                   </span>
                 </>
               ) : (

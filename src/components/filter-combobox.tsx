@@ -136,7 +136,9 @@ export function FilterCombobox({
                 onClick={() => select(opt)}
                 className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors ${value === opt ? 'bg-white/10 text-white/90' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
               >
-                {renderOption ? renderOption(opt) : (labelForValue?.(opt) ?? opt)}
+                {renderOption
+                  ? renderOption(opt)
+                  : (labelForValue?.(opt) ?? opt)}
               </button>
             ))}
           </div>

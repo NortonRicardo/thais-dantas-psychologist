@@ -9,7 +9,6 @@ export function LabLanding() {
     <div className="text-[#2D2D2D]">
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative flex min-h-svh flex-col overflow-hidden bg-[#B8AEA4]">
-
         {/* Nav */}
         <header className="relative z-30 px-5 py-6 sm:px-10 sm:py-8">
           <div className="mx-auto flex max-w-7xl items-center justify-between">
@@ -76,7 +75,6 @@ export function LabLanding() {
         {/* Bottom bar */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-6 pb-7 sm:px-10 sm:pb-9">
           <div className="pointer-events-auto mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-end gap-6">
-
             {/* Stats – bottom left */}
             <div className="hidden flex-col gap-1.5 lg:flex">
               <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/75">
@@ -120,7 +118,6 @@ export function LabLanding() {
 
       {/* ── CONTENT SECTIONS ─────────────────────────────────────────────── */}
       <div className="bg-[#F4F0EA]">
-
         <section
           id="sobre"
           className="scroll-mt-20 border-t border-[#B8AEA4]/30 px-6 py-24 sm:px-10"
