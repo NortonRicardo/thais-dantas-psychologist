@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { homeNavItems } from '../_constants/home-nav-items'
+import { WHATSAPP_BOOKING_URL } from '../_constants/contact-links'
 
 export function LabLanding() {
   return (
@@ -11,15 +12,21 @@ export function LabLanding() {
       <section className="relative flex min-h-svh flex-col overflow-hidden bg-[#B8AEA4]">
         {/* Nav */}
         <header className="relative z-30 px-5 py-6 sm:px-10 sm:py-8">
-          <div className="mx-auto flex max-w-7xl items-center justify-between">
-            {/* Nav — pill próprio que funde para transparente no lado direito */}
+          <div className="mx-auto flex max-w-7xl items-center gap-4 sm:gap-5">
             <nav
               aria-label="Navegação principal"
-              className="mr-5 flex-1 rounded-full bg-[linear-gradient(to_right,rgba(255,255,255,0.18),rgba(255,255,255,0.18)_45%,rgba(255,255,255,0.12)_60%,rgba(255,255,255,0.06)_75%,rgba(255,255,255,0.02)_88%,transparent)] px-6 py-2.5 backdrop-blur-sm sm:px-8 sm:py-3"
+              className="relative flex min-w-0 flex-1 items-center rounded-full bg-[linear-gradient(to_right,rgba(255,255,255,0.18),rgba(255,255,255,0.18)_45%,rgba(255,255,255,0.12)_60%,rgba(255,255,255,0.06)_75%,rgba(255,255,255,0.02)_88%,transparent)] py-2.5 pl-5 pr-3 backdrop-blur-sm sm:py-3 sm:pl-8 sm:pr-4"
             >
-              <ul className="flex list-none gap-x-5 p-0 sm:gap-x-8">
+              <Link
+                href="/"
+                className="relative z-10 shrink-0 font-[family-name:var(--font-cinzel)] text-sm font-medium tracking-wide text-white transition-colors hover:text-white/90 sm:text-base"
+              >
+                Thais Dantas
+              </Link>
+
+              <ul className="pointer-events-none absolute inset-0 flex list-none items-center justify-center gap-x-4 p-0 sm:gap-x-8">
                 {homeNavItems.map(({ href, label }) => (
-                  <li key={label}>
+                  <li key={label} className="pointer-events-auto">
                     <Link
                       href={href}
                       className="text-sm font-medium text-white/80 transition-colors hover:text-white"
@@ -31,34 +38,16 @@ export function LabLanding() {
               </ul>
             </nav>
 
-            {/* Botão — elemento separado, sem nenhum container compartilhado */}
-            <Link
-              href="/contato"
+            <a
+              href={WHATSAPP_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="shrink-0 rounded-full bg-white/95 px-4 py-2 text-sm font-medium text-[#7A6E65] shadow-sm transition-colors hover:bg-white sm:px-6 sm:py-2.5"
             >
               Agendar horário
-            </Link>
+            </a>
           </div>
         </header>
-
-        {/* Background display text */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 flex flex-col justify-between overflow-hidden px-6 py-16 sm:px-10 sm:py-20"
-        >
-          <span
-            className="mt-[5%] select-none self-start font-[family-name:var(--font-cinzel)] font-light italic leading-none tracking-tight text-[#C5BDB7]/50"
-            style={{ fontSize: 'clamp(60px, 11vw, 180px)' }}
-          >
-            Thais
-          </span>
-          <span
-            className="mb-[5%] select-none self-end font-[family-name:var(--font-cinzel)] font-light italic leading-none tracking-tight text-[#C5BDB7]/50"
-            style={{ fontSize: 'clamp(60px, 11vw, 180px)' }}
-          >
-            Dantas
-          </span>
-        </div>
 
         {/* Chair image */}
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-8 pb-36 pt-24 sm:pb-32 sm:pt-20">
@@ -163,13 +152,15 @@ export function LabLanding() {
               Atendimentos online ou presenciais, com horários combinados
               previamente. Para agendar ou tirar dúvidas, entre em contato.
             </p>
-            <Link
-              href="/contato"
+            <a
+              href={WHATSAPP_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#B8AEA4] px-6 py-3 text-sm font-medium text-[#7A6E65] transition-colors hover:bg-[#B8AEA4]/10"
             >
               Agendar uma consulta
               <ArrowRight className="size-3.5" strokeWidth={2} />
-            </Link>
+            </a>
           </div>
         </section>
       </div>
