@@ -50,15 +50,26 @@ export function LabLanding() {
         </header>
 
         {/* Chair image */}
-        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-8 pb-36 pt-24 sm:pb-32 sm:pt-20">
-          <Image
-            src="/chair.png"
-            alt="Consultório com duas cadeiras e mesa de apoio"
-            width={960}
-            height={640}
-            priority
-            className="h-auto w-full max-w-lg object-contain brightness-75 sm:max-w-xl lg:max-w-2xl"
+        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-8 pb-28 pt-36 sm:pb-24 sm:pt-40 lg:pt-44">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-[66%] z-[5] h-[26%] w-full bg-[radial-gradient(ellipse_100%_55%_at_50%_30%,rgba(32,28,24,0)_0%,rgba(32,28,24,0.03)_15%,rgba(32,28,24,0.08)_35%,rgba(32,28,24,0.11)_50%,rgba(32,28,24,0.04)_68%,transparent_85%)] blur-md sm:top-[67%] sm:h-[28%]"
           />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-[73%] z-[5] h-[22%] w-full bg-[radial-gradient(ellipse_100%_48%_at_50%_28%,rgba(32,28,24,0)_0%,rgba(32,28,24,0.02)_18%,rgba(32,28,24,0.07)_42%,rgba(32,28,24,0.03)_62%,transparent_80%)] blur-md sm:top-[74%] sm:h-[24%]"
+          />
+
+          <div className="relative z-10 w-full max-w-xl translate-y-4 sm:max-w-2xl sm:translate-y-6 lg:max-w-4xl lg:translate-y-8 xl:max-w-5xl">
+            <Image
+              src="/chair.png"
+              alt="Consultório com duas cadeiras e mesa de apoio"
+              width={960}
+              height={640}
+              priority
+              className="relative z-10 h-auto w-full object-contain brightness-75"
+            />
+          </div>
         </div>
 
         {/* Bottom bar */}
@@ -78,7 +89,7 @@ export function LabLanding() {
             </div>
 
             {/* Description – bottom center */}
-            <p className="text-center text-[10px] font-medium uppercase leading-loose tracking-[0.18em] text-white/80 sm:text-[11px]">
+            <p className="text-center text-[12px] font-medium uppercase leading-loose tracking-[0.18em] text-white/80 sm:text-[13px]">
               Um espaço calmo e livre de julgamentos para trabalhar ansiedade,
               esgotamento, relacionamentos e autoestima.{' '}
               <br className="hidden sm:block" />
