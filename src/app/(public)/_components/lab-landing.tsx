@@ -82,6 +82,27 @@ export function LabLanding() {
           </div>
         </div>
 
+        {/* Topics – 3 columns, above description */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-[13%] z-30 hidden px-6 sm:px-10 lg:block">
+          <div className="mx-auto flex max-w-3xl justify-between">
+            <div className="flex flex-col gap-1">
+              {['Obesidade', 'Emagrecimento'].map((t) => (
+                <p key={t} className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">{t}</p>
+              ))}
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              {['Terapia Cognitivo Comportamental', 'Endometriose'].map((t) => (
+                <p key={t} className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">{t}</p>
+              ))}
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              {['Cirurgia Bariátrica', 'Transtornos Alimentares'].map((t) => (
+                <p key={t} className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">{t}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Bottom bar */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-6 pb-7 sm:px-10 sm:pb-9">
           <div className="pointer-events-auto relative mx-auto flex max-w-7xl items-end">
@@ -91,7 +112,7 @@ export function LabLanding() {
               <span className="block">Sessões online ou presenciais, com acompanhamento personalizado.</span>
             </p>
 
-            {/* More – bottom right */}
+            {/* More – mobile only */}
             <div className="pointer-events-auto ml-auto flex items-center gap-2.5">
               <Link
                 href="#sobre"
@@ -126,6 +147,46 @@ export function LabLanding() {
               e acolhedor. Cada encontro é conduzido com escuta qualificada,
               respeito ao seu ritmo e foco no que faz sentido para você.
             </p>
+          </div>
+        </section>
+
+        <section
+          id="especialidades"
+          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
+        >
+          <div className="mx-auto max-w-5xl">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
+              Especialidades
+            </span>
+            <div className="mt-10 grid grid-cols-1 gap-px sm:grid-cols-[1fr_1px_1fr]">
+              <div className="flex flex-col">
+                <span className="mb-6 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]/50">
+                  Saúde & Corpo
+                </span>
+                {['Obesidade', 'Emagrecimento', 'Cirurgia Bariátrica', 'Endometriose'].map((t) => (
+                  <p
+                    key={t}
+                    className="border-t border-[#556040]/15 py-5 text-xl text-[#2D2D2D]/80"
+                  >
+                    {t}
+                  </p>
+                ))}
+              </div>
+              <div className="hidden bg-[#556040]/15 sm:block" />
+              <div className="mt-12 flex flex-col sm:mt-0 sm:pl-16">
+                <span className="mb-6 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]/50">
+                  Abordagem
+                </span>
+                {['Transtornos Alimentares', 'Terapia Cognitivo Comportamental'].map((t) => (
+                  <p
+                    key={t}
+                    className="border-t border-[#556040]/15 py-5 text-xl text-[#2D2D2D]/80"
+                  >
+                    {t}
+                  </p>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
