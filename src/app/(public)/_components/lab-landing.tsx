@@ -12,6 +12,20 @@ export function LabLanding() {
       <section className="relative flex min-h-svh flex-col overflow-hidden bg-[#556040]">
         {/* Nav */}
         <header className="relative z-30 px-5 py-6 sm:px-10 sm:py-8">
+          <div className="absolute top-full inset-x-0 px-5 pt-5 sm:px-10 sm:pt-6">
+            <div className="mx-auto flex max-w-7xl justify-between">
+              <div className="flex flex-col items-start gap-0.5">
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Artigos & Reflexões</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Saúde Mental no Dia a Dia</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Publicações em Breve</p>
+              </div>
+              <div className="flex flex-col items-end gap-0.5">
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Psicóloga CRP registrada</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Atendimento online e presencial</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Sessões sigilosas</p>
+              </div>
+            </div>
+          </div>
           <div className="mx-auto flex max-w-7xl items-center gap-4 sm:gap-5">
             <nav
               aria-label="Navegação principal"
@@ -70,30 +84,15 @@ export function LabLanding() {
 
         {/* Bottom bar */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-6 pb-7 sm:px-10 sm:pb-9">
-          <div className="pointer-events-auto mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-end gap-6">
-            {/* Stats – bottom left */}
-            <div className="hidden flex-col gap-1.5 lg:flex">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/75">
-                Psicóloga CRP registrada
-              </p>
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/75">
-                Atendimento online e presencial
-              </p>
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/75">
-                Sessões sigilosas
-              </p>
-            </div>
-
-            {/* Description – bottom center */}
-            <p className="text-center text-[12px] font-medium uppercase leading-loose tracking-[0.18em] text-white/80 sm:text-[13px]">
-              Um espaço calmo e livre de julgamentos para trabalhar ansiedade,
-              esgotamento, relacionamentos e autoestima.{' '}
-              <br className="hidden sm:block" />
-              Sessões online ou presenciais, com acompanhamento personalizado.
+          <div className="pointer-events-auto relative mx-auto flex max-w-7xl items-end">
+            {/* Description – centered absolutely */}
+            <p className="pointer-events-none absolute inset-x-0 bottom-0 mx-auto max-w-[1100px] text-center text-[10px] font-medium uppercase leading-loose tracking-[0.18em] text-white/80 sm:text-[11px]">
+              <span className="block">Um espaço calmo e livre de julgamentos para trabalhar ansiedade, esgotamento, relacionamentos e autoestima.</span>
+              <span className="block">Sessões online ou presenciais, com acompanhamento personalizado.</span>
             </p>
 
             {/* More – bottom right */}
-            <div className="flex items-center gap-2.5">
+            <div className="pointer-events-auto ml-auto flex items-center gap-2.5">
               <Link
                 href="#sobre"
                 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80 transition-opacity hover:opacity-100"
