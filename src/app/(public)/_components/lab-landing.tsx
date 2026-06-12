@@ -9,7 +9,7 @@ export function LabLanding() {
   return (
     <div className="text-[#2D2D2D]">
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative flex min-h-svh flex-col overflow-hidden bg-[#6B7A50]">
+      <section className="relative flex min-h-svh flex-col overflow-hidden bg-[#556040]">
         {/* Nav */}
         <header className="relative z-30 px-5 py-6 sm:px-10 sm:py-8">
           <div className="mx-auto flex max-w-7xl items-center gap-4 sm:gap-5">
@@ -42,7 +42,7 @@ export function LabLanding() {
               href={WHATSAPP_BOOKING_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 rounded-full bg-white/95 px-4 py-2 text-sm font-medium text-[#4A5530] shadow-sm transition-colors hover:bg-white sm:px-6 sm:py-2.5"
+              className="shrink-0 rounded-full bg-white/95 px-4 py-2 text-sm font-medium text-[#3A4424] shadow-sm transition-colors hover:bg-white sm:px-6 sm:py-2.5"
             >
               Agendar horário
             </a>
@@ -113,13 +113,13 @@ export function LabLanding() {
       </section>
 
       {/* ── CONTENT SECTIONS ─────────────────────────────────────────────── */}
-      <div className="bg-[#E2E8CC]">
+      <div className="bg-[#D4DCBA]">
         <section
           id="sobre"
-          className="scroll-mt-20 border-t border-[#6B7A50]/30 px-6 py-24 sm:px-10"
+          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
         >
           <div className="mx-auto max-w-3xl">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#6B7A50]">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
               Sobre
             </span>
             <p className="mt-5 text-xl leading-relaxed text-[#2D2D2D]/90 sm:text-2xl sm:leading-relaxed">
@@ -132,10 +132,10 @@ export function LabLanding() {
 
         <section
           id="terapia"
-          className="scroll-mt-20 border-t border-[#6B7A50]/30 px-6 py-24 sm:px-10"
+          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
         >
           <div className="mx-auto max-w-3xl">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#6B7A50]">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
               Terapia
             </span>
             <p className="mt-5 text-xl leading-relaxed text-[#2D2D2D]/90 sm:text-2xl sm:leading-relaxed">
@@ -149,10 +149,10 @@ export function LabLanding() {
 
         <section
           id="consultas"
-          className="scroll-mt-20 border-t border-[#6B7A50]/30 px-6 py-24 sm:px-10"
+          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
         >
           <div className="mx-auto max-w-3xl">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#6B7A50]">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
               Consultas
             </span>
             <p className="mt-5 text-xl leading-relaxed text-[#2D2D2D]/90 sm:text-2xl sm:leading-relaxed">
@@ -163,7 +163,7 @@ export function LabLanding() {
               href={WHATSAPP_BOOKING_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#6B7A50] px-6 py-3 text-sm font-medium text-[#4A5530] transition-colors hover:bg-[#6B7A50]/10"
+              className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#556040] px-6 py-3 text-sm font-medium text-[#3A4424] transition-colors hover:bg-[#556040]/10"
             >
               Agendar uma consulta
               <ArrowRight className="size-3.5" strokeWidth={2} />
