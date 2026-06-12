@@ -82,22 +82,22 @@ export function LabLanding() {
           </div>
         </div>
 
-        {/* Topics – 3 columns, above description */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-[13%] z-30 hidden px-6 sm:px-10 lg:block">
-          <div className="mx-auto flex max-w-3xl justify-between">
+        {/* Topics – 3 columns, above chair */}
+        <div className="pointer-events-none absolute inset-x-0 top-[32%] z-30 hidden px-6 sm:px-10 lg:block">
+          <div className="mx-auto flex max-w-5xl justify-between">
             <div className="flex flex-col gap-1">
               {['Obesidade', 'Emagrecimento'].map((t) => (
-                <p key={t} className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">{t}</p>
+                <p key={t} className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/30">{t}</p>
               ))}
             </div>
             <div className="flex flex-col items-center gap-1">
-              {['Terapia Cognitivo Comportamental', 'Endometriose'].map((t) => (
-                <p key={t} className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">{t}</p>
+              {['Terapia Cognitivo Comportamental', 'Transtornos Alimentares'].map((t) => (
+                <p key={t} className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/30">{t}</p>
               ))}
             </div>
             <div className="flex flex-col items-end gap-1">
-              {['Cirurgia Bariátrica', 'Transtornos Alimentares'].map((t) => (
-                <p key={t} className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">{t}</p>
+              {['Cirurgia Bariátrica', 'Endometriose'].map((t) => (
+                <p key={t} className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/30">{t}</p>
               ))}
             </div>
           </div>
@@ -112,7 +112,7 @@ export function LabLanding() {
               <span className="block">Sessões online ou presenciais, com acompanhamento personalizado.</span>
             </p>
 
-            {/* More – mobile only */}
+            {/* More – bottom right */}
             <div className="pointer-events-auto ml-auto flex items-center gap-2.5">
               <Link
                 href="#sobre"
