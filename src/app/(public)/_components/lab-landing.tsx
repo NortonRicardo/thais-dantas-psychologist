@@ -53,11 +53,7 @@ export function LabLanding() {
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-8 pb-28 pt-36 sm:pb-24 sm:pt-40 lg:pt-44">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-[66%] z-[5] h-[26%] w-full bg-[radial-gradient(ellipse_100%_55%_at_50%_30%,rgba(24,32,26,0)_0%,rgba(24,32,26,0.03)_15%,rgba(24,32,26,0.08)_35%,rgba(24,32,26,0.11)_50%,rgba(24,32,26,0.04)_68%,transparent_85%)] blur-md sm:top-[67%] sm:h-[28%]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-[73%] z-[5] h-[22%] w-full bg-[radial-gradient(ellipse_100%_48%_at_50%_28%,rgba(24,32,26,0)_0%,rgba(24,32,26,0.02)_18%,rgba(24,32,26,0.07)_42%,rgba(24,32,26,0.03)_62%,transparent_80%)] blur-md sm:top-[74%] sm:h-[24%]"
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[40%] w-full bg-[linear-gradient(to_bottom,transparent_0%,rgba(24,32,26,0.30)_50%,rgba(24,32,26,0.62)_100%)]"
           />
 
           <div className="relative z-10 w-full max-w-xl translate-y-4 sm:max-w-2xl sm:translate-y-6 lg:max-w-4xl lg:translate-y-8 xl:max-w-5xl">
