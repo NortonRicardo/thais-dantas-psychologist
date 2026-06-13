@@ -18,6 +18,7 @@ export function FilterCombobox({
   options,
   width = 'w-44',
   showClear = true,
+  light = false,
   renderOption,
   labelForValue,
   renderValue,
@@ -30,6 +31,8 @@ export function FilterCombobox({
   width?: string
   /** Se false, oculta o rodapé «limpar» (ex.: campo obrigatório). */
   showClear?: boolean
+  /** Modo claro — para uso em modais/fundos claros. */
+  light?: boolean
   renderOption?: (opt: string) => React.ReactNode
   /** Quando `value` não é legível (ex.: id), exibir rótulo no botão. */
   labelForValue?: (value: string) => string
@@ -68,10 +71,18 @@ export function FilterCombobox({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className={`flex h-9 min-w-0 ${width} items-center justify-between gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-0 text-sm outline-none hover:bg-white/[0.08] focus:border-white/20`}
+          className={`flex h-9 min-w-0 ${width} items-center justify-between gap-2 rounded-md border px-3 py-0 text-sm outline-none shadow-[0_2px_6px_rgba(0,0,0,0.15)] ${
+            light
+              ? 'border-[#2D2D2D]/15 bg-[#ede8e1] hover:bg-[#2D2D2D]/4 focus:border-[#556040]/40'
+              : 'border-white/10 bg-white/5 hover:bg-white/[0.08] focus:border-white/20'
+          }`}
         >
           <span
-            className={`flex min-w-0 flex-1 items-center gap-2 overflow-hidden text-left ${value ? 'text-white/80' : 'text-white/25'}`}
+            className={`flex min-w-0 flex-1 items-center gap-2 overflow-hidden text-left ${
+              light
+                ? value ? 'text-[#2D2D2D]/80' : 'text-[#2D2D2D]/35'
+                : value ? 'text-white/80' : 'text-white/25'
+            }`}
           >
             {value && renderValue ? (
               <span className="flex min-w-0 flex-1 overflow-hidden">
@@ -87,7 +98,7 @@ export function FilterCombobox({
               </span>
             )}
           </span>
-          <ChevronDown size={13} className="shrink-0 text-white/30" />
+          <ChevronDown size={13} className={`shrink-0 ${light ? 'text-[#2D2D2D]/30' : 'text-white/30'}`} />
         </button>
       </PopoverTrigger>
       <PopoverContent

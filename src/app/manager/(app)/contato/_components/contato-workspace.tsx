@@ -56,13 +56,15 @@ const GLASS = {
   border: '1px solid rgba(255,255,255,0.13)',
 } as const
 
-/* #F4F0EA (bege público) com L≈22% — marrom-bege escuro, visivelmente quente */
+/* Bege da paleta pública (#F4F0EA) com overlay preto 8% — modal claro sobre fundo verde */
 const DIALOG_STYLE = {
-  background: '#3d3028',
+  background: 'linear-gradient(rgba(0,0,0,0.08),rgba(0,0,0,0.08)),#F4F0EA',
 } as const
 
-const BTN_PRIMARY = 'bg-white text-[#3A4424] hover:bg-white/90 shadow-[0_2px_8px_rgba(0,0,0,0.35)]'
-const BTN_CANCEL  = 'border border-white/20 text-white/55 hover:bg-white/6 hover:border-white/35 hover:text-white/80 shadow-[0_2px_6px_rgba(0,0,0,0.2)]'
+/* Dentro do modal bege usamos texto escuro e botão verde musgo */
+const BTN_PRIMARY = 'bg-[#556040] text-white hover:bg-[#4a5438] shadow-[0_2px_8px_rgba(0,0,0,0.2)]'
+const BTN_CANCEL  = 'border border-[#2D2D2D]/20 text-[#2D2D2D]/60 hover:bg-[#2D2D2D]/6 hover:border-[#2D2D2D]/35 hover:text-[#2D2D2D]/80 shadow-[0_2px_6px_rgba(0,0,0,0.08)]'
+const INPUT_DIALOG_CLS = 'bg-[#ede8e1] border-[#2D2D2D]/15 text-[#2D2D2D] placeholder:text-[#2D2D2D]/35 focus-visible:ring-0 focus-visible:border-[#556040]/50 shadow-[0_2px_6px_rgba(0,0,0,0.08)]'
 
 /* ─── Ícones ─────────────────────────────────────────────────────────────── */
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -203,23 +205,24 @@ function MapSection({ data, onSaved }: { data: ContactData; onSaved: (u: Contact
 
       <Dialog open={modalOpen} onOpenChange={v => !v && setModalOpen(false)}>
         <DialogContent
-          className="border-[#F4F0EA]/12 text-white sm:max-w-md"
+          className="border-[#2D2D2D]/10 text-[#2D2D2D] sm:max-w-md"
           style={DIALOG_STYLE}
           onOpenAutoFocus={e => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle className="text-white/90">Localização no mapa</DialogTitle>
+            <DialogTitle className="text-[#2D2D2D]">Localização no mapa</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSave} className="space-y-4 pt-1">
             <div className="grid gap-1.5">
-              <Label className="text-sm text-white/70">URL do Google Maps (embed)</Label>
+              <Label className="text-sm text-[#2D2D2D]/70">URL do Google Maps (embed)</Label>
               <HttpsUrlSuffixField
                 id="mapEmbedUrl"
                 value={mapUrlSuffix}
                 onChange={setMapUrlSuffix}
                 placeholder="maps.google.com/maps?...&output=embed"
+                light
               />
-              <p className="text-xs text-white/30">
+              <p className="text-xs text-[#2D2D2D]/40">
                 Cole o caminho após https:// ou a URL completa.
               </p>
             </div>
@@ -367,23 +370,23 @@ function AddChannelModal({ open, onClose, onAdded }: {
   return (
     <Dialog open={open} onOpenChange={v => !v && handleClose()}>
       <DialogContent
-        className="border-[#F4F0EA]/12 text-white sm:max-w-md"
+        className="border-[#2D2D2D]/10 text-[#2D2D2D] sm:max-w-md"
         style={DIALOG_STYLE}
         onOpenAutoFocus={e => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="text-white/90">Novo canal de contato</DialogTitle>
+          <DialogTitle className="text-[#2D2D2D]">Novo canal de contato</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSave} className="space-y-4 pt-1">
           <div className="grid gap-1.5">
-            <Label className="text-sm text-white/70">Tipo</Label>
-            <div className="shadow-[0_2px_6px_rgba(0,0,0,0.25)]">
+            <Label className="text-sm text-[#2D2D2D]/70">Tipo</Label>
             <FilterCombobox
               value={label}
               onChange={handleTypeChange}
               placeholder="Selecione o tipo…"
               clearLabel="Limpar"
               showClear={false}
+              light
               options={CONTACT_TYPES.map(t => t.label)}
               labelForValue={l => l}
               width="w-full min-w-0"
@@ -408,37 +411,36 @@ function AddChannelModal({ open, onClose, onAdded }: {
                 )
               }}
             />
-            </div>
           </div>
 
           <div className="grid gap-1.5">
-            <Label className="text-sm text-white/70">
-              Ícone <span className="font-normal text-white/40">(definido pelo tipo)</span>
+            <Label className="text-sm text-[#2D2D2D]/70">
+              Ícone <span className="font-normal text-[#2D2D2D]/40">(definido pelo tipo)</span>
             </Label>
             <div
-              className={`flex h-10 w-full items-center gap-2.5 rounded-md border px-3 ${INPUT_CLS} pointer-events-none select-none ${label ? 'text-white/85' : 'text-white/35'} shadow-[0_2px_6px_rgba(0,0,0,0.25)]`}
+              className={`flex h-10 w-full items-center gap-2.5 rounded-md border px-3 ${INPUT_DIALOG_CLS} pointer-events-none select-none ${label ? 'text-[#2D2D2D]/80' : 'text-[#2D2D2D]/35'}`}
               aria-readonly
             >
               {label ? (
                 <>
-                  {createElement(ICON_MAP[iconKey] ?? Link, { size: 16, strokeWidth: 1.6, className: 'shrink-0 text-white/70' })}
+                  {createElement(ICON_MAP[iconKey] ?? Link, { size: 16, strokeWidth: 1.6, className: 'shrink-0 text-[#2D2D2D]/50' })}
                   <span className="truncate text-sm">
                     {ICON_OPTIONS.find(o => o.key === iconKey)?.label ?? iconKey}
                   </span>
                 </>
               ) : (
-                <span className="text-sm text-white/35">Escolha um tipo para ver o ícone</span>
+                <span className="text-sm text-[#2D2D2D]/35">Escolha um tipo para ver o ícone</span>
               )}
             </div>
           </div>
 
           <div className="grid gap-1.5">
-            <Label className="text-sm text-white/70">Descrição</Label>
+            <Label className="text-sm text-[#2D2D2D]/70">Descrição</Label>
             <Input
               value={value}
               onChange={e => handleValueChange(e.target.value)}
               placeholder={label ? (placeholder[label] ?? '') : 'Preencha o tipo primeiro…'}
-              className={`${INPUT_CLS} h-10 text-sm ${valueError ? 'border-rose-500/60' : ''}`}
+              className={`${INPUT_DIALOG_CLS} h-10 text-sm ${valueError ? 'border-rose-500/60' : ''}`}
             />
             {valueError && <p className="text-xs text-rose-400">{valueError}</p>}
           </div>
