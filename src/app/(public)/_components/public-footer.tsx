@@ -8,7 +8,7 @@ export function PublicFooter(_props: PublicFooterProps = {}) {
   return (
     <footer
       id="rodape"
-      className="border-t border-neutral-200 bg-white px-6 py-12 text-neutral-600"
+      className="border-t border-[#556040]/15 bg-white px-6 py-12 text-neutral-600"
     >
       <div className="mx-auto flex max-w-3xl flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm">

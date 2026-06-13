@@ -2,16 +2,17 @@
 
 import { useState } from 'react'
 import { MapPin } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-export function MapIframe({ src }: { src: string }) {
+export function MapIframe({ src, className }: { src: string; className?: string }) {
   const [loaded, setLoaded] = useState(false)
 
   return (
-    <div className="relative h-[280px] w-full sm:h-[360px]">
+    <div className={cn('relative w-full', className ?? 'h-[280px] sm:h-[360px]')}>
       {!loaded && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-neutral-50">
-          <MapPin size={24} strokeWidth={1.5} className="text-neutral-300" />
-          <span className="text-sm text-neutral-400">Carregando mapa…</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#556040]/5">
+          <MapPin size={24} strokeWidth={1.5} className="text-[#556040]/30" />
+          <span className="text-[11px] uppercase tracking-[0.2em] text-[#556040]/40">Carregando mapa…</span>
         </div>
       )}
       <iframe
