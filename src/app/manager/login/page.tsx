@@ -25,7 +25,7 @@ export default function LoginPage() {
         setLoading(false)
         return
       }
-      router.replace('/manager/contato')
+      router.replace('/manager')
     } catch {
       toast.error('Erro ao autenticar.')
       setLoading(false)
