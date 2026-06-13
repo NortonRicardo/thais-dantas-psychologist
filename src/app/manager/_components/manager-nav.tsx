@@ -5,14 +5,18 @@ import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const navItems = [{ href: '/manager/contato', label: 'Contato' }]
+const navItems = [
+  { href: '/manager', label: 'Início', exact: true },
+  { href: '/manager/contato', label: 'Contato', exact: false },
+  { href: '/manager/blog', label: 'Blog', exact: false },
+]
 
 export function ManagerNav() {
   const pathname = usePathname()
   return (
     <ul className="pointer-events-none absolute inset-0 flex list-none items-center justify-center gap-x-4 p-0 sm:gap-x-8">
-      {navItems.map(({ href, label }) => {
-        const isCurrent = pathname === href || pathname.startsWith(`${href}/`)
+      {navItems.map(({ href, label, exact }) => {
+        const isCurrent = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
         return (
           <li key={label} className="pointer-events-auto">
             <Link
