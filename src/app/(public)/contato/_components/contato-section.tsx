@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   Facebook,
   Github,
   Globe,
@@ -46,13 +45,19 @@ function getHref(label: string, value: string): string {
   return value.startsWith('http') ? value : `https://${value}`
 }
 
+const DEFAULT_CHANNELS = [
+  { id: 'default-phone', iconKey: 'phone', label: 'Telefone', value: '(62) 9 9201-6959' },
+  { id: 'default-wa', iconKey: 'message-circle', label: 'WhatsApp', value: '62992016959' },
+  { id: 'default-mail', iconKey: 'mail', label: 'E-mail', value: 'contato@thaisdantas.com.br' },
+]
+
+const DEFAULT_MAP_URL =
+  'https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed'
+
 const getData = unstable_cache(
   async () => {
     const infoRows = await db
-      .select({
-        id: contactInfo.id,
-        mapUrl: contactInfo.mapUrl,
-      })
+      .select({ id: contactInfo.id, mapUrl: contactInfo.mapUrl })
       .from(contactInfo)
       .limit(1)
 
@@ -63,27 +68,25 @@ const getData = unstable_cache(
           .select()
           .from(contactChannels)
           .where(eq(contactChannels.contactInfoId, info.id))
-          .orderBy(
-            asc(contactChannels.sortOrder),
-            asc(contactChannels.createdAt)
-          )
+          .orderBy(asc(contactChannels.sortOrder), asc(contactChannels.createdAt))
       : []
 
     return { info, channels }
   },
   ['contato-data'],
-  { tags: ['contato'] }
+  { tags: ['contato'] },
 )
 
 export async function ContatoSection() {
   const { info, channels } = await getData()
 
-  const mapUrl = info?.mapUrl?.trim() || null
+  const mapUrl = info?.mapUrl?.trim() || DEFAULT_MAP_URL
+  const displayChannels = channels.length > 0 ? channels : DEFAULT_CHANNELS
 
   return (
     <>
-      {/* ── HEADER ROW ── mesma estrutura do Blog & Reflexões ─────────── */}
-      <div className="flex items-center justify-between border-b border-white/15 pb-5 pt-14">
+      {/* Top bar */}
+      <div className="flex items-center justify-between border-b border-white/15 pb-5 pt-10">
         <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">
           Contato
         </span>
@@ -92,85 +95,68 @@ export async function ContatoSection() {
         </span>
       </div>
 
-      {/* ── HEADING ─────────────────────────────────────────────────────── */}
-      <div className="py-12">
-        <h1 className="font-[family-name:var(--font-cormorant)] text-[clamp(3.2rem,7vw,6.5rem)] font-light leading-[1.02] text-white">
-          Fale<br />
-          <em className="italic text-white/45">comigo.</em>
+      {/* Heading */}
+      <div className="py-8">
+        <h1 className="font-[family-name:var(--font-cormorant)] text-[clamp(2.2rem,4.5vw,4rem)] font-light leading-[1.05] text-white">
+          Fale <em className="italic text-white/45">comigo.</em>
         </h1>
-        <p className="mt-6 max-w-md text-[13px] leading-relaxed text-white/50">
+        <p className="mt-4 max-w-md text-[13px] leading-relaxed text-white/50">
           Escolha o canal de sua preferência para agendar uma consulta ou tirar dúvidas — responderei em breve.
         </p>
       </div>
 
-      {/* ── GRID ─── mesma estrutura dos artigos do blog ────────────────── */}
-      <div className="mt-auto grid flex-1 grid-cols-1 gap-px border-t border-white/15 sm:grid-cols-[2fr_1fr]">
+      {/* Grid */}
+      <div className="grid flex-1 grid-cols-1 gap-px border-t border-white/15 sm:grid-cols-2">
 
         {/* Channels */}
-        <div className="flex flex-col py-8 sm:pr-10">
-          {channels.length === 0 ? (
-            <p className="text-[13px] text-white/35">Nenhum canal cadastrado ainda.</p>
-          ) : (
-            <ul className="list-none p-0">
-              {channels.map(ch => {
-                const Icon = ICON_MAP[ch.iconKey] ?? Link
-                const href = getHref(ch.label, ch.value)
-                return (
-                  <li key={ch.id} className="border-b border-white/10 last:border-b-0">
-                    <a
-                      href={href}
-                      target={href.startsWith('http') ? '_blank' : undefined}
-                      rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                      className="group flex items-center gap-4 py-5 transition-opacity hover:opacity-60"
-                    >
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/60">
-                        <Icon size={13} strokeWidth={1.5} />
-                      </span>
-                      <span className="w-20 shrink-0 text-[9px] font-semibold uppercase tracking-[0.28em] text-white/35">
+        <div className="flex flex-col py-6 sm:pr-10">
+          <ul className="list-none p-0">
+            {displayChannels.map(ch => {
+              const Icon = ICON_MAP[ch.iconKey] ?? Link
+              const href = getHref(ch.label, ch.value)
+              return (
+                <li key={ch.id} className="border-b border-white/10 last:border-b-0">
+                  <a
+                    href={href}
+                    target={href.startsWith('http') ? '_blank' : undefined}
+                    rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    className="group flex items-center gap-4 py-4 transition-opacity hover:opacity-60"
+                  >
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/60">
+                      <Icon size={13} strokeWidth={1.5} />
+                    </span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-white/35">
                         {ch.label}
                       </span>
-                      <div className="h-px flex-1 bg-white/10" />
                       <span className="text-[13px] text-white/75">{ch.value}</span>
-                      <ArrowRight
-                        className="size-3 shrink-0 text-white/25 transition-transform group-hover:translate-x-0.5"
-                        strokeWidth={1.5}
-                      />
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
+                    </div>
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
         </div>
 
         {/* Location */}
-        <div className="flex flex-col gap-6 py-8 sm:border-l sm:border-white/15 sm:px-8">
-          <div>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/35">
-              Localização
-            </span>
-            <p className="mt-4 font-[family-name:var(--font-cormorant)] text-xl font-light leading-snug text-white">
-              PUC Goiás
-            </p>
-            <p className="mt-2 text-[12px] leading-relaxed text-white/45">
-              Av. Universitária, 1440<br />
-              Setor Universitário<br />
-              Goiânia – GO
-            </p>
+        <div className="flex flex-col py-6 sm:border-l sm:border-white/15 sm:px-8">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/35">
+            Localização
+          </span>
+          <h3 className="mt-3 font-[family-name:var(--font-cormorant)] text-2xl font-light leading-tight text-white">
+            PUC Goiás
+          </h3>
+          <p className="mt-2 text-[12px] leading-relaxed text-white/45">
+            Av. Universitária, 1440<br />
+            Setor Universitário — Goiânia, GO
+          </p>
+
+          <div className="mt-5 flex-1 overflow-hidden rounded-xl border border-white/15 opacity-85" style={{ minHeight: '280px' }}>
+            <MapIframe src={mapUrl} className="h-full min-h-[280px]" />
           </div>
 
-          <div className="overflow-hidden rounded-sm opacity-80">
-            <MapIframe
-              src={
-                mapUrl ??
-                'https://maps.google.com/maps?q=-16.6784792,-49.2453736&z=17&output=embed'
-              }
-              className="h-44"
-            />
-          </div>
-
-          <div className="mt-auto flex items-center gap-3 border-t border-white/10 pt-5">
-            <MapPin className="size-3 text-white/25" strokeWidth={1.5} />
+          <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-4">
+            <MapPin className="size-3 shrink-0 text-white/25" strokeWidth={1.5} />
             <span className="text-[10px] text-white/35">Atendimento presencial e online</span>
           </div>
         </div>
