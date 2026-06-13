@@ -6,9 +6,5 @@ export const metadata: Metadata = {
 }
 
 export default function ContatoManagerPage() {
-  return (
-    <div className="mx-auto max-w-[1400px] px-6 pb-16 pt-8">
-      <ContatoWorkspace />
-    </div>
-  )
+  return <ContatoWorkspace />
 }

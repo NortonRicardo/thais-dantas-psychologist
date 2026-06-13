@@ -19,6 +19,7 @@ import {
   Twitter,
   Youtube,
   Loader2,
+  Map,
   type LucideIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -43,18 +44,27 @@ import {
   contactInfoPutSchema,
 } from '@/lib/validation/contato-api'
 
+/* ─── Estilos compartilhados ─────────────────────────────────────────────── */
 const INPUT_CLS =
-  'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30'
+  'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:border-white/30 shadow-[0_2px_6px_rgba(0,0,0,0.25)]'
 
 const GLASS = {
   background:
-    'linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+    'linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35)',
+  border: '1px solid rgba(255,255,255,0.13)',
 } as const
 
+/* #F4F0EA (bege público) com L≈22% — marrom-bege escuro, visivelmente quente */
+const DIALOG_STYLE = {
+  background: '#3d3028',
+} as const
+
+const BTN_PRIMARY = 'bg-white text-[#3A4424] hover:bg-white/90 shadow-[0_2px_8px_rgba(0,0,0,0.35)]'
+const BTN_CANCEL  = 'border border-white/20 text-white/55 hover:bg-white/6 hover:border-white/35 hover:text-white/80 shadow-[0_2px_6px_rgba(0,0,0,0.2)]'
+
+/* ─── Ícones ─────────────────────────────────────────────────────────────── */
 const ICON_MAP: Record<string, LucideIcon> = {
   mail: Mail,
   phone: Phone,
@@ -89,6 +99,7 @@ const ICON_OPTIONS = [
   { key: 'link', label: 'Link genérico' },
 ]
 
+/* ─── Helpers ────────────────────────────────────────────────────────────── */
 function applyPhoneMask(raw: string): string {
   const d = raw.replace(/\D/g, '').slice(0, 11)
   if (d.length <= 2) return d.length ? `(${d}` : ''
@@ -99,43 +110,22 @@ function applyPhoneMask(raw: string): string {
 
 const PHONE_LABELS = new Set(['Telefone', 'WhatsApp'])
 
-function channelValueIssue(
-  label: string,
-  iconKey: string,
-  value: string
-): string | null {
+function channelValueIssue(label: string, iconKey: string, value: string): string | null {
   if (!label) return null
   const trial = contactChannelPostSchema.safeParse({ label, iconKey, value })
   if (trial.success) return null
-  const vIssue = trial.error.issues.find(i => i.path[0] === 'value')
-  return vIssue?.message ?? null
+  return trial.error.issues.find(i => i.path[0] === 'value')?.message ?? null
 }
 
-type ContactData = {
-  id: string
-  mapUrl: string
-}
+/* ─── Types ──────────────────────────────────────────────────────────────── */
+type ContactData = { id: string; mapUrl: string }
+type Channel = { id: string; label: string; iconKey: string; value: string; sortOrder: number }
 
-type Channel = {
-  id: string
-  label: string
-  iconKey: string
-  value: string
-  sortOrder: number
-}
-
-function MapCard({
-  data,
-  onSaved,
-}: {
-  data: ContactData
-  onSaved: (updated: ContactData) => void
-}) {
+/* ─── MapSection ─────────────────────────────────────────────────────────── */
+function MapSection({ data, onSaved }: { data: ContactData; onSaved: (u: ContactData) => void }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [mapUrlSuffix, setMapUrlSuffix] = useState(() =>
-    stripUrlScheme(data.mapUrl)
-  )
+  const [mapUrlSuffix, setMapUrlSuffix] = useState(() => stripUrlScheme(data.mapUrl))
 
   function openModal() {
     setMapUrlSuffix(stripUrlScheme(data.mapUrl))
@@ -144,9 +134,7 @@ function MapCard({
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
-    const parsed = contactInfoPutSchema.safeParse({
-      mapUrl: toHttpsStored(mapUrlSuffix).trim(),
-    })
+    const parsed = contactInfoPutSchema.safeParse({ mapUrl: toHttpsStored(mapUrlSuffix).trim() })
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? 'Dados inválidos.')
       return
@@ -159,8 +147,7 @@ function MapCard({
         body: JSON.stringify(parsed.data),
       })
       if (!res.ok) throw new Error()
-      const updated: ContactData = await res.json()
-      onSaved(updated)
+      onSaved(await res.json())
       setModalOpen(false)
       toast.success('Localização atualizada!')
     } catch {
@@ -172,50 +159,60 @@ function MapCard({
 
   return (
     <>
-      <div
-        className="group relative flex flex-col items-center gap-3 rounded-xl px-4 py-5 text-center"
-        style={GLASS}
-      >
+      {data.mapUrl ? (
+        /* Preview do mapa */
+        <div className="group overflow-hidden rounded-2xl" style={GLASS}>
+          <div className="relative h-[260px]">
+            <iframe
+              src={data.mapUrl}
+              title="Localização no mapa"
+              className="h-full w-full border-0"
+              allowFullScreen
+              loading="lazy"
+            />
+            <button
+              type="button"
+              onClick={openModal}
+              className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 text-[11px] font-medium text-white/80 opacity-0 backdrop-blur-sm transition-all group-hover:opacity-100 hover:bg-black/70 hover:text-white"
+            >
+              <Pencil size={10} /> Editar
+            </button>
+          </div>
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-white/10">
+            <MapPin size={13} className="shrink-0 text-white/40" strokeWidth={1.5} />
+            <p className="flex-1 truncate text-xs text-white/50">{data.mapUrl}</p>
+          </div>
+        </div>
+      ) : (
+        /* Estado vazio */
         <button
           type="button"
           onClick={openModal}
-          className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full text-white/25 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-white/60"
-          title="Editar localização"
+          className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl py-12 text-center transition-colors hover:bg-white/5"
+          style={GLASS}
         >
-          <Pencil size={11} />
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+            <Map size={20} className="text-white/50" strokeWidth={1.5} />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-white/70">Configurar mapa</p>
+            <p className="mt-0.5 text-xs text-white/35">Clique para adicionar a URL do Google Maps</p>
+          </div>
         </button>
-
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/60">
-          <MapPin size={18} strokeWidth={1.5} />
-        </span>
-
-        <div className="space-y-0.5">
-          <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">
-            Localização
-          </p>
-          <p className="max-w-[160px] truncate text-sm text-white/75">
-            {data.mapUrl ? (
-              data.mapUrl
-            ) : (
-              <span className="italic text-white/30">Não configurado</span>
-            )}
-          </p>
-        </div>
-      </div>
+      )}
 
       <Dialog open={modalOpen} onOpenChange={v => !v && setModalOpen(false)}>
-        <DialogContent className="border-white/10 bg-[#18181b] text-white sm:max-w-md">
+        <DialogContent
+          className="border-[#F4F0EA]/12 text-white sm:max-w-md"
+          style={DIALOG_STYLE}
+          onOpenAutoFocus={e => e.preventDefault()}
+        >
           <DialogHeader>
-            <DialogTitle className="text-white/90">
-              Localização no mapa
-            </DialogTitle>
+            <DialogTitle className="text-white/90">Localização no mapa</DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSave} className="space-y-4 pt-1">
             <div className="grid gap-1.5">
-              <Label className="text-sm text-white/70">
-                URL do Google Maps (embed)
-              </Label>
+              <Label className="text-sm text-white/70">URL do Google Maps (embed)</Label>
               <HttpsUrlSuffixField
                 id="mapEmbedUrl"
                 value={mapUrlSuffix}
@@ -223,29 +220,17 @@ function MapCard({
                 placeholder="maps.google.com/maps?...&output=embed"
               />
               <p className="text-xs text-white/30">
-                Cole o caminho após https:// ou a URL completa; o valor é salvo
-                com https://.
+                Cole o caminho após https:// ou a URL completa.
               </p>
             </div>
-
             <DialogFooter className="pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-white/50 hover:bg-white/5 hover:text-white"
-                onClick={() => setModalOpen(false)}
-                disabled={saving}
-              >
+              <Button type="button" variant="ghost" size="sm"
+                className={BTN_CANCEL}
+                onClick={() => setModalOpen(false)} disabled={saving}>
                 Cancelar
               </Button>
-              <Button
-                type="submit"
-                size="sm"
-                loading={saving}
-                loadingLabel="A guardar…"
-                className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
-              >
+              <Button type="submit" size="sm" loading={saving} loadingLabel="Salvando…"
+                className={`border-0 ${BTN_PRIMARY}`}>
                 Salvar
               </Button>
             </DialogFooter>
@@ -256,22 +241,15 @@ function MapCard({
   )
 }
 
-function ChannelCard({
-  channel,
-  onDeleted,
-}: {
-  channel: Channel
-  onDeleted: (id: string) => void
-}) {
+/* ─── ChannelCard ────────────────────────────────────────────────────────── */
+function ChannelCard({ channel, onDeleted }: { channel: Channel; onDeleted: (id: string) => void }) {
   const [deleting, setDeleting] = useState(false)
   const Icon = ICON_MAP[channel.iconKey] ?? Link
 
   async function handleDelete() {
     setDeleting(true)
     try {
-      const res = await fetch(`/api/contato/channels/${channel.id}`, {
-        method: 'DELETE',
-      })
+      const res = await fetch(`/api/contato/channels/${channel.id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error()
       onDeleted(channel.id)
       toast.success('Canal removido.')
@@ -282,50 +260,36 @@ function ChannelCard({
   }
 
   return (
-    <div
-      className="group relative flex flex-col items-center gap-3 rounded-xl px-4 py-5 text-center"
-      style={GLASS}
-    >
+    <div className="group relative flex items-center gap-4 rounded-xl px-4 py-4 transition-colors" style={GLASS}>
+      {/* Ícone */}
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/60">
+        <Icon size={16} strokeWidth={1.5} />
+      </span>
+
+      {/* Texto */}
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">{channel.label}</p>
+        <p className="mt-0.5 truncate text-sm text-white/80">{channel.value}</p>
+      </div>
+
+      {/* Deletar */}
       <button
         type="button"
         onClick={handleDelete}
         disabled={deleting}
-        aria-busy={deleting}
-        className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full text-white/25 opacity-0 transition-all group-hover:opacity-100 hover:bg-rose-500/15 hover:text-rose-400 disabled:opacity-40"
-        title="Remover canal"
+        className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full text-white/20 opacity-0 transition-all group-hover:opacity-100 hover:bg-rose-500/15 hover:text-rose-400 disabled:opacity-40"
+        title="Remover"
       >
-        {deleting ? (
-          <Loader2
-            size={11}
-            className="animate-spin text-rose-400/90"
-            aria-hidden
-          />
-        ) : (
-          <Trash2 size={11} />
-        )}
+        {deleting
+          ? <Loader2 size={13} className="animate-spin text-rose-400/90" />
+          : <Trash2 size={13} />}
       </button>
-
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/60">
-        <Icon size={18} strokeWidth={1.5} />
-      </span>
-
-      <div className="space-y-0.5">
-        <p className="text-[0.65rem] uppercase tracking-[3px] text-white/35">
-          {channel.label}
-        </p>
-        <p className="max-w-[160px] break-all text-sm text-white/75">
-          {channel.value}
-        </p>
-      </div>
     </div>
   )
 }
 
-function AddChannelModal({
-  open,
-  onClose,
-  onAdded,
-}: {
+/* ─── AddChannelModal ────────────────────────────────────────────────────── */
+function AddChannelModal({ open, onClose, onAdded }: {
   open: boolean
   onClose: () => void
   onAdded: (channel: Channel) => void
@@ -350,10 +314,7 @@ function AddChannelModal({
   }
 
   function handleClose() {
-    setLabel('')
-    setIconKey('mail')
-    setValue('')
-    setValueError(null)
+    setLabel(''); setIconKey('mail'); setValue(''); setValueError(null)
     onClose()
   }
 
@@ -361,10 +322,8 @@ function AddChannelModal({
     e.preventDefault()
     const parsed = contactChannelPostSchema.safeParse({ label, iconKey, value })
     if (!parsed.success) {
-      const msg =
-        parsed.error.issues.find(i => i.path[0] === 'value')?.message ??
-        parsed.error.issues[0]?.message ??
-        'Dados inválidos.'
+      const msg = parsed.error.issues.find(i => i.path[0] === 'value')?.message
+        ?? parsed.error.issues[0]?.message ?? 'Dados inválidos.'
       setValueError(msg)
       return
     }
@@ -377,12 +336,9 @@ function AddChannelModal({
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(
-          typeof body.error === 'string' ? body.error : 'Erro ao criar canal'
-        )
+        throw new Error(typeof body.error === 'string' ? body.error : 'Erro ao criar canal')
       }
-      const created: Channel = await res.json()
-      onAdded(created)
+      onAdded(await res.json())
       handleClose()
       toast.success('Canal adicionado!')
     } catch (err) {
@@ -394,8 +350,8 @@ function AddChannelModal({
 
   const placeholder: Record<string, string> = {
     'E-mail': 'contato@thaisdantas.com.br',
-    Telefone: '+55 62 9 0000-0000',
-    WhatsApp: '+55 62 9 0000-0000',
+    Telefone: '(62) 9 0000-0000',
+    WhatsApp: '(62) 9 0000-0000',
     LinkedIn: 'https://linkedin.com/in/thaisdantas',
     Instagram: 'https://instagram.com/thaisdantas',
     GitHub: 'https://github.com/thaisdantas',
@@ -410,16 +366,18 @@ function AddChannelModal({
 
   return (
     <Dialog open={open} onOpenChange={v => !v && handleClose()}>
-      <DialogContent className="border-white/10 bg-[#18181b] text-white sm:max-w-md">
+      <DialogContent
+        className="border-[#F4F0EA]/12 text-white sm:max-w-md"
+        style={DIALOG_STYLE}
+        onOpenAutoFocus={e => e.preventDefault()}
+      >
         <DialogHeader>
-          <DialogTitle className="text-white/90">
-            Novo canal de contato
-          </DialogTitle>
+          <DialogTitle className="text-white/90">Novo canal de contato</DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSave} className="space-y-4 pt-1">
           <div className="grid gap-1.5">
             <Label className="text-sm text-white/70">Tipo</Label>
+            <div className="shadow-[0_2px_6px_rgba(0,0,0,0.25)]">
             <FilterCombobox
               value={label}
               onChange={handleTypeChange}
@@ -434,10 +392,7 @@ function AddChannelModal({
                 const Icon = t ? (ICON_MAP[t.icon] ?? Link) : Link
                 return (
                   <span className="flex items-center gap-2">
-                    {createElement(Icon, {
-                      size: 14,
-                      className: 'shrink-0 opacity-70',
-                    })}
+                    {createElement(Icon, { size: 14, className: 'shrink-0 opacity-70' })}
                     {l}
                   </span>
                 )
@@ -447,46 +402,32 @@ function AddChannelModal({
                 const Icon = t ? (ICON_MAP[t.icon] ?? Link) : Link
                 return (
                   <span className="flex min-w-0 flex-1 items-center gap-2">
-                    {createElement(Icon, {
-                      size: 14,
-                      className: 'shrink-0 opacity-70',
-                    })}
+                    {createElement(Icon, { size: 14, className: 'shrink-0 opacity-70' })}
                     <span className="truncate">{l}</span>
                   </span>
                 )
               }}
             />
+            </div>
           </div>
 
           <div className="grid gap-1.5">
             <Label className="text-sm text-white/70">
-              Ícone{' '}
-              <span className="font-normal text-white/40">
-                (definido pelo tipo)
-              </span>
+              Ícone <span className="font-normal text-white/40">(definido pelo tipo)</span>
             </Label>
             <div
-              className={`flex h-10 w-full items-center gap-2.5 rounded-md border px-3 ${INPUT_CLS} pointer-events-none select-none ${
-                label ? 'text-white/85' : 'text-white/35'
-              }`}
+              className={`flex h-10 w-full items-center gap-2.5 rounded-md border px-3 ${INPUT_CLS} pointer-events-none select-none ${label ? 'text-white/85' : 'text-white/35'} shadow-[0_2px_6px_rgba(0,0,0,0.25)]`}
               aria-readonly
             >
               {label ? (
                 <>
-                  {createElement(ICON_MAP[iconKey] ?? Link, {
-                    size: 16,
-                    strokeWidth: 1.6,
-                    className: 'shrink-0 text-white/70',
-                  })}
+                  {createElement(ICON_MAP[iconKey] ?? Link, { size: 16, strokeWidth: 1.6, className: 'shrink-0 text-white/70' })}
                   <span className="truncate text-sm">
-                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ??
-                      iconKey}
+                    {ICON_OPTIONS.find(o => o.key === iconKey)?.label ?? iconKey}
                   </span>
                 </>
               ) : (
-                <span className="text-sm text-white/35">
-                  Escolha um tipo para ver o ícone correspondente
-                </span>
+                <span className="text-sm text-white/35">Escolha um tipo para ver o ícone</span>
               )}
             </div>
           </div>
@@ -496,35 +437,20 @@ function AddChannelModal({
             <Input
               value={value}
               onChange={e => handleValueChange(e.target.value)}
-              placeholder={
-                label ? (placeholder[label] ?? '') : 'Preencha o tipo primeiro…'
-              }
+              placeholder={label ? (placeholder[label] ?? '') : 'Preencha o tipo primeiro…'}
               className={`${INPUT_CLS} h-10 text-sm ${valueError ? 'border-rose-500/60' : ''}`}
             />
-            {valueError && (
-              <p className="text-xs text-rose-400">{valueError}</p>
-            )}
+            {valueError && <p className="text-xs text-rose-400">{valueError}</p>}
           </div>
 
           <DialogFooter className="pt-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="text-white/50 hover:bg-white/5 hover:text-white"
-              onClick={handleClose}
-              disabled={saving}
-            >
+            <Button type="button" variant="ghost" size="sm"
+              className={BTN_CANCEL}
+              onClick={handleClose} disabled={saving}>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              size="sm"
-              loading={saving}
-              loadingLabel="A adicionar…"
-              disabled={!label}
-              className="border-0 bg-orange-800 text-orange-50 hover:bg-orange-700 disabled:opacity-50"
-            >
+            <Button type="submit" size="sm" loading={saving} loadingLabel="Adicionando…"
+              disabled={!label} className={`border-0 ${BTN_PRIMARY}`}>
               Adicionar
             </Button>
           </DialogFooter>
@@ -534,6 +460,7 @@ function AddChannelModal({
   )
 }
 
+/* ─── ContatoWorkspace ───────────────────────────────────────────────────── */
 export function ContatoWorkspace() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ContactData | null>(null)
@@ -547,9 +474,8 @@ export function ContatoWorkspace() {
         fetch('/api/contato'),
         fetch('/api/contato/channels'),
       ])
-      const info = await infoRes.json()
+      setData(await infoRes.json())
       const chs = await channelsRes.json()
-      setData(info)
       setChannels(Array.isArray(chs) ? chs : [])
     } catch {
       toast.error('Erro ao carregar informações de contato.')
@@ -558,78 +484,92 @@ export function ContatoWorkspace() {
     }
   }, [])
 
-  useEffect(() => {
-    load()
-  }, [load])
+  useEffect(() => { load() }, [load])
 
   return (
-    <>
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-white/90">Contato</h1>
-        <p className="mt-0.5 text-sm text-white/40">
-          Mapa e canais exibidos na página pública.
-        </p>
+    <div className="mx-auto max-w-7xl px-6 pb-16 sm:px-10">
+
+      {/* Cabeçalho */}
+      <div className="mb-10 flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-white/90">Contato</h1>
+          <p className="mt-0.5 text-sm text-white/40">Mapa e canais exibidos na página pública.</p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="space-y-8">
-          <Skeleton className="h-[140px] w-full max-w-md rounded-xl bg-white/10" />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-[140px] rounded-xl bg-white/10" />
-            ))}
+        <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
+          <div>
+            <Skeleton className="mb-3 h-3 w-12 rounded bg-white/10" />
+            <Skeleton className="h-[300px] rounded-2xl bg-white/10" />
+          </div>
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <Skeleton className="h-3 w-24 rounded bg-white/10" />
+              <Skeleton className="h-8 w-28 rounded-full bg-white/10" />
+            </div>
+            <div className="grid gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 rounded-xl bg-white/10" />
+              ))}
+            </div>
           </div>
         </div>
       ) : data ? (
-        <div className="space-y-10">
-          <section aria-labelledby="contato-mapa-heading">
-            <h2
-              id="contato-mapa-heading"
-              className="mb-4 text-sm font-medium uppercase tracking-[2px] text-white/45"
-            >
-              Mapa
+        <div className="grid gap-10 lg:grid-cols-[1fr_2fr]">
+
+          {/* Coluna esquerda — Mapa */}
+          <section aria-labelledby="section-mapa">
+            <h2 id="section-mapa" className="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">
+              Localização
             </h2>
-            <div className="max-w-sm">
-              <MapCard data={data} onSaved={setData} />
-            </div>
+            <MapSection data={data} onSaved={setData} />
           </section>
 
-          <section aria-labelledby="contato-canais-heading">
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <h2
-                id="contato-canais-heading"
-                className="text-sm font-medium uppercase tracking-[2px] text-white/45"
-              >
+          {/* Coluna direita — Canais */}
+          <section aria-labelledby="section-canais">
+            <div className="mb-3 flex items-center justify-between gap-4">
+              <h2 id="section-canais" className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">
                 Canais de contato
               </h2>
               <Button
                 type="button"
                 size="sm"
-                className="shrink-0 gap-1.5 border-0 bg-orange-800 text-orange-50 hover:bg-orange-700"
+                className={`shrink-0 gap-1.5 border-0 ${BTN_PRIMARY}`}
                 onClick={() => setModalOpen(true)}
               >
-                <Plus size={14} /> Adicionar canal
+                <Plus size={13} /> Adicionar
               </Button>
             </div>
+
             {channels.length > 0 ? (
-              <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid gap-3">
                 {channels.map(ch => (
                   <ChannelCard
                     key={ch.id}
                     channel={ch}
-                    onDeleted={id =>
-                      setChannels(prev => prev.filter(c => c.id !== id))
-                    }
+                    onDeleted={id => setChannels(prev => prev.filter(c => c.id !== id))}
                   />
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-white/35">
-                Nenhum canal cadastrado. Use &quot;Adicionar canal&quot; para
-                incluir e-mail, telefone ou redes sociais.
-              </p>
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl py-12 text-center transition-colors hover:bg-white/5"
+                style={GLASS}
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
+                  <Plus size={16} className="text-white/40" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-white/60">Nenhum canal cadastrado</p>
+                  <p className="mt-0.5 text-xs text-white/30">Clique para adicionar e-mail, telefone ou redes sociais</p>
+                </div>
+              </button>
             )}
           </section>
+
         </div>
       ) : null}
 
@@ -638,6 +578,6 @@ export function ContatoWorkspace() {
         onClose={() => setModalOpen(false)}
         onAdded={ch => setChannels(prev => [...prev, ch])}
       />
-    </>
+    </div>
   )
 }

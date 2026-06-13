@@ -9,30 +9,25 @@ const navItems = [{ href: '/manager/contato', label: 'Contato' }]
 
 export function ManagerNav() {
   const pathname = usePathname()
-
   return (
-    <nav
-      className="flex flex-wrap items-center justify-center gap-1 justify-self-center"
-      aria-label="Principal"
-    >
+    <ul className="pointer-events-none absolute inset-0 flex list-none items-center justify-center gap-x-4 p-0 sm:gap-x-8">
       {navItems.map(({ href, label }) => {
         const isCurrent = pathname === href || pathname.startsWith(`${href}/`)
         return (
-          <Link
-            key={label}
-            href={href}
-            className={cn(
-              'inline-flex items-center rounded-md px-3 py-2 text-sm leading-5 transition-colors duration-150',
-              isCurrent
-                ? 'font-semibold text-[#fafafa]'
-                : 'text-[#d4d4d8] hover:text-[#fafafa]'
-            )}
-          >
-            {label}
-          </Link>
+          <li key={label} className="pointer-events-auto">
+            <Link
+              href={href}
+              className={cn(
+                'text-sm font-medium transition-colors',
+                isCurrent ? 'text-white' : 'text-white/70 hover:text-white',
+              )}
+            >
+              {label}
+            </Link>
+          </li>
         )
       })}
-    </nav>
+    </ul>
   )
 }
 
@@ -48,10 +43,9 @@ export function ManagerLogout() {
     <button
       type="button"
       onClick={handleLogout}
-      className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-white/35 transition-colors hover:text-white/70"
-      title="Sair"
+      className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/95 px-4 py-2 text-sm font-medium text-[#3A4424] shadow-sm transition-colors hover:bg-white sm:px-5 sm:py-2.5"
     >
-      <LogOut size={14} />
+      <LogOut size={13} />
       Sair
     </button>
   )

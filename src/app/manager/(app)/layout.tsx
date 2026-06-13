@@ -1,42 +1,26 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { ManagerLogout, ManagerNav } from '../_components/manager-nav'
-
-const headerShadow = [
-  '0 8px 8px rgba(0,0,0,0.1)',
-  '0 4px 4px rgba(0,0,0,0.1)',
-  '0 2px 2px rgba(0,0,0,0.1)',
-  '0 0 0 1px rgba(0,0,0,0.1)',
-  'inset 0 0 0 1px rgba(255,255,255,0.03)',
-  'inset 0 1px 0 rgba(255,255,255,0.03)',
-].join(', ')
+import { ManagerNav, ManagerLogout } from '../_components/manager-nav'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <div className="mx-auto max-w-[1700px] px-4">
-        <header
-          className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-2"
-          style={{
-            background: '#071812',
-            borderRadius: '0 0 1rem 1rem',
-            boxShadow: headerShadow,
-          }}
-          role="banner"
-        >
-          <div className="flex min-w-0 shrink-0 items-center justify-self-start">
+      <div className="px-6 py-6 sm:px-10 sm:py-8">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 sm:gap-5">
+          <nav
+            aria-label="Gestor"
+            className="relative flex min-w-0 flex-1 items-center rounded-full bg-[linear-gradient(to_right,rgba(255,255,255,0.18),rgba(255,255,255,0.18)_45%,rgba(255,255,255,0.12)_60%,rgba(255,255,255,0.06)_75%,rgba(255,255,255,0.02)_88%,transparent)] py-2.5 pl-5 pr-3 backdrop-blur-sm sm:py-3 sm:pl-8 sm:pr-4"
+          >
             <Link
               href="/manager/contato"
-              className="text-[1.125rem] font-semibold leading-7 text-[#e4e4e7] hover:text-white transition-colors"
+              className="relative z-10 shrink-0 font-[family-name:var(--font-cinzel)] text-sm font-medium tracking-wide text-white transition-colors hover:text-white/90 sm:text-base"
             >
               Thais Dantas
             </Link>
-          </div>
-          <ManagerNav />
-          <div className="flex min-w-0 justify-end justify-self-end">
-            <ManagerLogout />
-          </div>
-        </header>
+            <ManagerNav />
+          </nav>
+          <ManagerLogout />
+        </div>
       </div>
       {children}
     </>
