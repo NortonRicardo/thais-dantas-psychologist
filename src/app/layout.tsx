@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Cinzel } from 'next/font/google'
+import { Cormorant_Garamond, Inter, Cinzel } from 'next/font/google'
 
 import './globals.css'
 import { Providers } from './providers'
@@ -28,13 +28,20 @@ const cinzel = Cinzel({
   weight: ['400', '700', '900'],
 })
 
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  variable: '--font-cormorant',
+  weight: ['300', '400'],
+  style: ['normal', 'italic'],
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="pt-BR"
-      className={`${inter.variable} ${cinzel.variable}`}
+      className={`${inter.variable} ${cinzel.variable} ${cormorant.variable}`}
       suppressHydrationWarning
     >
       <body className={`${inter.className} antialiased`}>

@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ArrowRight, ChevronDown, Phone } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -12,17 +12,23 @@ export function LabLanding() {
       <section className="relative flex min-h-svh flex-col overflow-hidden bg-[#556040]">
         {/* Nav */}
         <header className="relative z-30 px-5 py-6 sm:px-10 sm:py-8">
-          <div className="absolute top-full inset-x-0 px-5 pt-5 sm:px-10 sm:pt-6">
+          <div className="absolute top-full inset-x-0 px-5 pt-14 sm:px-10 sm:pt-16">
             <div className="mx-auto flex max-w-7xl justify-between">
-              <div className="flex flex-col items-start gap-0.5">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Artigos & Reflexões</p>
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Saúde Mental no Dia a Dia</p>
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Publicações em Breve</p>
+              <div className="flex flex-col items-start gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/40">Blog</p>
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Artigos & Reflexões</p>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Saúde Mental no Dia a Dia</p>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Publicações em Breve</p>
+                </div>
               </div>
-              <div className="flex flex-col items-end gap-0.5">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Psicóloga CRP registrada</p>
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Atendimento online e presencial</p>
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Sessões sigilosas</p>
+              <div className="flex flex-col items-end gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/40">Atendimento</p>
+                <div className="flex flex-col items-end gap-0.5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Psicóloga CRP registrada</p>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Online e presencial</p>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">Sessões sigilosas</p>
+                </div>
               </div>
             </div>
           </div>
@@ -82,34 +88,14 @@ export function LabLanding() {
           </div>
         </div>
 
-        {/* Topics – 3 columns, above chair */}
-        <div className="pointer-events-none absolute inset-x-0 top-[32%] z-30 hidden px-6 sm:px-10 lg:block">
-          <div className="mx-auto flex max-w-5xl justify-between">
-            <div className="flex flex-col gap-1">
-              {['Obesidade', 'Emagrecimento'].map((t) => (
-                <p key={t} className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/30">{t}</p>
-              ))}
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              {['Terapia Cognitivo Comportamental', 'Transtornos Alimentares'].map((t) => (
-                <p key={t} className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/30">{t}</p>
-              ))}
-            </div>
-            <div className="flex flex-col items-end gap-1">
-              {['Cirurgia Bariátrica', 'Endometriose'].map((t) => (
-                <p key={t} className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/30">{t}</p>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* Bottom bar */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-6 pb-7 sm:px-10 sm:pb-9">
           <div className="pointer-events-auto relative mx-auto flex max-w-7xl items-end">
             {/* Description – centered absolutely */}
             <p className="pointer-events-none absolute inset-x-0 bottom-0 mx-auto max-w-[1100px] text-center text-[10px] font-medium uppercase leading-loose tracking-[0.18em] text-white/80 sm:text-[11px]">
-              <span className="block">Um espaço calmo e livre de julgamentos para trabalhar ansiedade, esgotamento, relacionamentos e autoestima.</span>
-              <span className="block">Sessões online ou presenciais, com acompanhamento personalizado.</span>
+              <span className="block">Um espaço calmo para tratar obesidade, emagrecimento, transtornos alimentares, cirurgia bariátrica e endometriose.</span>
+              <span className="block">Terapia Cognitivo Comportamental — atendimento online ou presencial, com acompanhamento personalizado.</span>
             </p>
 
             {/* More – bottom right */}
@@ -132,27 +118,168 @@ export function LabLanding() {
         </div>
       </section>
 
+      {/* ── SPECIALTY SECTIONS ───────────────────────────────────────────── */}
+      {[
+        {
+          tag: 'Especialidade',
+          title: 'Obesidade',
+          titleEm: '& Corpo',
+          body: 'A obesidade vai além do aspecto físico — ela é moldada por gatilhos emocionais, padrões comportamentais e pela história de cada pessoa. O acompanhamento psicológico cria um espaço seguro para identificar esses padrões, trabalhar a relação com a comida e o próprio corpo, e construir mudanças duradouras sem julgamento.',
+          src: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=900&q=80',
+          alt: 'Reflexão e autocuidado',
+          label: 'Obesidade',
+          flip: false,
+          light: true,
+        },
+        {
+          tag: 'Especialidade',
+          title: 'Emagrecimento',
+          titleEm: 'consciente',
+          body: 'Emagrecer de forma sustentável começa na mente. Mais do que controlar o peso, o processo envolve compreender o que leva ao comer emocional, romper ciclos de culpa e restrição, e cultivar uma relação mais leve com a alimentação. A psicoterapia oferece as ferramentas para que essa transformação venha de dentro.',
+          src: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900&q=80',
+          alt: 'Equilíbrio alimentar',
+          label: 'Emagrecimento',
+          flip: true,
+          light: false,
+        },
+        {
+          tag: 'Especialidade',
+          title: 'Transtornos',
+          titleEm: 'Alimentares',
+          body: 'Anorexia, bulimia, compulsão alimentar e outros transtornos carregam sofrimentos que vão muito além da mesa. O tratamento psicológico é peça central nesse caminho — ajudando a ressignificar a relação com o corpo, a comida e a autoimagem, com escuta acolhedora e abordagem baseada em evidências.',
+          src: '/Transtornos Alimentares.png',
+          alt: 'Transtornos Alimentares',
+          label: 'Transtornos Alimentares',
+          flip: false,
+          light: true,
+        },
+        {
+          tag: 'Especialidade',
+          title: 'Cirurgia',
+          titleEm: 'Bariátrica',
+          body: 'A cirurgia bariátrica transforma o corpo, mas a mente precisa acompanhar essa mudança. O suporte psicológico — antes e depois do procedimento — é fundamental para avaliar a prontidão emocional, prevenir transtornos no pós-operatório e garantir que os resultados sejam mantidos a longo prazo.',
+          src: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=900&q=80',
+          alt: 'Cuidado e preparo',
+          label: 'Cirurgia Bariátrica',
+          flip: true,
+          light: false,
+        },
+        {
+          tag: 'Abordagem',
+          title: 'Terapia Cognitivo',
+          titleEm: 'Comportamental',
+          body: 'A TCC é uma das abordagens mais bem estudadas da psicologia. Ela parte da compreensão de que nossos pensamentos influenciam diretamente nossas emoções e comportamentos — e que é possível mudá-los. Com técnicas práticas e foco nos objetivos de cada pessoa, a TCC oferece resultados concretos e duradouros.',
+          src: '/TCC.png',
+          alt: 'Terapia Cognitivo Comportamental',
+          label: 'TCC',
+          flip: false,
+          light: true,
+        },
+        {
+          tag: 'Experiência Clínica',
+          title: 'Endometriose',
+          titleEm: '& Saúde Mental',
+          body: 'Viver com endometriose é carregar uma dor que muitas vezes não é vista. A dor crônica, o longo caminho até o diagnóstico e os impactos na fertilidade e na vida social geram ansiedade, depressão e isolamento. O acompanhamento psicológico oferece um espaço de escuta real — para que a mulher seja cuidada em todas as dimensões.',
+          src: '/endometrioze.png',
+          alt: 'Endometriose e saúde mental',
+          label: 'Endometriose',
+          flip: true,
+          light: false,
+        },
+      ].map(({ tag, title, titleEm, body, src, alt, label, flip, light }) => {
+        const bg = light ? 'bg-[#B8AEA4]' : 'bg-[#7A9068]'
+
+        const colorSide = (
+          <div key="color" className={`relative flex items-center px-10 py-20 sm:px-16 xl:px-24 ${bg}`}>
+            <div className="pointer-events-none absolute inset-0 bg-black/20" />
+            <div className="relative z-10 flex max-w-[460px] flex-col gap-6">
+              <span className="text-[0.57rem] font-light uppercase tracking-[0.3em] text-[#2e2b28] opacity-40">{tag}</span>
+              <h2 className="font-[family-name:var(--font-cormorant)] text-[clamp(2.4rem,3.8vw,4rem)] font-light leading-[1.06] text-[#2e2b28]">
+                {title}<br />
+                <em className="italic opacity-50">{titleEm}</em>
+              </h2>
+              <div className="h-px w-8 bg-[#2e2b28] opacity-20" />
+              <p className="max-w-[40ch] text-sm leading-[1.9] text-[#2e2b28] opacity-55">{body}</p>
+              <a
+                href={WHATSAPP_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-flex items-center gap-2 text-[0.59rem] font-light uppercase tracking-[0.24em] text-[#2e2b28] opacity-40 transition-opacity hover:opacity-80"
+              >
+                Agendar consulta <ArrowRight className="size-3" />
+              </a>
+            </div>
+          </div>
+        )
+
+        const blendColor = light ? '#938B83' : '#627353'
+
+        const imageSide = (
+          <div key="image" className="group relative overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt={alt}
+              className="absolute inset-0 h-full w-full object-cover object-top brightness-90 transition-transform duration-[1100ms] ease-in-out group-hover:scale-105"
+            />
+            {/* Dark overlay — same level as colorSide */}
+            <div className="pointer-events-none absolute inset-0 z-10 bg-black/20" />
+            {/* Blend into solid color — above dark overlay */}
+            <div
+              className={`pointer-events-none absolute top-0 z-20 h-full w-[55%] ${flip ? 'right-0' : 'left-0'}`}
+              style={{
+                background: flip
+                  ? `linear-gradient(to left, ${blendColor}, transparent)`
+                  : `linear-gradient(to right, ${blendColor}, transparent)`,
+              }}
+            />
+            {/* Shadow on screen edge — above dark overlay */}
+            <div
+              className={`pointer-events-none absolute top-0 z-20 h-full w-[20%] ${flip ? 'left-0' : 'right-0'}`}
+              style={{
+                background: flip
+                  ? 'linear-gradient(to right, rgba(0,0,0,0.35), transparent)'
+                  : 'linear-gradient(to left, rgba(0,0,0,0.35), transparent)',
+              }}
+            />
+            <span className={`absolute bottom-7 z-30 text-[0.58rem] font-extralight uppercase tracking-[0.22em] text-white opacity-50 ${flip ? 'left-6' : 'right-6'}`}>{label}</span>
+          </div>
+        )
+
+        return (
+          <section
+            key={title}
+            className={`grid min-h-svh overflow-hidden ${flip ? 'grid-cols-[40fr_60fr]' : 'grid-cols-[60fr_40fr]'}`}
+          >
+            {flip ? <>{imageSide}{colorSide}</> : <>{colorSide}{imageSide}</>}
+          </section>
+        )
+      })}
+
       {/* ── CONTENT SECTIONS ─────────────────────────────────────────────── */}
-      <div className="bg-[#D4DCBA]">
+      <div className="bg-white">
         <section
           id="sobre"
-          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
+          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-14 sm:px-10"
         >
           <div className="mx-auto max-w-3xl">
             <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
               Sobre
             </span>
-            <p className="mt-5 text-xl leading-relaxed text-[#2D2D2D]/90 sm:text-2xl sm:leading-relaxed">
+            <p className="mt-5 text-sm leading-relaxed text-[#2D2D2D]/90 sm:text-base sm:leading-relaxed">
               Sou Thais Dantas, psicóloga dedicada a oferecer um ambiente seguro
               e acolhedor. Cada encontro é conduzido com escuta qualificada,
               respeito ao seu ritmo e foco no que faz sentido para você.
+              O processo terapêutico pode ajudar a compreender padrões emocionais,
+              desenvolver recursos internos e construir relações mais saudáveis
+              consigo e com os outros — sempre com confidencialidade e cuidado.
             </p>
           </div>
         </section>
 
         <section
           id="especialidades"
-          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
+          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-14 sm:px-10"
         >
           <div className="mx-auto max-w-5xl">
             <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
@@ -166,7 +293,7 @@ export function LabLanding() {
                 {['Obesidade', 'Emagrecimento', 'Cirurgia Bariátrica', 'Endometriose'].map((t) => (
                   <p
                     key={t}
-                    className="border-t border-[#556040]/15 py-5 text-xl text-[#2D2D2D]/80"
+                    className="border-t border-[#556040]/15 py-2.5 text-sm text-[#2D2D2D]/80"
                   >
                     {t}
                   </p>
@@ -180,7 +307,7 @@ export function LabLanding() {
                 {['Transtornos Alimentares', 'Terapia Cognitivo Comportamental'].map((t) => (
                   <p
                     key={t}
-                    className="border-t border-[#556040]/15 py-5 text-xl text-[#2D2D2D]/80"
+                    className="border-t border-[#556040]/15 py-2.5 text-sm text-[#2D2D2D]/80"
                   >
                     {t}
                   </p>
@@ -190,44 +317,96 @@ export function LabLanding() {
           </div>
         </section>
 
-        <section
-          id="terapia"
-          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
-        >
-          <div className="mx-auto max-w-3xl">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
-              Terapia
-            </span>
-            <p className="mt-5 text-xl leading-relaxed text-[#2D2D2D]/90 sm:text-2xl sm:leading-relaxed">
-              O processo terapêutico pode ajudar a compreender padrões
-              emocionais, desenvolver recursos internos e construir relações
-              mais saudáveis consigo e com os outros — sempre com
-              confidencialidade e cuidado.
-            </p>
-          </div>
-        </section>
 
-        <section
-          id="consultas"
-          className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-24 sm:px-10"
-        >
-          <div className="mx-auto max-w-3xl">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
-              Consultas
-            </span>
-            <p className="mt-5 text-xl leading-relaxed text-[#2D2D2D]/90 sm:text-2xl sm:leading-relaxed">
-              Atendimentos online ou presenciais, com horários combinados
-              previamente. Para agendar ou tirar dúvidas, entre em contato.
-            </p>
-            <a
-              href={WHATSAPP_BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#556040] px-6 py-3 text-sm font-medium text-[#3A4424] transition-colors hover:bg-[#556040]/10"
-            >
-              Agendar uma consulta
-              <ArrowRight className="size-3.5" strokeWidth={2} />
-            </a>
+
+        {/* ── CONTACT ──────────────────────────────────────────────────────── */}
+        <section className="border-t border-[#556040]/20 px-6 py-10 sm:px-10">
+          <div className="mx-auto flex max-w-5xl items-center gap-8">
+
+            {/* Map + Address */}
+            <div className="flex flex-1 items-center gap-6">
+              <div className="h-32 w-48 shrink-0 overflow-hidden rounded-sm">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3822.5896755297!2d-49.26997518508!3d-16.68921308748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x935ef15a77fc9bab%3A0x9d5dfaa6e0d78ec4!2sPontif%C3%ADcia%20Universidade%20Cat%C3%B3lica%20de%20Goi%C3%A1s!5e0!3m2!1spt-BR!2sbr!4v1657549036!5m2!1spt-BR!2sbr"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Localização PUC Goiás"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">Localização</p>
+                <p className="mt-1 text-sm font-medium text-[#2D2D2D]">PUC Goiás</p>
+                <p className="text-sm text-[#2D2D2D]/60">Av. Universitária, 1440</p>
+                <p className="text-sm text-[#2D2D2D]/60">Setor Universitário</p>
+                <p className="text-sm text-[#2D2D2D]/60">Goiânia – GO</p>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-28 w-px shrink-0 bg-[#556040]/15" />
+
+            {/* Avatar + Info */}
+            <div className="flex flex-1 items-center gap-5">
+              <div className="relative size-32 shrink-0 overflow-hidden rounded-full ring-1 ring-[#556040]/20">
+                <Image
+                  src="/thais dantas.png"
+                  alt="Thais Dantas"
+                  fill
+                  className="object-cover object-top"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <p className="text-base font-medium text-[#2D2D2D]">Thais Dantas</p>
+                <p className="text-sm text-[#2D2D2D]/55">Psicóloga — CRP 09/</p>
+                <p className="text-sm text-[#2D2D2D]/55">Especialista em Saúde Alimentar</p>
+                <div className="mt-1 flex flex-col gap-1">
+                  <a
+                    href="tel:+5562992016959"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#556040] hover:opacity-75 transition-opacity"
+                  >
+                    <Phone className="size-3.5" strokeWidth={1.5} />
+                    (62) 9 9201-6959
+                  </a>
+                  <a
+                    href={WHATSAPP_BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#556040] hover:opacity-75 transition-opacity"
+                  >
+                    <svg className="size-3.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.112 1.523 5.84L0 24l6.338-1.499A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.652-.493-5.184-1.357l-.372-.22-3.862.913.978-3.768-.242-.387A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                    </svg>
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-28 w-px shrink-0 bg-[#556040]/15" />
+
+            {/* Consultas */}
+            <div id="consultas" className="flex flex-1 flex-col gap-4 scroll-mt-20">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">Consultas</p>
+              <p className="text-sm leading-relaxed text-[#2D2D2D]/70">
+                Atendimentos online ou presenciais, com horários combinados previamente.
+              </p>
+              <a
+                href={WHATSAPP_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#556040] px-5 py-2.5 text-sm font-medium text-[#3A4424] transition-colors hover:bg-[#556040]/10"
+              >
+                Agendar uma consulta
+                <ArrowRight className="size-3.5" strokeWidth={2} />
+              </a>
+            </div>
+
           </div>
         </section>
       </div>
