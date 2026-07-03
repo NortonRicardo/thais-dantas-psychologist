@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 import { ChevronDown, Search, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 import {
   Popover,
@@ -19,6 +20,7 @@ export function FilterCombobox({
   width = 'w-44',
   showClear = true,
   light = false,
+  popoverClassName,
   renderOption,
   labelForValue,
   renderValue,
@@ -33,6 +35,8 @@ export function FilterCombobox({
   showClear?: boolean
   /** Modo claro — para uso em modais/fundos claros. */
   light?: boolean
+  /** Classe extra para o PopoverContent (ex.: cor de fundo customizada). */
+  popoverClassName?: string
   renderOption?: (opt: string) => React.ReactNode
   /** Quando `value` não é legível (ex.: id), exibir rótulo no botão. */
   labelForValue?: (value: string) => string
@@ -103,7 +107,10 @@ export function FilterCombobox({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="scheme-dark flex max-h-[70vh] w-[var(--radix-popover-trigger-width)] min-w-0 flex-col overflow-hidden border-white/10 bg-[#071525] p-0 text-white shadow-xl"
+        className={cn(
+          'scheme-dark flex max-h-[70vh] w-[var(--radix-popover-trigger-width)] min-w-0 flex-col overflow-hidden border-white/10 p-0 text-white shadow-xl',
+          popoverClassName ?? 'bg-[#1e2a14]'
+        )}
       >
         <div className="shrink-0 border-b border-white/10 px-2 py-2">
           <div className="relative">
