@@ -48,6 +48,47 @@ export const contactChannels = pgTable(
 export type ContactChannel = typeof contactChannels.$inferSelect
 export type NewContactChannel = typeof contactChannels.$inferInsert
 
+/** Categorias disponíveis para os artigos do blog. */
+export const blogCategories = pgTable('blog_categories', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type BlogCategory = typeof blogCategories.$inferSelect
+export type NewBlogCategory = typeof blogCategories.$inferInsert
+
+/** Artigos do blog público. */
+export const blogPosts = pgTable(
+  'blog_posts',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    title: text('title').notNull(),
+    subtitle: text('subtitle'),
+    excerpt: text('excerpt').notNull().default(''),
+    slug: text('slug').notNull().unique(),
+    category: text('category').notNull(),
+    coverImageUrl: text('cover_image_url'),
+    bodyHtml: text('body_html').notNull().default(''),
+    published: boolean('published').notNull().default(false),
+    publishedAt: timestamp('published_at', { withTimezone: true }),
+    views: integer('views').notNull().default(0),
+    readTimeMinutes: integer('read_time_minutes').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [index('idx_blog_posts_published').on(t.published, t.publishedAt)]
+)
+
+export type BlogPost = typeof blogPosts.$inferSelect
+export type NewBlogPost = typeof blogPosts.$inferInsert
+
 // ─── Better Auth tables ──────────────────────────────────────────────────────
 
 export const authUsers = pgTable('auth_user', {

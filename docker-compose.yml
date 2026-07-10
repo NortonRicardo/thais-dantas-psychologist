@@ -12,6 +12,8 @@ services:
       - .env
     environment:
       NODE_ENV: production
+    volumes:
+      - blog_uploads:/app/public/uploads/blog
     depends_on:
       db:
         condition: service_healthy
@@ -40,6 +42,7 @@ services:
 
 volumes:
   pg_data:
+  blog_uploads:
 
 networks:
   app-network:

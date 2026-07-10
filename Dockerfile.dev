@@ -1,6 +1,11 @@
 # Desenvolvimento com docker compose (código montado por volume).
 FROM oven/bun:1-slim
 
+# Next.js dev server (webpack) hangs indefinitely when run under Bun's
+# runtime instead of real Node.js — install Node.js just for `next dev`.
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY package.json bun.lock ./

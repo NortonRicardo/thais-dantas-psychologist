@@ -35,6 +35,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  serverExternalPackages: ['sharp'],
+  ...(isDev ? { allowedDevOrigins: ['localhost', '0.0.0.0'] } : {}),
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }]
   },

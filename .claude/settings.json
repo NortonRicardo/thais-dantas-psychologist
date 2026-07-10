@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(docker info *)",
+      "Bash(bun --version)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\('main'\\), d.get\\('module'\\), d.get\\('types'\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('exports'\\), indent=2\\)\\)\")",
+      "Bash(DATABASE_URL=\"postgres://thais_dantas:thais_dantas@localhost:5432/thais_dantas\" bun run db:generate)",
+      "Bash(bun -e ' *)",
+      "Bash(bun install *)",
+      "Bash(bunx tsc *)",
+      "Bash(git stash *)",
+      "Bash(curl -s http://localhost:3000/blog)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/blog/artigo-de-teste-automatizado)",
+      "Bash(awk 'NR==63{print length, $0}' package.json)",
+      "Bash(bunx @tailwindcss/cli -i src/app/globals.css -o /tmp/out.css)",
+      "Bash(bunx @tailwindcss/cli@4.1.18 -i src/app/globals.css -o /tmp/out2.css)",
+      "Bash(curl -s -m 15 -o /dev/null -w 'STATUS:%{http_code}\\\\n' \"http://localhost:3000/manager/blog/732af744-2a2d-460f-86ba-5051b9ee8b05\")",
+      "Bash(curl -s -m 15 \"http://localhost:3000/blog\" -o /dev/null -w 'STATUS:%{http_code}\\\\n')"
+    ]
+  }
+}
