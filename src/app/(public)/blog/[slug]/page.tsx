@@ -82,14 +82,11 @@ export default async function ArticlePage({
         <div className="mx-auto w-full max-w-3xl">
           <Link
             href="/blog"
-            className="mt-8 inline-flex items-center gap-1.5 text-[12px] text-white/50 transition-colors hover:text-white/80"
+            className="mt-8 flex w-fit items-center gap-1.5 text-[12px] text-white/50 transition-colors hover:text-white/80"
           >
             <ArrowLeft size={13} /> Blog
           </Link>
-          <span className="mt-6 inline-block rounded-full bg-white/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-white">
-            {post.category}
-          </span>
-          <h1 className="mt-4 font-[family-name:var(--font-cormorant)] text-[clamp(2rem,4.5vw,3.5rem)] font-light leading-[1.05] text-white">
+          <h1 className="mt-6 font-[family-name:var(--font-cormorant)] text-[clamp(2rem,4.5vw,3.5rem)] font-light leading-[1.05] text-white">
             {post.title}
           </h1>
           {post.subtitle && (
@@ -97,6 +94,16 @@ export default async function ArticlePage({
               {post.subtitle}
             </p>
           )}
+          <div className="mt-4 flex flex-wrap justify-end gap-2">
+            {post.categories.map(c => (
+              <span
+                key={c.id}
+                className="inline-block rounded-full bg-white/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-white"
+              >
+                {c.name}
+              </span>
+            ))}
+          </div>
           <div className="mt-6 flex items-center gap-4 border-t border-white/15 pb-8 pt-5">
             <span className="text-[11px] text-white/40">
               {post.publishedAt ? formatPostDate(post.publishedAt) : ''}

@@ -4,15 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NextImage from 'next/image'
-import {
-  ArrowLeft,
-  ImagePlus,
-  Loader2,
-  Pencil,
-  Plus,
-  Trash2,
-  X,
-} from 'lucide-react'
+import { ArrowLeft, ImagePlus, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -27,12 +19,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { FilterCombobox } from '@/components/filter-combobox'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { blogPostWriteSchema } from '@/lib/validation/blog-api'
 import { CategoryDialog } from './category-dialog'
+import { CategoryMultiSelect } from './category-multi-select'
 import { RichTextEditor } from './rich-text-editor'
 
 type Category = { id: string; name: string }
@@ -49,7 +41,7 @@ type BlogPostRecord = {
   id: string
   title: string
   subtitle: string | null
-  category: string
+  categories: Category[]
   slug: string
   coverImageUrl: string | null
   bodyHtml: string
@@ -189,7 +181,7 @@ export function ArticleEditor({
 
   const [title, setTitle] = useState('')
   const [subtitle, setSubtitle] = useState('')
-  const [category, setCategory] = useState('')
+  const [categoryIds, setCategoryIds] = useState<string[]>([])
   const [coverImageUrl, setCoverImageUrl] = useState('')
   const [bodyHtml, setBodyHtml] = useState('')
   const [published, setPublished] = useState(false)
@@ -210,15 +202,14 @@ export function ArticleEditor({
   useEffect(loadCategories, [])
 
   function handleCategorySaved(saved: Category) {
+    const isNew = !editingCategory
     setCategories(prev => {
-      const next = editingCategory
-        ? prev.map(c => (c.id === saved.id ? saved : c))
-        : [...prev, saved]
+      const next = isNew
+        ? [...prev, saved]
+        : prev.map(c => (c.id === saved.id ? saved : c))
       return next.sort((a, b) => a.name.localeCompare(b.name, 'pt'))
     })
-    if (editingCategory && category === editingCategory.name) {
-      setCategory(saved.name)
-    }
+    if (isNew) setCategoryIds(prev => [...prev, saved.id])
   }
 
   useEffect(() => {
@@ -232,7 +223,7 @@ export function ArticleEditor({
       .then(post => {
         setTitle(post.title)
         setSubtitle(post.subtitle ?? '')
-        setCategory(post.category)
+        setCategoryIds(post.categories.map(c => c.id))
         setCoverImageUrl(post.coverImageUrl ?? '')
         setBodyHtml(post.bodyHtml)
         setPublished(post.published)
@@ -253,7 +244,7 @@ export function ArticleEditor({
     const payload = {
       title,
       subtitle: subtitle || undefined,
-      category,
+      categoryIds,
       coverImageUrl: coverImageUrl || null,
       bodyHtml,
       published,
@@ -448,49 +439,20 @@ export function ArticleEditor({
           {/* Categoria */}
           <div className="rounded-2xl p-5" style={GLASS}>
             <Label className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">
-              Categoria
+              Categorias
             </Label>
-            <FilterCombobox
-              value={category}
-              onChange={setCategory}
-              placeholder="Selecione uma categoria…"
-              clearLabel="Limpar"
-              showClear={false}
-              options={categories.map(c => c.name)}
-              width="w-full"
-              renderOption={opt => (
-                <span className="flex w-full min-w-0 items-center justify-between gap-2">
-                  <span className="truncate">{opt}</span>
-                  <span
-                    role="button"
-                    tabIndex={-1}
-                    title="Editar categoria"
-                    onClick={e => {
-                      e.stopPropagation()
-                      const found = categories.find(c => c.name === opt)
-                      if (!found) return
-                      setEditingCategory(found)
-                      setCategoryDialogOpen(true)
-                    }}
-                    className="shrink-0 rounded p-1 text-white/30 transition-colors hover:bg-white/10 hover:text-white/70"
-                  >
-                    <Pencil size={11} />
-                  </span>
-                </span>
-              )}
-              footer={
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingCategory(undefined)
-                    setCategoryDialogOpen(true)
-                  }}
-                  className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white/90"
-                >
-                  <Plus size={12} className="shrink-0" />
-                  Nova categoria
-                </button>
-              }
+            <CategoryMultiSelect
+              categories={categories}
+              selectedIds={categoryIds}
+              onChange={setCategoryIds}
+              onRequestCreate={() => {
+                setEditingCategory(undefined)
+                setCategoryDialogOpen(true)
+              }}
+              onRequestEdit={c => {
+                setEditingCategory(c)
+                setCategoryDialogOpen(true)
+              }}
             />
           </div>
         </div>

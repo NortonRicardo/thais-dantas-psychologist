@@ -175,7 +175,7 @@ export default async function BlogPage({
                       />
                       <div className="absolute inset-0 bg-[#556040]/20" />
                       <TagBadge
-                        category={featured.category}
+                        categories={featured.categories}
                         className="absolute bottom-5 left-5"
                         light
                       />
@@ -185,7 +185,7 @@ export default async function BlogPage({
                       <span className="pointer-events-none absolute -right-4 -top-4 select-none font-[family-name:var(--font-cormorant)] text-[14rem] font-light leading-none text-white/5">
                         01
                       </span>
-                      <TagBadge category={featured.category} light />
+                      <TagBadge categories={featured.categories} light />
                     </div>
                   )}
                   <div className="flex flex-col justify-between bg-white p-8">
@@ -289,20 +289,26 @@ export default async function BlogPage({
 
 /* ─── Tag badge ──────────────────────────────────────────────────────────── */
 function TagBadge({
-  category,
+  categories,
   className = '',
   light = false,
 }: {
-  category: string
+  categories: { id: string; name: string }[]
   className?: string
   light?: boolean
 }) {
+  if (categories.length === 0) return null
   return (
-    <span
-      className={`inline-block rounded-full px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.22em] ${light ? 'bg-white/20 text-white' : 'bg-[#556040]/10 text-[#556040]'} ${className}`}
-    >
-      {category}
-    </span>
+    <div className={`flex flex-wrap gap-1.5 ${className}`}>
+      {categories.map(c => (
+        <span
+          key={c.id}
+          className={`inline-block rounded-full px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.22em] ${light ? 'bg-white/20 text-white' : 'bg-[#556040]/10 text-[#556040]'}`}
+        >
+          {c.name}
+        </span>
+      ))}
+    </div>
   )
 }
 
@@ -337,7 +343,7 @@ function ArticleCard({
           />
           <div className="absolute inset-0 bg-[#556040]/15" />
           <TagBadge
-            category={a.category}
+            categories={a.categories}
             className="absolute bottom-4 left-4"
             light
           />
@@ -354,7 +360,7 @@ function ArticleCard({
               {num}
             </span>
             <TagBadge
-              category={a.category}
+              categories={a.categories}
               light={isDark}
               className="relative mb-3"
             />

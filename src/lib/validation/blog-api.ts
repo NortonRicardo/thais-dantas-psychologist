@@ -14,11 +14,9 @@ export const blogPostWriteSchema = z.object({
     .max(300, 'Subtítulo: no máximo 300 caracteres.')
     .optional()
     .transform(v => (v ? v : undefined)),
-  category: z
-    .string()
-    .trim()
-    .min(1, 'Categoria obrigatória.')
-    .max(80, 'Categoria: no máximo 80 caracteres.'),
+  categoryIds: z
+    .array(z.string().uuid('Categoria inválida.'))
+    .min(1, 'Selecione ao menos uma categoria.'),
   slug: z
     .string()
     .trim()

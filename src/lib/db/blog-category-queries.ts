@@ -1,6 +1,6 @@
 import { asc, eq } from 'drizzle-orm'
 import { db } from './index'
-import { blogCategories, blogPosts, type BlogCategory } from './schema'
+import { blogCategories, type BlogCategory } from './schema'
 
 export async function listCategories(): Promise<BlogCategory[]> {
   return db.select().from(blogCategories).orderBy(asc(blogCategories.name))
@@ -34,32 +34,15 @@ export async function getCategoryById(
   return row
 }
 
-/** Renomeia a categoria e propaga o novo nome para todos os artigos que a usam. */
+/** Renomeia a categoria — os artigos referenciam por id, então nada mais precisa mudar. */
 export async function renameCategory(
   id: string,
   name: string
 ): Promise<BlogCategory | undefined> {
-  return db.transaction(async tx => {
-    const [existing] = await tx
-      .select()
-      .from(blogCategories)
-      .where(eq(blogCategories.id, id))
-      .limit(1)
-    if (!existing) return undefined
-
-    const [updated] = await tx
-      .update(blogCategories)
-      .set({ name })
-      .where(eq(blogCategories.id, id))
-      .returning()
-
-    if (existing.name !== name) {
-      await tx
-        .update(blogPosts)
-        .set({ category: name })
-        .where(eq(blogPosts.category, existing.name))
-    }
-
-    return updated
-  })
+  const [updated] = await db
+    .update(blogCategories)
+    .set({ name })
+    .where(eq(blogCategories.id, id))
+    .returning()
+  return updated
 }

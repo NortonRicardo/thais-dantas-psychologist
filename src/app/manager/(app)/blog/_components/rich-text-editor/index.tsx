@@ -26,6 +26,7 @@ import {
   Pilcrow,
   Quote,
   Redo2,
+  RemoveFormatting,
   Square,
   Squircle,
   Strikethrough,
@@ -439,6 +440,144 @@ export function RichTextEditor({
       </div>
 
       <EditorContent editor={editor} className="px-6 py-4 sm:px-10" />
+
+      {editor && (
+        <BubbleMenu
+          editor={editor}
+          shouldShow={({ state, from, to }) => {
+            if (state.selection instanceof NodeSelection) return false
+            return from !== to
+          }}
+          className="flex max-w-[90vw] flex-wrap items-center gap-1 rounded-lg border border-white/10 bg-[#1e2a14] p-1 shadow-xl"
+        >
+          <ToolbarButton
+            title="Desfazer"
+            onClick={() => editor.chain().focus().undo().run()}
+            disabled={!editor.can().undo()}
+          >
+            <Undo2 size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Refazer"
+            onClick={() => editor.chain().focus().redo().run()}
+            disabled={!editor.can().redo()}
+          >
+            <Redo2 size={14} />
+          </ToolbarButton>
+
+          <Divider />
+
+          <ToolbarButton
+            title="Parágrafo"
+            active={editor.isActive('paragraph')}
+            onClick={() => editor.chain().focus().setParagraph().run()}
+          >
+            <Pilcrow size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Título 2"
+            active={editor.isActive('heading', { level: 2 })}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+          >
+            <Heading2 size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Título 3"
+            active={editor.isActive('heading', { level: 3 })}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 3 }).run()
+            }
+          >
+            <Heading3 size={14} />
+          </ToolbarButton>
+
+          <Divider />
+
+          <ToolbarButton
+            title="Alinhar texto à esquerda"
+            active={editor.isActive({ textAlign: 'left' })}
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          >
+            <AlignLeft size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Centralizar texto"
+            active={editor.isActive({ textAlign: 'center' })}
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          >
+            <AlignCenter size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Alinhar texto à direita"
+            active={editor.isActive({ textAlign: 'right' })}
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          >
+            <AlignRight size={14} />
+          </ToolbarButton>
+
+          <Divider />
+
+          <ToolbarButton
+            title="Negrito"
+            active={editor.isActive('bold')}
+            onClick={() => editor.chain().focus().toggleBold().run()}
+          >
+            <Bold size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Itálico"
+            active={editor.isActive('italic')}
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+          >
+            <Italic size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Tachado"
+            active={editor.isActive('strike')}
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+          >
+            <Strikethrough size={14} />
+          </ToolbarButton>
+
+          <Divider />
+
+          <ToolbarButton
+            title="Lista"
+            active={editor.isActive('bulletList')}
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+          >
+            <List size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Lista numerada"
+            active={editor.isActive('orderedList')}
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          >
+            <ListOrdered size={14} />
+          </ToolbarButton>
+          <ToolbarButton
+            title="Citação"
+            active={editor.isActive('blockquote')}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          >
+            <Quote size={14} />
+          </ToolbarButton>
+
+          <Divider />
+
+          <LinkButton editor={editor} />
+          <ToolbarButton
+            title="Remover formatação"
+            onClick={() =>
+              editor.chain().focus().unsetAllMarks().clearNodes().run()
+            }
+          >
+            <RemoveFormatting size={14} />
+          </ToolbarButton>
+        </BubbleMenu>
+      )}
 
       {editor && (
         <BubbleMenu

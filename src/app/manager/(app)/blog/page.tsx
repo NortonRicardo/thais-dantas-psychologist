@@ -42,7 +42,7 @@ const PER_PAGE = 6
 type Article = {
   id: string
   title: string
-  category: string
+  categories: { id: string; name: string }[]
   published: boolean
 }
 
@@ -77,9 +77,16 @@ function ArticleRow({
         </span>
       </td>
       <td className="px-6 py-4">
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs text-white/55">
-          {article.category}
-        </span>
+        <div className="flex flex-wrap gap-1.5">
+          {article.categories.map(c => (
+            <span
+              key={c.id}
+              className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs text-white/55"
+            >
+              {c.name}
+            </span>
+          ))}
+        </div>
       </td>
       <td className="px-6 py-4">
         <span
@@ -158,8 +165,8 @@ export default function BlogManagerPage() {
 
   const categories = useMemo(
     () =>
-      [...new Set(articles.map(a => a.category))].sort((a, b) =>
-        a.localeCompare(b, 'pt')
+      [...new Set(articles.flatMap(a => a.categories.map(c => c.name)))].sort(
+        (a, b) => a.localeCompare(b, 'pt')
       ),
     [articles]
   )
@@ -167,7 +174,8 @@ export default function BlogManagerPage() {
   const filtered = useMemo(() => {
     return articles.filter(a => {
       const matchSearch = a.title.toLowerCase().includes(search.toLowerCase())
-      const matchCat = !category || a.category === category
+      const matchCat =
+        !category || a.categories.some(c => c.name === category)
       return matchSearch && matchCat
     })
   }, [articles, search, category])

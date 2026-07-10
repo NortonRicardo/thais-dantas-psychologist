@@ -6,6 +6,7 @@ import {
   boolean,
   integer,
   index,
+  primaryKey,
 } from 'drizzle-orm/pg-core'
 
 /** Informações de contato exibidas na página pública /contato (registro único) */
@@ -69,7 +70,6 @@ export const blogPosts = pgTable(
     subtitle: text('subtitle'),
     excerpt: text('excerpt').notNull().default(''),
     slug: text('slug').notNull().unique(),
-    category: text('category').notNull(),
     coverImageUrl: text('cover_image_url'),
     bodyHtml: text('body_html').notNull().default(''),
     published: boolean('published').notNull().default(false),
@@ -88,6 +88,25 @@ export const blogPosts = pgTable(
 
 export type BlogPost = typeof blogPosts.$inferSelect
 export type NewBlogPost = typeof blogPosts.$inferInsert
+
+/** Associação N:N entre artigos e categorias (um artigo pode ter várias). */
+export const blogPostCategories = pgTable(
+  'blog_post_categories',
+  {
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => blogPosts.id, { onDelete: 'cascade' }),
+    categoryId: uuid('category_id')
+      .notNull()
+      .references(() => blogCategories.id, { onDelete: 'cascade' }),
+  },
+  t => [
+    primaryKey({ columns: [t.postId, t.categoryId] }),
+    index('idx_blog_post_categories_category_id').on(t.categoryId),
+  ]
+)
+
+export type BlogPostCategory = typeof blogPostCategories.$inferSelect
 
 // ─── Better Auth tables ──────────────────────────────────────────────────────
 
