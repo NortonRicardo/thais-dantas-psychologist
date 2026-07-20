@@ -19,7 +19,9 @@
       "Bash(bunx @tailwindcss/cli@4.1.18 -i src/app/globals.css -o /tmp/out2.css)",
       "Bash(curl -s -m 15 -o /dev/null -w 'STATUS:%{http_code}\\\\n' \"http://localhost:3000/manager/blog/732af744-2a2d-460f-86ba-5051b9ee8b05\")",
       "Bash(curl -s -m 15 \"http://localhost:3000/blog\" -o /dev/null -w 'STATUS:%{http_code}\\\\n')",
-      "Bash(curl -s -m 15 \"http://localhost:3000/blog/ansiedade-e-alimentacao-verificacao-final\" -o /dev/null -w 'STATUS:%{http_code}\\\\n')"
+      "Bash(curl -s -m 15 \"http://localhost:3000/blog/ansiedade-e-alimentacao-verificacao-final\" -o /dev/null -w 'STATUS:%{http_code}\\\\n')",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
