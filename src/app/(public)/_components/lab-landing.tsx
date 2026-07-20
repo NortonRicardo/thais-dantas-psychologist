@@ -308,7 +308,7 @@ export function LabLanding() {
             {/* Carousel */}
             <Carousel
               className="mt-10"
-              opts={{ align: 'start', loop: true }}
+              opts={{ loop: true }}
               setApi={setCarouselApi}
             >
               <CarouselContent className="-ml-4">
