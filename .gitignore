@@ -37,8 +37,8 @@ yarn-error.log*
 # vercel
 .vercel
 
-# uploads (dev — em produção fica em volume Docker)
-/public/uploads/
+# dado bruto de terceiros (avaliações copiadas do Google Maps) — nunca versionar
+comentarios.text
 
 # typescript
 *.tsbuildinfo

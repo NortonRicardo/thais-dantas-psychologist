@@ -21,7 +21,7 @@ const securityHeaders = [
       // React dev mode and Turbopack require 'unsafe-eval' for source maps / callstack reconstruction
       `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://images.unsplash.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://lh3.googleusercontent.com",
       "font-src 'self'",
       "connect-src 'self'",
       "frame-src 'self' https://www.google.com https://maps.google.com",

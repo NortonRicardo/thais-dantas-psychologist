@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { LabLanding } from './_components/lab-landing'
+import { GOOGLE_REVIEWS_FALLBACK } from './_constants/google-reviews-fallback'
 
 export const metadata: Metadata = {
   title: 'Thais Dantas | Psicóloga',
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <LabLanding />
+  return <LabLanding googlePlace={GOOGLE_REVIEWS_FALLBACK} />
 }
