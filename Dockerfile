@@ -34,11 +34,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Diretório de uploads do blog — recebe o volume nomeado do docker-compose.yml.
-# Precisa existir com o dono correto ANTES do primeiro mount do volume, pois o
-# Docker inicializa um volume novo copiando o conteúdo já presente no caminho da imagem.
-RUN mkdir -p ./public/uploads/blog && chown -R nextjs:nodejs ./public/uploads
-
 # Arquivos necessários para migrations e seed
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts

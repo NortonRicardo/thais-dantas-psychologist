@@ -1,8 +1,7 @@
-import { randomUUID } from 'node:crypto'
-import { mkdir, writeFile } from 'node:fs/promises'
-import path from 'node:path'
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
+import { db } from '@/lib/db'
+import { blogImages } from '@/lib/db/schema'
 
 const ALLOWED_MIME = new Set([
   'image/png',
@@ -12,7 +11,6 @@ const ALLOWED_MIME = new Set([
 ])
 const MAX_SIZE_BYTES = 8 * 1024 * 1024
 const MAX_DIMENSION = 2000
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'blog')
 
 export async function POST(req: NextRequest) {
   try {
@@ -52,13 +50,19 @@ export async function POST(req: NextRequest) {
 
     const metadata = await sharp(processed).metadata()
 
-    await mkdir(UPLOAD_DIR, { recursive: true })
-    const filename = `${randomUUID()}.webp`
-    await writeFile(path.join(UPLOAD_DIR, filename), processed)
+    const [created] = await db
+      .insert(blogImages)
+      .values({
+        data: processed,
+        contentType: 'image/webp',
+        width: metadata.width ?? null,
+        height: metadata.height ?? null,
+      })
+      .returning({ id: blogImages.id })
 
     return NextResponse.json(
       {
-        url: `/uploads/blog/${filename}`,
+        url: `/uploads/blog/${created.id}.webp`,
         width: metadata.width ?? null,
         height: metadata.height ?? null,
       },

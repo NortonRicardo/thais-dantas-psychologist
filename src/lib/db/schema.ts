@@ -7,7 +7,14 @@ import {
   integer,
   index,
   primaryKey,
+  customType,
 } from 'drizzle-orm/pg-core'
+
+const bytea = customType<{ data: Buffer }>({
+  dataType() {
+    return 'bytea'
+  },
+})
 
 /** Informações de contato exibidas na página pública /contato (registro único) */
 export const contactInfo = pgTable('contact_info', {
@@ -88,6 +95,21 @@ export const blogPosts = pgTable(
 
 export type BlogPost = typeof blogPosts.$inferSelect
 export type NewBlogPost = typeof blogPosts.$inferInsert
+
+/** Imagens do blog (capa e inline), guardadas como bytes no próprio banco. */
+export const blogImages = pgTable('blog_images', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  data: bytea('data').notNull(),
+  contentType: text('content_type').notNull().default('image/webp'),
+  width: integer('width'),
+  height: integer('height'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type BlogImage = typeof blogImages.$inferSelect
+export type NewBlogImage = typeof blogImages.$inferInsert
 
 /** Associação N:N entre artigos e categorias (um artigo pode ter várias). */
 export const blogPostCategories = pgTable(
