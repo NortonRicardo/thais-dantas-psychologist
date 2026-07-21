@@ -573,45 +573,56 @@ export function LabLanding({
           id="especialidades"
           className="scroll-mt-20 border-t border-[#556040]/30 px-6 py-14 sm:px-10"
         >
-          <div className="mx-auto max-w-5xl">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
-              Especialidades
-            </span>
-            <div className="mt-10 grid grid-cols-1 gap-px sm:grid-cols-[1fr_1px_1fr]">
-              <div className="flex flex-col">
-                <span className="mb-6 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]/50">
-                  Saúde & Corpo
-                </span>
-                {[
-                  'Obesidade',
-                  'Emagrecimento',
-                  'Cirurgia Bariátrica',
-                  'Endometriose',
-                ].map(t => (
-                  <p
-                    key={t}
-                    className="border-t border-[#556040]/15 py-2.5 text-sm text-[#2D2D2D]/80"
-                  >
-                    {t}
-                  </p>
-                ))}
-              </div>
-              <div className="hidden bg-[#556040]/15 sm:block" />
-              <div className="mt-12 flex flex-col sm:mt-0 sm:pl-16">
-                <span className="mb-6 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]/50">
-                  Abordagem
-                </span>
-                {[
-                  'Transtornos Alimentares',
-                  'Terapia Cognitivo Comportamental',
-                ].map(t => (
-                  <p
-                    key={t}
-                    className="border-t border-[#556040]/15 py-2.5 text-sm text-[#2D2D2D]/80"
-                  >
-                    {t}
-                  </p>
-                ))}
+          <div className="mx-auto flex max-w-5xl items-center gap-10 sm:gap-14">
+            <div className="relative hidden aspect-square w-52 shrink-0 self-center overflow-hidden rounded-full sm:block">
+              <Image
+                src="/thais dantas.png"
+                alt="Thais Dantas"
+                fill
+                className="object-cover object-top"
+              />
+            </div>
+            <div className="hidden h-full w-px shrink-0 self-stretch bg-[#556040]/15 sm:block" />
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]">
+                Especialidades
+              </span>
+              <div className="mt-10 grid grid-cols-1 gap-px sm:grid-cols-[1fr_1px_1fr]">
+                <div className="flex flex-col">
+                  <span className="mb-6 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]/50">
+                    Saúde & Corpo
+                  </span>
+                  {[
+                    'Obesidade',
+                    'Emagrecimento',
+                    'Cirurgia Bariátrica',
+                    'Endometriose',
+                  ].map(t => (
+                    <p
+                      key={t}
+                      className="border-t border-[#556040]/15 py-2.5 text-sm text-[#2D2D2D]/80"
+                    >
+                      {t}
+                    </p>
+                  ))}
+                </div>
+                <div className="hidden bg-[#556040]/15 sm:block" />
+                <div className="mt-12 flex flex-col sm:mt-0 sm:pl-16">
+                  <span className="mb-6 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#556040]/50">
+                    Abordagem
+                  </span>
+                  {[
+                    'Transtornos Alimentares',
+                    'Terapia Cognitivo Comportamental',
+                  ].map(t => (
+                    <p
+                      key={t}
+                      className="border-t border-[#556040]/15 py-2.5 text-sm text-[#2D2D2D]/80"
+                    >
+                      {t}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -652,49 +663,39 @@ export function LabLanding({
             {/* Divider */}
             <div className="h-28 w-px shrink-0 bg-[#556040]/15" />
 
-            {/* Avatar + Info */}
-            <div className="flex flex-1 items-center gap-5">
-              <div className="relative size-32 shrink-0 overflow-hidden rounded-full ring-1 ring-[#556040]/20">
-                <Image
-                  src="/thais dantas.png"
-                  alt="Thais Dantas"
-                  fill
-                  className="object-cover object-top"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <p className="text-base font-medium text-[#2D2D2D]">
-                  Thais Dantas
-                </p>
-                <p className="text-sm text-[#2D2D2D]/55">Psicóloga — CRP 09/</p>
-                <p className="text-sm text-[#2D2D2D]/55">
-                  Especialista em Saúde Alimentar
-                </p>
-                <div className="mt-1 flex flex-col gap-1">
-                  <a
-                    href="tel:+5562992016959"
-                    className="inline-flex items-center gap-1.5 text-sm text-[#556040] hover:opacity-75 transition-opacity"
+            {/* Info */}
+            <div className="flex flex-1 flex-col gap-1.5">
+              <p className="text-base font-medium text-[#2D2D2D]">
+                Thais Dantas
+              </p>
+              <p className="text-sm text-[#2D2D2D]/55">Psicóloga — CRP 09/</p>
+              <p className="text-sm text-[#2D2D2D]/55">
+                Especialista em Saúde Alimentar
+              </p>
+              <div className="mt-1 flex flex-col gap-1">
+                <a
+                  href="tel:+5562992016959"
+                  className="inline-flex items-center gap-1.5 text-sm text-[#556040] hover:opacity-75 transition-opacity"
+                >
+                  <Phone className="size-3.5" strokeWidth={1.5} />
+                  (62) 9 9201-6959
+                </a>
+                <a
+                  href={WHATSAPP_BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-[#556040] hover:opacity-75 transition-opacity"
+                >
+                  <svg
+                    className="size-3.5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
                   >
-                    <Phone className="size-3.5" strokeWidth={1.5} />
-                    (62) 9 9201-6959
-                  </a>
-                  <a
-                    href={WHATSAPP_BOOKING_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm text-[#556040] hover:opacity-75 transition-opacity"
-                  >
-                    <svg
-                      className="size-3.5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.112 1.523 5.84L0 24l6.338-1.499A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.652-.493-5.184-1.357l-.372-.22-3.862.913.978-3.768-.242-.387A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
-                    </svg>
-                    WhatsApp
-                  </a>
-                </div>
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.112 1.523 5.84L0 24l6.338-1.499A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.652-.493-5.184-1.357l-.372-.22-3.862.913.978-3.768-.242-.387A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                  </svg>
+                  WhatsApp
+                </a>
               </div>
             </div>
 
