@@ -14,6 +14,7 @@ import { db } from './index'
 import {
   blogCategories,
   blogPostCategories,
+  blogPostViews,
   blogPosts,
   type BlogPost,
   type NewBlogPost,
@@ -34,7 +35,10 @@ async function getCategoriesForPost(
   return executor
     .select({ id: blogCategories.id, name: blogCategories.name })
     .from(blogPostCategories)
-    .innerJoin(blogCategories, eq(blogPostCategories.categoryId, blogCategories.id))
+    .innerJoin(
+      blogCategories,
+      eq(blogPostCategories.categoryId, blogCategories.id)
+    )
     .where(eq(blogPostCategories.postId, postId))
     .orderBy(asc(blogCategories.name))
 }
@@ -53,7 +57,10 @@ async function getCategoriesForPosts(
       name: blogCategories.name,
     })
     .from(blogPostCategories)
-    .innerJoin(blogCategories, eq(blogPostCategories.categoryId, blogCategories.id))
+    .innerJoin(
+      blogCategories,
+      eq(blogPostCategories.categoryId, blogCategories.id)
+    )
     .where(inArray(blogPostCategories.postId, postIds))
     .orderBy(asc(blogCategories.name))
 
@@ -70,7 +77,9 @@ async function setPostCategories(
   categoryIds: string[],
   tx: Executor
 ) {
-  await tx.delete(blogPostCategories).where(eq(blogPostCategories.postId, postId))
+  await tx
+    .delete(blogPostCategories)
+    .where(eq(blogPostCategories.postId, postId))
   if (categoryIds.length > 0) {
     await tx
       .insert(blogPostCategories)
@@ -332,6 +341,10 @@ export async function getPublishedPostBySlug(slug: string) {
     .set({ views: sql`${blogPosts.views} + 1` })
     .where(eq(blogPosts.id, row.id))
     .catch(err => console.error('[blog] falha ao incrementar views', err))
+
+  db.insert(blogPostViews)
+    .values({ postId: row.id })
+    .catch(err => console.error('[blog] falha ao registrar view log', err))
 
   const categories = await getCategoriesForPost(row.id)
   return { ...row, categories }

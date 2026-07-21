@@ -108,6 +108,39 @@ export const blogPostCategories = pgTable(
 
 export type BlogPostCategory = typeof blogPostCategories.$inferSelect
 
+/** Visitas ao site (uma linha por page load público, via beacon do client). */
+export const pageViews = pgTable(
+  'page_views',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    path: text('path').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [index('idx_page_views_created_at').on(t.createdAt)]
+)
+
+export type PageView = typeof pageViews.$inferSelect
+export type NewPageView = typeof pageViews.$inferInsert
+
+/** Histórico de leituras por artigo (permite calcular "mais lido" por período). */
+export const blogPostViews = pgTable(
+  'blog_post_views',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => blogPosts.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  t => [index('idx_blog_post_views_post_id').on(t.postId, t.createdAt)]
+)
+
+export type BlogPostView = typeof blogPostViews.$inferSelect
+
 // ─── Better Auth tables ──────────────────────────────────────────────────────
 
 export const authUsers = pgTable('auth_user', {

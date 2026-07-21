@@ -31,6 +31,9 @@ export async function proxy(req: NextRequest) {
   // Passa direto: endpoints internos do Better Auth
   if (pathname.startsWith('/api/auth')) return NextResponse.next()
 
+  // Passa direto: registro de visitas ao site (endpoint público, sem sessão)
+  if (pathname === '/api/track/view') return NextResponse.next()
+
   // Passa direto: página de login
   if (pathname === '/manager/login') return NextResponse.next()
 
